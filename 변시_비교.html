@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>베리타스 PASS:ON — 이렇게 달라집니다 (헌법 · 금동흠)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1F3C; --navy2:#12294d; --panel:#152a4d; --panel2:#1b3358;
+  --line:#284872; --gold:#C9A227; --gold2:#e5be44;
+  --ink:#eaf0fb; --sub:#9db0cf; --dim:#6f85a8; --ok:#4a9d7f; --org:#d98a45;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--navy);color:var(--ink);font-family:'Noto Sans KR',sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.top{background:linear-gradient(135deg,var(--navy),var(--navy2));border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40}
+.topin{display:flex;align-items:center;gap:16px;padding:13px 20px;max-width:1080px;margin:0 auto;flex-wrap:wrap}
+.brand{font-family:'Noto Serif KR',serif;font-weight:900;color:var(--gold);font-size:1.1rem}
+.brand small{font-family:'Noto Sans KR';font-weight:500;color:var(--sub);font-size:.72rem;margin-left:8px}
+.back{margin-left:auto;border:1px solid var(--gold);background:none;color:var(--gold);font-size:.76rem;font-weight:700;border-radius:999px;padding:7px 16px;cursor:pointer;transition:.2s}
+.back:hover{background:var(--gold);color:var(--navy)}
+.head{text-align:center;padding:34px 0 8px}
+.head .eyebrow{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.14em;color:var(--navy);background:var(--gold);padding:4px 12px;border-radius:999px;margin-bottom:14px}
+.head h1{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.8rem;margin:0 0 8px}
+.head h1 .hl{color:var(--gold)}
+.head p{color:var(--sub);font-size:.92rem;margin:0}
+
+/* split panels */
+.split{margin:24px 0 10px;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.pane{position:relative}
+.pane .plabel{position:absolute;left:16px;top:14px;z-index:5;display:flex;align-items:center;gap:8px;
+  font-size:.78rem;font-weight:700;padding:5px 12px;border-radius:999px}
+.pane.before .plabel{background:#26364d;color:var(--sub)}
+.pane.after .plabel{background:var(--gold);color:var(--navy)}
+.divider{display:flex;align-items:center;justify-content:center;gap:12px;background:var(--navy);padding:10px;position:relative}
+.divider::before,.divider::after{content:"";height:1px;flex:1;background:var(--line)}
+.divider .vs{font-family:'Noto Serif KR',serif;font-weight:900;color:var(--gold);font-size:1.05rem;padding:4px 16px;border:1px solid var(--gold);border-radius:999px;background:var(--navy2)}
+
+/* ── BEFORE : 고시닷컴 재현(밝은 테마, 일부러 난잡) ── */
+.gosi{background:#f4f5f7;color:#222;padding:52px 20px 22px;font-size:.84rem}
+.gosi .gbar{position:absolute;top:0;left:0;right:0;background:#111;color:#fff;font-size:.68rem;padding:6px 16px;display:flex;gap:8px;align-items:center}
+.gosi .gbar .w{background:#e11;color:#fff;font-weight:900;padding:1px 6px;border-radius:3px;font-size:.6rem}
+.gosi .gbrand{font-weight:900;font-size:1.05rem;color:#0a7;margin-bottom:14px}
+.gosi .gbrand span{color:#333}
+.gosi h4{margin:0 0 4px;font-size:1rem;color:#111}
+.gosi .gsub{color:#888;font-size:.74rem;margin-bottom:12px}
+.glist{background:#fff;border:1px solid #ddd;border-radius:6px;max-height:250px;overflow-y:auto}
+.grow{display:flex;align-items:center;gap:10px;padding:9px 13px;border-bottom:1px solid #eee;font-size:.78rem}
+.grow:last-child{border-bottom:none}
+.grow .gh{width:38px;height:38px;border-radius:50%;background:#dde;flex:none;display:grid;place-items:center;color:#889;font-size:.7rem}
+.grow .gt{flex:1;color:#333}
+.grow .gt b{color:#c50;font-weight:700}
+.grow .gvod{font-size:.64rem;color:#08a;border:1px solid #08a;border-radius:3px;padding:1px 5px}
+.grow .gprc{font-weight:700;color:#111;width:78px;text-align:right}
+.gbuy{margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.gbuy .gonly{background:#f60;color:#fff;font-weight:700;border:none;border-radius:5px;padding:11px 20px;font-size:.86rem;cursor:default}
+.gbuy .gtot{font-weight:900;color:#c50;font-size:1.05rem}
+.gbuy .gtot s{color:#aaa;font-weight:400;font-size:.8rem}
+.gflaws{margin-top:14px;display:flex;flex-direction:column;gap:5px}
+.gflaw{display:flex;gap:8px;align-items:flex-start;font-size:.76rem;color:#a33}
+.gflaw .x{color:#c00;font-weight:900;flex:none}
+.gflaw b{color:#922}
+
+/* ── AFTER : PASS:ON ── */
+.pass{background:linear-gradient(160deg,var(--panel),var(--navy2));padding:52px 20px 24px}
+.pass .rxbanner{background:linear-gradient(135deg,#1c355c,#12294d);border:1px solid var(--gold);border-radius:12px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pass .rxbanner .dx{font-size:.74rem;color:var(--sub)}
+.pass .rxbanner .verd{font-family:'Noto Serif KR',serif;font-weight:900;color:var(--gold2);font-size:1.12rem}
+.pass .rxbanner .arrow{color:var(--gold);font-size:1.1rem}
+.pass .rxbanner .pick{font-size:.82rem;color:var(--ink)}
+.pass .rxbanner .pick b{color:var(--gold2)}
+.ptoc{background:var(--navy2);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.prow{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:.82rem}
+.prow:last-child{border-bottom:none}
+.prow.weak{background:#173059}
+.prow .pcaret{color:var(--gold);font-size:.72rem;width:12px;flex:none}
+.prow .pnm{flex:1}
+.prow .pw{font-size:.66rem;font-weight:700;color:var(--navy);background:var(--org);border-radius:5px;padding:2px 7px}
+.prow .plnk{display:flex;gap:5px;flex-wrap:wrap}
+.prow .plnk span{font-size:.66rem;color:var(--sub);border:1px solid var(--line);border-radius:5px;padding:2px 7px}
+.prow .plnk span.sell{color:var(--gold2);border-color:var(--gold)}
+.prow .pprc{font-size:.74rem;color:var(--gold2);font-weight:700;width:60px;text-align:right}
+.prow .pbuy{font-size:.66rem;font-weight:700;color:var(--gold);border:1px solid var(--gold);border-radius:6px;padding:3px 9px}
+.prow .plock{color:var(--dim);width:12px;flex:none}
+.pgood{margin-top:14px;display:flex;flex-direction:column;gap:5px}
+.pg{display:flex;gap:8px;align-items:flex-start;font-size:.78rem;color:#a7e0c8}
+.pg .c{color:var(--ok);font-weight:900;flex:none}
+.pg b{color:#c8ead9}
+
+/* bottom cta */
+.cta{text-align:center;padding:22px 0 44px}
+.cta a{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,var(--gold),var(--gold2));
+  color:var(--navy);font-weight:900;font-size:.92rem;text-decoration:none;padding:13px 26px;border-radius:11px;transition:.16s}
+.cta a:hover{filter:brightness(1.06)}
+.foot{color:var(--dim);font-size:.7rem;text-align:center;padding:0 20px 40px;line-height:1.7}
+@media(max-width:640px){.head h1{font-size:1.4rem}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="topin">
+    <div class="brand">베리타스 PASS:ON <small>이렇게 달라집니다 · 헌법(금동흠)</small></div>
+    <button class="back" onclick="history.length>1?history.back():location.href='변시_학습포털.html'">← 데모로 돌아가기</button>
+  </div>
+</div>
+<div class="wrap">
+  <div class="head">
+    <span class="eyebrow">BEFORE / AFTER · 같은 강의, 다른 판매</span>
+    <h1>25강을 <span class="hl">통으로 사던 화면</span>이, 이렇게 바뀝니다</h1>
+    <p>판단할 수 없던 화면이 진단으로, 쌓이던 동영상이 매출로, 통묶음 하나가 강의·교재·PDF 세 갈래 판매로.</p>
+  </div>
+
+  <div class="split">
+    <!-- BEFORE -->
+    <div class="pane before">
+      <span class="plabel">지금 · 고시닷컴</span>
+      <div class="gosi">
+        <div class="gbar"><span class="w">WARNING</span><span>고시닷컴은 정당한 이용자의 권리보호를 위해 저작권법에 의거 불법 복제를 금합니다.</span></div>
+        <div class="gbrand">gosi.com <span>| 변호사시험</span></div>
+        <h4>26년 06월 [2027대비] 금동흠 이론/사례 단권화 헌법 강의</h4>
+        <div class="gsub">스파르타 1기 · 수강기간 31일 · 2배수 · 강의수 25강</div>
+        <div class="glist">
+          <div class="grow"><span class="gh">1</span><span class="gt">(0605-1) 수험 방법론</span><span class="gvod">VOD+MOBILE</span></div>
+          <div class="grow"><span class="gh">2</span><span class="gt">(0605-2) 헌법소원 요건 중 청구인 능력</span><span class="gvod">VOD+MOBILE</span></div>
+          <div class="grow"><span class="gh">3</span><span class="gt">(0605-3) 헌법소원 요건 중 대상</span><span class="gvod">VOD+MOBILE</span></div>
+          <div class="grow"><span class="gh">4</span><span class="gt">(0606-1) 제1회 모의고사 해설</span><span class="gvod">VOD+MOBILE</span></div>
+          <div class="grow"><span class="gh">5</span><span class="gt">(0606-2) 위헌소원 p.23</span><span class="gvod">VOD+MOBILE</span></div>
+          <div class="grow"><span class="gh">6</span><span class="gt">(0606-3) 위헌소원 사례풀이</span><span class="gvod">VOD+MOBILE</span></div>
+          <div class="grow"><span class="gh">7</span><span class="gt">(0608-1) 제2회 모의고사 해설</span><span class="gvod">VOD+MOBILE</span></div>
+          <div class="grow"><span class="gh">8</span><span class="gt">(0608-2) 권한쟁의심판 p.31</span><span class="gvod">VOD+MOBILE</span></div>
+          <div class="grow"><span class="gh">9</span><span class="gt">(0608-3) 헌법개정과 개정의 한계 p.48</span><span class="gvod">VOD+MOBILE</span></div>
+          <div class="grow"><span class="gh">…</span><span class="gt">… 제25강까지 (모의고사 해설·방법론 뒤섞임)</span></div>
+        </div>
+        <div class="gbuy">
+          <button class="gonly">장바구니 담기 (25강 전체)</button>
+          <span class="gtot"><s>328,000원</s> 252,000원</span>
+        </div>
+        <div class="gflaws">
+          <div class="gflaw"><span class="x">✕</span> <b>수강생이 어떤 강의를 들을지 스스로 판단할 수 없다</b> — 진단·안내가 없다</div>
+          <div class="gflaw"><span class="x">✕</span> <b>동영상이 팔리지 않고 쌓이기만 한다</b> — 좋은 강의가 매출로 이어지지 못한다</div>
+          <div class="gflaw"><span class="x">✕</span> <b>판매는 25강 통묶음 하나</b> — 교재·자료도 따로 팔 길이 없다</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"><span class="vs">VS</span></div>
+
+    <!-- AFTER -->
+    <div class="pane after">
+      <span class="plabel">PASS:ON</span>
+      <div class="pass">
+        <div class="rxbanner">
+          <span class="dx">헌법 자가진단 결과</span>
+          <span class="verd">심화 단계부터</span>
+          <span class="arrow">→</span>
+          <span class="pick">취약 목차 <b>위헌소원</b>을 여기부터 — 진단이 골라 줍니다</span>
+        </div>
+        <div class="ptoc">
+          <div class="prow weak"><span class="pcaret">▾</span><span class="pnm">위헌소원 <span style="color:var(--dim);font-size:.72rem">p.23</span></span><span class="pw">진단 취약 · 여기부터</span>
+            <span class="plnk"><span class="sell">강의 재생</span><span class="sell">교재 구매</span><span class="sell">PDF 낱개</span><span>💬 AI</span></span></div>
+          <div class="prow weak"><span class="pcaret">▸</span><span class="pnm">위헌소원 사례풀이</span><span class="pw">진단 취약</span><span class="pprc">9,900원</span></div>
+          <div class="prow"><span class="plock">🔒</span><span class="pnm">권한쟁의심판 <span style="color:var(--dim);font-size:.72rem">p.31</span></span><span class="pprc">9,900원</span><span class="pbuy">지금 결제</span></div>
+          <div class="prow"><span class="plock">🔒</span><span class="pnm">기본권 총론 <span style="color:var(--dim);font-size:.72rem">p.92</span></span><span class="pprc">9,900원</span><span class="pbuy">지금 결제</span></div>
+          <div class="prow"><span class="plock">🔒</span><span class="pnm">재산권 <span style="color:var(--dim);font-size:.72rem">p.152</span></span><span class="pprc">9,900원</span><span class="pbuy">지금 결제</span></div>
+          <div class="prow"><span class="plock" style="color:var(--dim)">…</span><span class="pnm" style="color:var(--dim)">… 개념·쟁점 목차만 17개 (모의고사 해설·방법론 제외)</span></div>
+        </div>
+        <div class="pgood">
+          <div class="pg"><span class="c">✓</span> <b>진단이 들을 강의를 판단해 준다</b> — 수준·취약 목차를 짚어 처방</div>
+          <div class="pg"><span class="c">✓</span> <b>쌓여 있던 동영상이 팔리기 시작한다</b> — 진단이 강의로, 취약부분이 수강으로 연결</div>
+          <div class="pg"><span class="c">✓</span> <b>목차마다 강의료 + 교재 + 낱개 PDF, 세 갈래로 판매</b> — 하나의 목차가 세 번 판다</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta">
+    <a href="변시_진단처방여정.html">아래 화면을 직접 눌러보기 — 진단 → 처방 → 순환 →</a>
+  </div>
+</div>
+<div class="foot">
+  본 화면은 시연용 데모입니다. 위쪽은 고시닷컴 단강 화면(2027 대비 금동흠 헌법)을 참고해 재현한 예시이며, 실제와 다를 수 있습니다.<br>
+  1행2필 행정법구조연구소 × 베리타스법학원 제안 자료 · 2026. 8.
+</div>
+</body>
+</html>

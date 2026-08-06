@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>변호사시험 연간 로드맵 계산기</title>
+<style>
+  :root{
+    --ink:#16203A; --muted:#6B7488; --line:#E3E7EF; --paper:#F4F6FA; --card:#fff;
+    --accent:#3B5BDB; --accent-soft:#E8EDFB; --danger:#c0435f; --danger-soft:#fbe7ec;
+    --ok:#1f9d6b; --ok-soft:#e7f4ee; --p1:#3B5BDB; --p2:#c0435f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","맑은 고딕",sans-serif;
+    background:var(--paper); color:var(--ink); line-height:1.6;
+    -webkit-font-smoothing:antialiased; padding:26px 14px 80px;
+  }
+  .wrap{max-width:720px;margin:0 auto}
+
+  /* 활용법 가이드 */
+  .guide{
+    background:linear-gradient(135deg,#eef2ff,#e8edfb);border:1px solid #d4dcf5;
+    border-radius:14px;margin-bottom:20px;overflow:hidden;
+  }
+  .guide-head{
+    width:100%;display:flex;justify-content:space-between;align-items:center;
+    background:none;border:none;cursor:pointer;padding:15px 20px;font:inherit;
+  }
+  .gh-title{font-size:14.5px;font-weight:800;color:var(--accent)}
+  .gh-arrow{font-size:12px;color:var(--accent);transition:transform .25s}
+  .gh-arrow.closed{transform:rotate(180deg)}
+  .guide-body{padding:0 20px 18px;display:flex;flex-direction:column;gap:12px}
+  .guide-body.closed{display:none}
+  .gstep{display:flex;gap:12px;align-items:flex-start}
+  .gnum{
+    flex:0 0 auto;width:24px;height:24px;border-radius:7px;background:var(--accent);color:#fff;
+    font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px;
+  }
+  .gtext{font-size:13.5px;color:var(--ink);line-height:1.6}
+  .gtext b{font-weight:800}
+  .gc{display:inline-block;font-size:11.5px;font-weight:800;padding:1px 9px;border-radius:20px;margin:0 1px}
+  .gc.ok{background:var(--ok-soft);color:var(--ok)}
+  .gc.tight{background:#fbf4e5;color:#c9821a}
+  .gc.over{background:var(--danger-soft);color:var(--danger)}
+
+  .head{text-align:center;margin-bottom:20px}
+  .head .kicker{
+    display:inline-block;font-size:12px;font-weight:700;letter-spacing:1.5px;color:#fff;
+    background:linear-gradient(100deg,#3a4fd0,#5847d4);padding:6px 16px;border-radius:30px;margin-bottom:12px;
+  }
+  .head h1{font-size:24px;font-weight:800;letter-spacing:-0.6px}
+  .head p{margin-top:8px;font-size:14px;color:var(--muted)}
+
+  /* 요약 바 (상단 고정 결과) */
+  .summary{
+    position:sticky;top:10px;z-index:5;
+    background:linear-gradient(135deg,#1a2350,#3a4fd0);border-radius:16px;padding:18px 22px;
+    color:#fff;margin-bottom:20px;box-shadow:0 8px 24px rgba(26,35,80,.22);
+  }
+  .summary .srow{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+  .summary .sitem{text-align:center;flex:1;min-width:100px}
+  .summary .sl{font-size:11.5px;font-weight:700;opacity:.85;margin-bottom:3px}
+  .summary .sv{font-size:24px;font-weight:900;letter-spacing:-0.5px}
+  .summary .sv span{font-size:13px;font-weight:700}
+  .summary .verdict-box{
+    margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.18);
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .summary .verdict{
+    font-size:13.5px;font-weight:700;text-align:center;line-height:1.5;
+  }
+  .summary .verdict.ok{color:#8ef0c0}
+  .summary .verdict.tight{color:#ffd98a}
+  .summary .verdict.over{color:#ff9db0}
+  .summary .verdict .vtag{
+    display:inline-block;font-size:11px;font-weight:800;padding:2px 9px;border-radius:20px;
+    background:rgba(255,255,255,.16);color:#fff;margin-right:6px;vertical-align:middle;
+  }
+
+  /* 그룹 */
+  .group{margin-bottom:18px}
+  .group-title{
+    font-size:13px;font-weight:800;color:#fff;border-radius:8px;padding:6px 14px;
+    display:inline-block;margin-bottom:10px;letter-spacing:0.3px;
+  }
+  .group-title.g1{background:var(--p1)}
+  .group-title.g2{background:var(--p2)}
+
+  /* 강의 행 */
+  .course{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:9px;
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;transition:border-color .15s,opacity .15s;
+  }
+  .course.off{opacity:.5}
+  .course .chk{flex:0 0 auto;width:22px;height:22px;cursor:pointer;accent-color:var(--accent)}
+  .course .cinfo{flex:1;min-width:130px}
+  .course .cname{font-size:14.5px;font-weight:800}
+  .course .cmeta{font-size:12px;color:var(--muted);margin-top:1px}
+  .course .inputs{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .field{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .field label{font-size:10.5px;font-weight:700;color:var(--muted)}
+  .field input{
+    width:64px;font:inherit;font-size:15px;font-weight:700;text-align:center;
+    border:1.5px solid var(--line);border-radius:9px;padding:7px 4px;color:var(--ink);
+  }
+  .field input:focus{outline:none;border-color:var(--accent)}
+  .field .days{
+    font-size:16px;font-weight:800;color:var(--accent);min-width:52px;text-align:center;
+  }
+  .field .days span{font-size:12px;font-weight:700;color:var(--muted)}
+
+  .note{font-size:12.5px;color:var(--muted);margin:16px 0 8px;line-height:1.6;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .note b{color:var(--ink)}
+
+  .reset{
+    display:block;margin:18px auto 0;font:inherit;font-size:13px;font-weight:700;color:var(--muted);
+    background:none;border:1px solid var(--line);border-radius:30px;padding:9px 20px;cursor:pointer;
+  }
+  .reset:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* 하루 학습량 슬라이더 (1차/2차) */
+  .presets{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:16px 20px;margin-bottom:18px;display:flex;flex-direction:column;gap:18px;
+  }
+  .slider-block{}
+  .slider-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .slider-name{font-size:13px;font-weight:800;color:#fff;border-radius:8px;padding:4px 12px}
+  .slider-name.s1c{background:var(--p1)}
+  .slider-name.s2c{background:var(--p2)}
+  .slider{
+    width:100%;-webkit-appearance:none;appearance:none;height:8px;border-radius:99px;
+    background:linear-gradient(90deg,var(--accent-soft),var(--accent));outline:none;cursor:pointer;
+  }
+  .slider.slider-2{background:linear-gradient(90deg,var(--danger-soft),var(--danger))}
+  .slider::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);border:3px solid #fff;box-shadow:0 2px 8px rgba(59,91,219,.4);cursor:pointer;
+  }
+  .slider.slider-2::-webkit-slider-thumb{background:var(--danger);box-shadow:0 2px 8px rgba(192,67,95,.4)}
+  .slider::-moz-range-thumb{
+    width:26px;height:26px;border-radius:50%;background:var(--accent);
+    border:3px solid #fff;box-shadow:0 2px 8px rgba(59,91,219,.4);cursor:pointer;
+  }
+  .slider.slider-2::-moz-range-thumb{background:var(--danger)}
+  .slider-val{font-size:15px;font-weight:800;color:var(--accent);white-space:nowrap}
+  .slider-val b{font-size:20px}
+  .slider-2 ~ .slider-ticks{}
+  .slider-block:last-child .slider-val{color:var(--danger)}
+  .slider-ticks{display:flex;justify-content:space-between;margin-top:8px;padding:0 2px}
+  .slider-ticks span{font-size:11px;font-weight:700;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <span class="kicker">변호사시험 · 연간 로드맵 계산기</span>
+    <h1>내가 만들어가는 나만의 합격 로드맵</h1>
+    <p>들을 과정과 하루 강의수를 정하면 — 변시일까지 완주 가능한지 자동 판정됩니다.</p>
+  </div>
+
+  <!-- 활용법 가이드 (접이식) -->
+  <div class="guide" id="guide">
+    <button class="guide-head" id="guideToggle">
+      <span class="gh-title">📖 사용법 — 3단계면 끝납니다</span>
+      <span class="gh-arrow" id="guideArrow">▲</span>
+    </button>
+    <div class="guide-body" id="guideBody">
+      <div class="gstep">
+        <span class="gnum">1</span>
+        <div class="gtext"><b>내가 들을 과정을 고르세요.</b> 왼쪽 체크박스로 선택합니다. 초시생은 전 과정을, 재시생은 진단 결과에 따라 필요한 과정만 체크하세요.</div>
+      </div>
+      <div class="gstep">
+        <span class="gnum">2</span>
+        <div class="gtext"><b>하루에 몇 강 들을지 정하세요.</b> 위쪽 <b>슬라이더</b>는 들을 강의수를 통일시킵니다(정규·답안 각각). 강의마다 다르게 하려면 각 강의의 <b>‘하루 강의’ 칸</b>을 직접 바꾸면 됩니다.</div>
+      </div>
+      <div class="gstep">
+        <span class="gnum">3</span>
+        <div class="gtext"><b>결과를 확인하세요.</b> 파란 박스에 총 소요일과 시험까지 남은 날이 뜹니다. <span class="gc ok">여유</span> <span class="gc tight">빠듯</span> <span class="gc over">초과</span> 신호를 보고 하루 강의량을 조정하면 나만의 계획이 완성됩니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 요약 바 -->
+  <div class="summary">
+    <div class="srow">
+      <div class="sitem"><div class="sl">선택한 과정</div><div class="sv" id="sumCount">0<span>개</span></div></div>
+      <div class="sitem"><div class="sl">총 강의 수</div><div class="sv" id="sumLectures">0<span>강</span></div></div>
+      <div class="sitem"><div class="sl">총 소요 기간</div><div class="sv" id="sumDays">0<span>일</span></div></div>
+      <div class="sitem"><div class="sl">시험까지</div><div class="sv" id="sumDday">–<span>일</span></div></div>
+    </div>
+    <div class="verdict-box" id="verdictBox">
+      <div class="verdict" id="verdict">들을 과정을 선택해보세요.</div>
+    </div>
+  </div>
+
+  <!-- 하루 학습량 슬라이더 (1차 / 2차 각각) -->
+  <div class="presets">
+    <div class="slider-block">
+      <div class="slider-top"><span class="slider-name s1c">정규 강의</span><div class="slider-val"><b id="sliderVal1">3</b>강 / 일</div></div>
+      <input type="range" id="allSlider1" min="3" max="8" step="1" value="3" class="slider">
+      <div class="slider-ticks"><span>3강</span><span>4강</span><span>5강</span><span>6강</span><span>7강</span><span>8강</span></div>
+    </div>
+    <div class="slider-block">
+      <div class="slider-top"><span class="slider-name s2c">답안 훈련</span><div class="slider-val"><b id="sliderVal2">5</b>강 / 일</div></div>
+      <input type="range" id="allSlider2" min="3" max="8" step="1" value="5" class="slider slider-2">
+      <div class="slider-ticks"><span>3강</span><span>4강</span><span>5강</span><span>6강</span><span>7강</span><span>8강</span></div>
+    </div>
+  </div>
+
+  <!-- 1차 -->
+  <div class="group">
+    <div style="background:#FFF8E6;border:1px solid #F5DFA0;border-radius:12px;padding:13px 16px;margin-bottom:14px;font-size:13px;color:#6B5312;line-height:1.6">
+      ✅ <b>강의 수는 7법 합계 근사치</b>입니다 — 실제 편성이 확정되면 <b>강의 수 칸을 직접 수정</b>하세요.<br>재시생은 면제 과정의 체크를 해제하면 <b>나만의 로드맵</b>이 됩니다.
+    </div>
+    <span class="group-title g1">정규 강의 과정</span>
+    <div id="group1"></div>
+  </div>
+
+  <!-- 2차 -->
+  <div class="group">
+    <span class="group-title g2">답안 훈련 과정</span>
+    <div id="group2"></div>
+  </div>
+
+  <div class="note">
+    <b>강의 수는 그 해 편성에 따라 달라집니다.</b> 각 강의의 강의 수 칸을 직접 고쳐서 올해 실제 강의 수로 맞출 수 있습니다.
+    소요일은 <b>강의 수 ÷ 하루 강의량</b>으로 계산되며, 주말·복습일은 별도로 감안하세요.
+  </div>
+
+  <button class="reset" id="resetBtn">↺ 처음 상태로</button>
+
+</div>
+
+<script>
+/* ===== 강의 데이터 (근사치 · 매년 이 값만 고치면 됨) ===== */
+const COURSES = [
+  // phase 1 = 정규 강의(선택형·이론), phase 2 = 답안 훈련(사례형·기록형)
+  // 강의 수는 7법(헌법·민법·형법·행정법·민소법·형소법·상법) 합계 근사치 — 편성 확정 시 직접 수정
+  { id:"intro",  phase:1, name:"입문이론",   lectures:14,  perDay:3, on:true,  desc:"7법 × 2강 오리엔테이션" },
+  { id:"base",   phase:1, name:"기본이론",   lectures:420, perDay:3, on:true,  desc:"민법 90 · 형법 70 · 헌법 55 · 행정법 55 · 민소법 55 · 형소법 55 · 상법 40" },
+  { id:"prob",   phase:1, name:"문제풀이",   lectures:210, perDay:3, on:true,  desc:"7법 각 30강 내외 — 선택형 5지택일 대비" },
+  { id:"deep",   phase:1, name:"심화이론",   lectures:140, perDay:3, on:true,  desc:"7법 각 20강 내외 — 고난도·최신판례" },
+  { id:"final",  phase:1, name:"파이널",     lectures:70,  perDay:3, on:true,  desc:"7법 각 10강 — 전범위 총정리" },
+  { id:"case2",  phase:2, name:"사례형 답안훈련", lectures:84, perDay:2, on:true, desc:"7법 각 12회 — 목차·현출·첨삭 연동" },
+  { id:"rec2",   phase:2, name:"기록형 CBT 훈련", lectures:35, perDay:2, on:true, desc:"공법·민사·형사 기록 — 실전 화면·타이핑 환경" },
+  { id:"mock2",  phase:2, name:"전범위 모의고사", lectures:21, perDay:2, on:false, desc:"선택·사례·기록 통합 3회 × 7세트" },
+];
+
+/* ===== 시험일 자동 계산 (변호사시험 · 1월 둘째 주 화요일 시작 근사) ===== */
+function secondTuesdayOfJan(y){let d=new Date(y,0,1);while(d.getDay()!==2)d.setDate(d.getDate()+1);d.setDate(d.getDate()+7);return d;}
+const TODAY=new Date();TODAY.setHours(0,0,0,0);
+let examYear=TODAY.getFullYear();
+if(TODAY>secondTuesdayOfJan(examYear))examYear+=1;
+const EXAM1=secondTuesdayOfJan(examYear);
+const EXAM2=EXAM1; // 변시는 단일 시험 — 답안 훈련도 같은 D-day
+function ddayTo(t){return Math.round((new Date(t.getFullYear(),t.getMonth(),t.getDate())-TODAY)/86400000);}
+
+/* ===== 렌더 ===== */
+function courseRow(c){
+  return `
+  <div class="course ${c.on?'':'off'}" data-id="${c.id}">
+    <input type="checkbox" class="chk" ${c.on?'checked':''}>
+    <div class="cinfo">
+      <div class="cname">${c.name}</div>
+      <div class="cmeta">${c.desc}</div>
+    </div>
+    <div class="inputs">
+      <div class="field">
+        <label>강의 수</label>
+        <input type="number" class="in-lec" value="${c.lectures}" min="0">
+      </div>
+      <div class="field">
+        <label>하루 강의</label>
+        <input type="number" class="in-per" value="${c.perDay}" min="1">
+      </div>
+      <div class="field">
+        <label>소요일</label>
+        <div class="days"><b class="out-days">0</b><span>일</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function render(){
+  document.getElementById("group1").innerHTML = COURSES.filter(c=>c.phase===1).map(courseRow).join("");
+  document.getElementById("group2").innerHTML = COURSES.filter(c=>c.phase===2).map(courseRow).join("");
+  bindEvents();
+  recalc();
+}
+
+function bindEvents(){
+  document.querySelectorAll(".course").forEach(row=>{
+    const c = COURSES.find(x=>x.id===row.dataset.id);
+    const chk = row.querySelector(".chk");
+    const lec = row.querySelector(".in-lec");
+    const per = row.querySelector(".in-per");
+    chk.onchange = ()=>{ c.on = chk.checked; row.classList.toggle("off", !c.on); recalc(); };
+    lec.oninput = ()=>{ c.lectures = parseInt(lec.value)||0; recalc(); };
+    per.oninput = ()=>{ c.perDay = Math.max(1, parseInt(per.value)||1); recalc(); };
+  });
+}
+
+function recalc(){
+  let totalLec=0, totalDays=0, count=0;
+  let days1=0, days2=0;  // 1차 소요일, 2차 소요일 각각
+  COURSES.forEach(c=>{
+    const row = document.querySelector(`.course[data-id="${c.id}"]`);
+    const days = c.perDay>0 ? Math.ceil(c.lectures / c.perDay) : 0;
+    row.querySelector(".out-days").textContent = c.on ? days : 0;
+    if(c.on){
+      totalLec += c.lectures; totalDays += days; count++;
+      if(c.phase===1) days1 += days;
+      else days2 += days;
+    }
+  });
+  document.getElementById("sumCount").innerHTML = count + '<span>개</span>';
+  document.getElementById("sumLectures").innerHTML = totalLec + '<span>강</span>';
+  document.getElementById("sumDays").innerHTML = totalDays + '<span>일</span>';
+
+  const has1 = COURSES.some(c=>c.on && c.phase===1);
+  const has2 = COURSES.some(c=>c.on && c.phase===2);
+  const dday1 = ddayTo(EXAM1);
+  const dday2 = ddayTo(EXAM2);
+
+  // 요약 상단 D-day: 2차 선택 시 2차, 아니면 1차 기준
+  const headDday = has2 ? dday2 : dday1;
+  document.getElementById("sumDday").innerHTML = (headDday>0?headDday:0) + '<span>일</span>';
+
+  const box = document.getElementById("verdictBox");
+
+  if(count===0){
+    box.innerHTML = '<div class="verdict">들을 과정을 선택해보세요.</div>';
+    return;
+  }
+
+  // 한 줄 판정 생성 함수
+  function makeLine(label, needDays, dday){
+    const gap = dday - needDays;
+    let cls, txt;
+    if(gap >= 30){
+      cls="ok";
+      txt = `<span class="vtag">${label}</span>시험까지 <b>D-${dday>0?dday:0}</b> · 필요 <b>${needDays}일</b> → <b>${gap}일 여유</b> 👍`;
+    } else if(gap >= 0){
+      cls="tight";
+      txt = `<span class="vtag">${label}</span>시험까지 <b>D-${dday>0?dday:0}</b> · 필요 <b>${needDays}일</b> → <b>여유 ${gap}일</b> ⚠️ 빠듯합니다`;
+    } else {
+      cls="over";
+      txt = `<span class="vtag">${label}</span>시험까지 <b>D-${dday>0?dday:0}</b> · 필요 <b>${needDays}일</b> → <b>${-gap}일 초과</b> ❗ 조정 필요`;
+    }
+    return `<div class="verdict ${cls}">${txt}</div>`;
+  }
+
+  let html = "";
+  if(has1 && has2){
+    // 정규 판정 + 전체(정규+답안) 판정 — 같은 변시일 기준
+    html += makeLine("정규", days1, dday1);
+    html += makeLine("전체", days1 + days2, dday2);
+  } else if(has2){
+    // 답안 훈련만
+    html += makeLine("답안", days2, dday2);
+  } else {
+    // 정규만
+    html += makeLine("정규", days1, dday1);
+  }
+  box.innerHTML = html;
+}
+
+/* 슬라이더: 1차 / 2차 하루 강의량 각각 일괄 변경 (3~8강) */
+function bindSlider(sliderId, valId, phase){
+  const slider = document.getElementById(sliderId);
+  const valEl = document.getElementById(valId);
+  slider.oninput = ()=>{
+    const v = parseInt(slider.value);
+    valEl.textContent = v;
+    COURSES.forEach(c=>{ if(c.phase===phase) c.perDay=v; });
+    document.querySelectorAll(`.course`).forEach(row=>{
+      const c = COURSES.find(x=>x.id===row.dataset.id);
+      if(c.phase===phase) row.querySelector(".in-per").value = v;
+    });
+    recalc();
+  };
+}
+bindSlider("allSlider1", "sliderVal1", 1);
+bindSlider("allSlider2", "sliderVal2", 2);
+
+/* 리셋 */
+const DEFAULTS = JSON.parse(JSON.stringify(COURSES));
+/* 활용법 가이드 접기/펼치기 */
+document.getElementById("guideToggle").onclick = ()=>{
+  document.getElementById("guideBody").classList.toggle("closed");
+  document.getElementById("guideArrow").classList.toggle("closed");
+};
+
+render();
+</script>
+</body>
+</html>

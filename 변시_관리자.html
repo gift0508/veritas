@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>베리타스 PASS:ON — 운영 관제실</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0d1f3c;--navy2:#1a2a4a;--line:#2e4a7d;--gold:#e8b93c;--gold-dim:#c9a227;
+--ink:#eef2fa;--sub:#9fb0cd;--mute:#63799f;--ok:#5ec98f;--alert:#e86a5a;--done:#3d5a8a}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;font-weight:300;color:var(--ink);
+background:linear-gradient(160deg,#0a1830 0%,var(--navy2) 60%,#141f3d 100%);min-height:100vh;letter-spacing:-.01em}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 70px}
+.topbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding:22px 0 16px;border-bottom:1px solid var(--line)}
+.brand{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.35rem;color:var(--gold)}
+.brand small{font-family:'Noto Sans KR';font-weight:400;font-size:.72rem;color:var(--sub);margin-left:10px}
+.mini{border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);
+font-family:'Noto Sans KR';font-size:.7rem;font-weight:500;border-radius:7px;padding:4px 10px;cursor:pointer}
+.mini:hover{border-color:var(--gold);color:var(--gold)}
+.userchip{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:.78rem;color:var(--sub)}
+.panel{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+.panel h3{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.05rem;margin-bottom:4px}
+.panel .sub{font-size:.76rem;color:var(--sub);margin-bottom:14px}
+.akpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:24px}
+.akpi{border:1px solid var(--line);border-radius:12px;padding:16px 14px;text-align:center;background:rgba(255,255,255,.03)}
+.akpi b{display:block;font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.7rem;color:var(--ink)}
+.akpi span{font-size:.68rem;color:var(--mute);letter-spacing:.08em}
+.akpi.warn2 b,.akpi.alert2 b{color:var(--alert)}
+.akpi.gold2 b{color:var(--gold)}
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px}
+@media(max-width:860px){.agrid{grid-template-columns:1fr}}
+.bars .bar{display:flex;align-items:center;gap:12px;margin:10px 0}
+.bar .bl{width:56px;font-size:.8rem;font-weight:500;flex:none}
+.bar .track{flex:1;height:13px;background:rgba(0,0,0,.28);border-radius:7px;overflow:hidden}
+.bar .fill{height:100%;border-radius:7px;background:linear-gradient(90deg,#4a7bd0,#5aa8e8)}
+.bar.weak .fill{background:linear-gradient(90deg,#c0533f,var(--alert))}
+.bar .bv{width:44px;text-align:right;font-size:.8rem;color:var(--sub);flex:none;font-variant-numeric:tabular-nums}
+/* 랭킹 */
+.rk{display:grid;grid-template-columns:52px 1.3fr .9fr .9fr .9fr 1fr;gap:8px;align-items:center;
+padding:10px 8px;border-top:1px solid rgba(255,255,255,.06);cursor:pointer;border-radius:8px;font-size:.82rem}
+.rk:hover{background:rgba(232,185,60,.07)}
+.rk.head{border-top:none;cursor:default;font-size:.66rem;color:var(--mute);letter-spacing:.06em;font-weight:700}
+.rk.head:hover{background:none}
+.rk .medal{font-size:1.15rem;text-align:center}
+.rk .rnum{font-family:'Noto Serif KR',serif;font-weight:900;text-align:center;color:var(--sub)}
+.rk .rname{font-weight:700}
+.rk .rname small{color:var(--mute);font-weight:300;font-size:.68rem;margin-left:5px}
+.rk .score{font-family:'Noto Serif KR',serif;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums}
+.rk.top1{background:rgba(232,185,60,.1);border-radius:10px}
+/* 조언 큐 */
+.adv{border:1px solid var(--line);border-radius:11px;padding:13px 15px;margin-top:10px;background:rgba(0,0,0,.14)}
+.adv .ahead{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.adv .an{font-weight:700;font-size:.88rem}
+.adv .an small{color:var(--mute);font-weight:300;font-size:.68rem;margin-left:4px}
+.tagx{font-size:.62rem;font-weight:700;border-radius:999px;padding:2px 9px;letter-spacing:.04em}
+.tagx.t-warn{color:var(--alert);border:1px solid rgba(232,106,90,.5)}
+.tagx.t-weak{color:#e8925a;border:1px solid rgba(232,146,90,.5)}
+.tagx.t-top{color:var(--ok);border:1px solid rgba(94,201,143,.4)}
+.tagx.t-link{color:var(--gold);border:1px solid rgba(232,185,60,.45)}
+.adv p{font-size:.79rem;color:var(--sub);line-height:1.65;margin-top:6px}
+.adv p b{color:var(--ink);font-weight:500}
+.adv .abtns{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+/* 리포트 */
+.reprow{display:grid;grid-template-columns:1.3fr .9fr .9fr 1.2fr auto auto;gap:8px;align-items:center;
+padding:9px 6px;border-top:1px solid rgba(255,255,255,.06);font-size:.8rem}
+.reprow.head{border-top:none;font-size:.66rem;color:var(--mute);letter-spacing:.06em;font-weight:700}
+.reprow .rn{font-weight:700}.reprow .rn small{color:var(--mute);font-weight:300;font-size:.68rem;margin-left:4px}
+.pct{font-family:'Noto Serif KR',serif;font-weight:900;color:var(--gold)}
+.rep-note{font-size:.72rem;color:var(--sub)}
+/* 리포트 미리보기 */
+.repcard{background:linear-gradient(160deg,#122241,#1a2a4a);border:1px solid var(--gold);border-radius:16px;padding:26px 28px}
+.repk{font-size:.66rem;letter-spacing:.24em;color:var(--gold);font-weight:700}
+.repcard h2{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.4rem;margin:8px 0 4px}
+.repdate{font-size:.72rem;color:var(--mute)}
+.bigpos{display:flex;gap:14px;flex-wrap:wrap;margin:18px 0}
+.bp{flex:1;min-width:130px;border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;background:rgba(0,0,0,.16)}
+.bp b{display:block;font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.5rem;color:var(--gold)}
+.bp span{font-size:.64rem;color:var(--mute);letter-spacing:.08em}
+.repmsg{border-left:3px solid var(--gold);padding:10px 14px;background:rgba(232,185,60,.06);border-radius:0 10px 10px 0;
+font-size:.84rem;line-height:1.75;margin-top:14px}
+.repmsg b{color:var(--gold);font-weight:700}
+@media(max-width:720px){.reprow{grid-template-columns:1.2fr .8fr auto auto}.reprow :nth-child(3),.reprow :nth-child(4){display:none}.reprow.head :nth-child(3),.reprow.head :nth-child(4){display:none}}
+/* 히트맵 */
+.heat{overflow-x:auto}
+.hrow{display:grid;grid-template-columns:110px repeat(7,minmax(46px,1fr)) 90px;gap:5px;align-items:center;padding:4px 0;cursor:pointer;border-radius:8px}
+.hrow:hover{background:rgba(232,185,60,.07)}
+.hrow.hh{cursor:default;font-size:.66rem;color:var(--mute);font-weight:700}
+.hname{font-size:.78rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hname small{color:var(--mute);font-weight:300;font-size:.66rem;margin-left:4px}
+.hcell{height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:rgba(255,255,255,.85)}
+.hs0{background:#3a4a6d}.hs1{background:#3d6cb8}.hs2{background:#c9a227;color:#0d1f3c}.hs3{background:#3e9c6d}
+.hcell.hw{box-shadow:inset 0 0 0 2px var(--alert)}
+.hstat{font-size:.64rem;font-weight:700;text-align:center;border-radius:999px;padding:3px 6px}
+.hstat.ok{color:var(--ok);border:1px solid rgba(94,201,143,.4)}
+.hstat.warn{color:var(--alert);border:1px solid rgba(232,106,90,.5)}
+/* 그룹표 */
+.grow{display:grid;grid-template-columns:1.2fr .7fr 1fr 1fr .7fr;gap:8px;padding:8px 4px;border-top:1px solid rgba(255,255,255,.06);align-items:center;font-size:.78rem}
+.grow.head{border-top:none;font-size:.66rem;color:var(--mute);font-weight:700}
+.grow .gn{font-weight:700}.grow .gwarn{color:var(--alert);font-weight:700}.grow .gok{color:var(--mute)}
+/* 상세 모달 */
+.smodal{position:fixed;inset:0;z-index:55;background:rgba(5,12,26,.72);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 16px}
+.smodal.open{display:flex}
+.scard{width:100%;max-width:860px;background:linear-gradient(160deg,#122241,#1a2a4a);border:1px solid var(--line);
+border-radius:16px;padding:26px 28px;position:relative;box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.sclose{position:absolute;right:18px;top:16px;background:none;border:1px solid var(--line);color:var(--sub);
+border-radius:999px;padding:5px 13px;font-size:.72rem;cursor:pointer;font-family:'Noto Sans KR'}
+.sclose:hover{border-color:var(--gold);color:var(--gold)}
+.shead h3{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.3rem}
+.smeta{font-size:.8rem;color:var(--sub);margin-top:6px}.smeta b{color:var(--ink);font-weight:700}
+.sfeed{font-size:.76rem;color:var(--gold);margin-top:5px}
+.sgrid{display:grid;grid-template-columns:1.1fr 1fr;gap:26px;margin-top:20px}
+@media(max-width:720px){.sgrid{grid-template-columns:1fr}}
+.stt{font-size:.7rem;letter-spacing:.16em;color:var(--mute);font-weight:700;margin-bottom:9px}
+.mrow{display:flex;align-items:center;gap:5px;margin:5px 0}
+.ml{width:52px;font-size:.76rem;font-weight:500;flex:none}.ml.weakl{color:var(--alert)}
+.ms{width:26px;height:13px;border-radius:4px;border:1px solid var(--line);flex:none}
+.ms-done{background:var(--done);border-color:var(--done)}.ms-now{background:var(--gold);border-color:var(--gold)}
+.mstage{font-size:.66rem;color:var(--mute);margin-left:6px}
+.sacts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.extbtn{text-align:center;font-size:.7rem;font-weight:500;color:var(--sub);text-decoration:none;
+border:1px solid var(--line);border-radius:8px;padding:7px 8px;transition:.15s;cursor:pointer;background:none;font-family:'Noto Sans KR'}
+.extbtn:hover{border-color:var(--gold);color:var(--gold)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:60;background:var(--gold);color:var(--navy);
+font-size:.8rem;font-weight:700;border-radius:999px;padding:11px 22px;opacity:0;pointer-events:none;transition:.3s;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.toast.show{opacity:1}
+/* 게이트 */
+.gate{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;
+background:linear-gradient(160deg,var(--navy),var(--navy2));padding:20px}
+.gate.hidden{display:none}
+.gatecard{width:100%;max-width:380px;background:rgba(255,255,255,.045);border:1px solid var(--line);
+border-radius:18px;padding:32px 30px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.gbrand{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.5rem;color:var(--gold)}
+.gsub{font-size:.75rem;color:var(--sub);margin:6px 0 20px}
+.gatecard input{width:100%;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;
+color:var(--ink);font-family:'Noto Sans KR';font-size:.92rem;padding:11px 13px;outline:none;text-align:center}
+.gatecard input:focus{border-color:var(--gold)}
+.gnote{font-size:.7rem;color:var(--mute);margin-top:14px}
+@media(max-width:720px){
+.rk{grid-template-columns:40px 1.2fr .8fr .8fr 1fr;font-size:.74rem}.rk :nth-child(5){display:none}.rk.head :nth-child(5){display:none}
+.hrow{grid-template-columns:80px repeat(7,minmax(30px,1fr)) 60px}.hcell{height:20px;font-size:.52rem}}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="gatecard">
+    <div class="gbrand">베리타스 PASS:ON</div>
+    <div class="gsub">관리자 전용 페이지 — 운영 관제실</div>
+    <input id="fAdmin" type="password" placeholder="관리자 코드 (데모: veritas)"
+      oninput="if(this.value.trim()==='veritas')enter()" onkeydown="if(event.key==='Enter')enter()">
+    <div class="gnote">코드를 입력하면 자동으로 입장합니다</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">베리타스 PASS:ON <small>관리자 전용 · 운영 관제실</small></div>
+    <div class="userchip"><span><b style="color:var(--ink)">관리자</b> · 베리타스 온라인운영팀</span>
+      <button class="mini" onclick="location.reload()">잠금</button></div>
+  </div>
+
+  <div class="akpis">
+    <div class="akpi"><b id="kTotal">0</b><span>총 수강생</span></div>
+    <div class="akpi"><b>19</b><span>오늘 활동</span></div>
+    <div class="akpi warn2"><b id="kWarn">0</b><span>기한 주의</span></div>
+    <div class="akpi alert2"><b id="kAdv">0</b><span>조언 대기</span></div>
+    <div class="akpi gold2"><b id="kLink">0</b><span>오프라인 연계(5%)</span></div>
+    <div class="akpi gold2"><b id="kLocal">0%</b><span>지방 로스쿨 비중</span></div>
+  </div>
+
+  <div class="agrid">
+    <div class="panel">
+      <h3>🏆 수강생 랭킹</h3>
+      <div class="sub">종합지수 = 통과 칸 × 2.5 + 평균 정답률 × 0.5 + 누적 문항 ÷ 200 · 행 클릭 시 상세</div>
+      <div id="ranking"></div>
+    </div>
+    <div class="panel">
+      <h3>🎯 조언 큐 — 누구에게, 어떤 조언을</h3>
+      <div class="sub">데이터 신호가 자동 생성한 개입 권고 · 실서비스에서는 AI가 초안 작성, 관리자가 확정 발송</div>
+      <div id="advice"></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:22px">
+    <h3>💳 종합반 신청 승인 대기</h3>
+    <div class="sub">단과생의 종합반 신청 접수 목록 · 절차: 비용 산정·안내(오프라인 대비 할인가 · 기수강 단과 비용 산입) → 입금 확인 → [비번 발급] → 문자 발송 → 전환</div>
+    <div id="upgQueue"></div>
+  </div>
+
+  <div class="panel" style="margin-top:22px">
+    <h3>📮 위치 진단 리포트 — "당신은 지금 여기입니다"</h3>
+    <div class="sub">수강생별 현재 위치(랭킹 백분위·28칸·취약·이번 주 권고)를 리포트로 생성해 발송합니다 · 실서비스에서는 매주 월요일 자동 발송
+      <button class="mini" style="margin-left:10px" onclick="sendAllReports()">전체 일괄 발송</button></div>
+    <div id="reportList"></div>
+  </div>
+
+  <div class="agrid">
+    <div class="panel">
+      <h3>수요 지도 — 로스쿨별 유입</h3>
+      <div class="sub">어느 로스쿨에서 많이 오는가 — 지방 거점 마케팅의 근거</div>
+      <div class="bars" id="schoolBars"></div>
+    </div>
+    <div class="panel">
+      <h3>학년별 분석</h3>
+      <div class="sub">학년(초시·재시 성격) 단위의 진도·성취 비교</div>
+      <div id="byYear"></div>
+    </div>
+  </div>
+
+  <div class="agrid">
+    <div class="panel">
+      <h3>전체 수준 — 단계 분포</h3>
+      <div class="sub">전 수강생 × 7법 칸의 단계 분포 · 학원이 지금 어느 국면인지</div>
+      <div class="bars" id="stageDist"></div>
+    </div>
+    <div class="panel">
+      <h3>전체 수준 — 과목별 평균 정답률</h3>
+      <div class="sub">65% 미만은 전사적 보강 후보</div>
+      <div class="bars" id="avgRates"></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:22px">
+    <h3>전체 진단 한눈판 — 수강생 × 7법</h3>
+    <div class="sub">색 = 단계(기본→문풀→심화→파이널) · 붉은 테두리 = 취약 · 행 클릭 시 상세</div>
+    <div class="heat" id="heatmap"></div>
+  </div>
+</div>
+
+<div class="smodal" id="studentModal" onclick="if(event.target===this)closeStudent()">
+  <div class="scard"><button class="sclose" onclick="closeStudent()">✕ 닫기</button><div id="studentBody"></div></div>
+</div>
+
+<script>
+const laws=["헌법","민법","형법","행정법","민소법","형소법","상법"];
+const R=[
+ {n:"이O진",s:"전북대",y:"3학년",cells:9,acc:6214,st:"warn",lk:1,pos:[1,1,1,1,2,1,1],weak:["민법"],rates:[78,52,81,74,69,76,71],last:"3일 전 (정체)",feed:"사례 답안 2건 첨삭 대기"},
+ {n:"박O호",s:"제주대",y:"졸업생",cells:11,acc:9102,st:"warn",lk:0,pos:[2,2,2,1,2,2,1],weak:["행정법","상법"],rates:[84,79,88,54,77,80,61],last:"오늘 09:12",feed:"CBT 서면 1건 첨삭 반환 완료"},
+ {n:"김O린",s:"경북대",y:"3학년",cells:8,acc:5830,st:"ok",lk:1,pos:[1,1,1,1,1,1,1],weak:[],rates:[80,76,79,72,74,78,70],last:"오늘 07:41",feed:"상담 후 5일 연속 이행 — 정상 궤도"},
+ {n:"최O원",s:"전남대",y:"3학년",cells:7,acc:5488,st:"ok",lk:1,pos:[1,1,1,1,1,1,1],weak:["형소법"],rates:[75,73,77,70,72,58,69],last:"어제 22:30",feed:"사례 답안 1건 첨삭 대기"},
+ {n:"정O우",s:"강원대",y:"졸업생",cells:10,acc:8455,st:"ok",lk:0,pos:[2,1,2,1,1,2,1],weak:[],rates:[83,77,85,75,74,82,72],last:"오늘 10:05",feed:"첨삭 이력 12건 · 스코어 상승 추세"},
+ {n:"한O서",s:"충남대",y:"3학년",cells:6,acc:5102,st:"ok",lk:0,pos:[1,1,1,1,1,1,0],weak:["상법"],rates:[74,71,76,69,70,73,55],last:"오늘 08:55",feed:"상법 기본 재배치 — 지난주 재조정 반영"},
+ {n:"오O민",s:"부산대",y:"2학년",cells:4,acc:3247,st:"ok",lk:1,pos:[1,0,1,0,0,1,0],weak:[],rates:[72,68,73,66,65,70,63],last:"어제 21:14",feed:"2학년 선행 트랙 — 기본 단계 중심"},
+ {n:"장O희",s:"원광대",y:"3학년",cells:8,acc:5914,st:"ok",lk:0,pos:[1,1,1,1,1,1,1],weak:["민소법"],rates:[77,74,78,72,59,75,70],last:"오늘 06:58",feed:"사례 답안 3건 첨삭 대기 (우선 배정 후보)"},
+ {n:"윤O성",s:"동아대",y:"졸업생",cells:12,acc:9873,st:"ok",lk:1,pos:[2,2,2,2,2,2,1],weak:[],rates:[86,82,87,80,79,84,74],last:"오늘 09:47",feed:"최상위 페이스 — 파이널 조기 진입 검토"},
+ {n:"서O아",s:"충북대",y:"3학년",cells:7,acc:5340,st:"ok",lk:0,pos:[1,1,1,1,1,1,1],weak:["헌법"],rates:[57,73,76,71,70,74,68],last:"오늘 08:20",feed:"헌법 문풀 +1주 연장 — 지난주 재조정 반영"}
+];
+const metro=["서울대","고려대","연세대","성균관대","한양대","이화여대","중앙대","경희대","서강대","한국외대","서울시립대","건국대","인하대","아주대"];
+const avgOf=x=>Math.round(x.rates.reduce((a,b)=>a+b,0)/7);
+const scoreOf=x=>+(x.cells*2.5+avgOf(x)*0.5+x.acc/200).toFixed(1);
+
+function enter(){
+  document.getElementById("gate").classList.add("hidden");
+  render();
+}
+function toast(m){let t=document.getElementById("toastEl");
+  if(!t){t=document.createElement("div");t.id="toastEl";t.className="toast";document.body.appendChild(t);}
+  t.textContent=m;t.classList.add("show");clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove("show"),2400);}
+
+function render(){
+  // KPI
+  document.getElementById("kTotal").textContent=R.length;
+  document.getElementById("kWarn").textContent=R.filter(x=>x.st==="warn").length;
+  document.getElementById("kLink").textContent=R.filter(x=>x.lk).length;
+  document.getElementById("kLocal").textContent=Math.round(R.filter(x=>!metro.includes(x.s)).length/R.length*100)+"%";
+  // 랭킹
+  const ranked=[...R].map(x=>({...x,score:scoreOf(x),avg:avgOf(x)})).sort((a,b)=>b.score-a.score);
+  const medals=["🥇","🥈","🥉"];
+  document.getElementById("ranking").innerHTML=
+   `<div class="rk head"><span></span><span>수강생</span><span>통과 칸</span><span>평균 정답률</span><span>누적 문항</span><span style="text-align:right">종합지수</span></div>`+
+   ranked.map((x,i)=>{
+     const idx=R.findIndex(r=>r.n===x.n);
+     return `<div class="rk ${i===0?"top1":""}" onclick="openStudent(${idx})">
+       <span class="${i<3?"medal":"rnum"}">${i<3?medals[i]:i+1}</span>
+       <span class="rname">${x.n}<small>${x.s} ${x.y}</small></span>
+       <span>${x.cells} / 28</span><span>${x.avg}%</span><span>${x.acc.toLocaleString()}문</span>
+       <span class="score" style="text-align:right">${x.score}</span></div>`;
+   }).join("");
+  // 조언 큐
+  const adv=[];
+  R.forEach((x,i)=>{
+    if(x.st==="warn")adv.push({i,t:"t-warn",tag:"정체 개입",msg:`<b>${x.last}</b> — 3일 규칙 발동. 1:1 상담 제안 + 해당 강의 해소 기한 재조정을 권고합니다.`});
+    x.weak.forEach(w=>{const r=x.rates[laws.indexOf(w)];
+      adv.push({i,t:"t-weak",tag:"취약 보강",msg:`<b>${w} ${r}%</b> — ${w} 문풀 칸 연장 + 사례 첨삭 주기 단축. 고시닷컴 ${w} 보강강의와 북라인 PDF 낱개(해당 챕터) 추천 발송을 권고합니다.`});});
+    if(x.cells>=11)adv.push({i,t:"t-top",tag:"상위 관리",msg:`최상위 페이스(<b>${x.cells}/28</b>) — 파이널 조기 진입 검토 및 익명 우수답안 공유 요청을 권고합니다.`});
+    if(!x.lk&&x.cells>=8)adv.push({i,t:"t-link",tag:"연계 제안",msg:`진도 안정권 · 미연계 — 방학 오프라인 특강 <b>5% 연계 할인</b> 안내 발송 적기입니다.`});
+  });
+  document.getElementById("kAdv").textContent=adv.length;
+  document.getElementById("advice").innerHTML=adv.map(a=>{
+    const x=R[a.i];
+    return `<div class="adv"><div class="ahead"><span class="an">${x.n}<small>${x.s} ${x.y}</small></span><span class="tagx ${a.t}">${a.tag}</span></div>
+      <p>${a.msg}</p>
+      <div class="abtns"><button class="mini" onclick="toast('${x.n} 님에게 조언을 발송했습니다')">발송</button>
+      <button class="mini" onclick="openStudent(${a.i})">상세 보기</button></div></div>`;
+  }).join("");
+  renderUpgQueue();
+  renderReports();
+  // 수요 지도
+  const cnt={};R.forEach(x=>cnt[x.s]=(cnt[x.s]||0)+1);
+  const es=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);const mx=es[0][1];
+  document.getElementById("schoolBars").innerHTML=es.map(([s,c])=>`
+   <div class="bar"><span class="bl">${s}</span><div class="track"><div class="fill" style="width:${c/mx*100}%"></div></div><span class="bv">${c}명</span></div>`).join("");
+  // 학년별
+  const g={};R.forEach(x=>{if(!g[x.y])g[x.y]={n:0,c:0,r:0,w:0};g[x.y].n++;g[x.y].c+=x.cells;g[x.y].r+=avgOf(x);if(x.st==="warn")g[x.y].w++;});
+  document.getElementById("byYear").innerHTML=
+   `<div class="grow head"><span>학년</span><span>인원</span><span>평균 통과 칸</span><span>평균 정답률</span><span>주의</span></div>`+
+   Object.entries(g).sort((a,b)=>b[1].n-a[1].n).map(([k,v])=>`<div class="grow"><span class="gn">${k}</span><span>${v.n}명</span>
+   <span>${(v.c/v.n).toFixed(1)} / 28</span><span>${Math.round(v.r/v.n)}%</span><span class="${v.w?"gwarn":"gok"}">${v.w?v.w+"명":"—"}</span></div>`).join("");
+  // 단계 분포
+  const dist=[0,0,0,0];R.forEach(x=>x.pos.forEach(p=>dist[Math.min(p,3)]++));
+  const tc=dist.reduce((a,b)=>a+b,0);const stN=["기본","문풀","심화","파이널"];const stC=["#3a4a6d","#3d6cb8","#c9a227","#3e9c6d"];
+  document.getElementById("stageDist").innerHTML=stN.map((n,i)=>`
+   <div class="bar"><span class="bl">${n}</span><div class="track"><div class="fill" style="width:${(dist[i]/tc*100).toFixed(1)}%;background:${stC[i]}"></div></div><span class="bv">${Math.round(dist[i]/tc*100)}%</span></div>`).join("");
+  // 평균 정답률
+  const avg=laws.map((l,li)=>Math.round(R.reduce((a,x)=>a+x.rates[li],0)/R.length));
+  document.getElementById("avgRates").innerHTML=laws.map((l,li)=>`
+   <div class="bar ${avg[li]<65?"weak":""}"><span class="bl">${l}</span><div class="track"><div class="fill" style="width:${avg[li]}%"></div></div><span class="bv">${avg[li]}%</span></div>`).join("");
+  // 히트맵
+  document.getElementById("heatmap").innerHTML=
+   `<div class="hrow hh"><span></span>${laws.map(l=>`<span style="text-align:center">${l}</span>`).join("")}<span style="text-align:center">페이스</span></div>`+
+   R.map((x,i)=>`<div class="hrow" onclick="openStudent(${i})"><span class="hname">${x.n}<small>${x.s}</small></span>${
+     laws.map((l,li)=>{const p=Math.min(x.pos[li],3);return `<span class="hcell hs${p} ${x.weak.includes(l)?"hw":""}">${stN[p]}</span>`;}).join("")
+   }${x.st==="warn"?'<span class="hstat warn">주의</span>':'<span class="hstat ok">정상</span>'}</div>`).join("");
+}
+
+function rankPct(i){
+  const ranked=[...R].map((x,j)=>({j,score:scoreOf(x)})).sort((a,b)=>b.score-a.score);
+  const pos=ranked.findIndex(r=>r.j===i)+1;
+  return {rank:pos,pct:Math.round(pos/R.length*100)};
+}
+function nextGoal(x){
+  const stN=["기본","문풀","심화","파이널"];
+  const minP=Math.min(...x.pos);const li=x.pos.indexOf(minP);
+  return laws[li]+" "+stN[minP]+" 통과 → "+(stN[minP+1]||"완료");
+}
+function weekAdvice(x){
+  if(x.st==="warn")return "정체 신호가 감지되었습니다. 이번 주는 분량보다 재시동이 목표입니다 — 상담 슬롯을 함께 제안드립니다.";
+  if(x.weak.length){const w=x.weak[0];const r=x.rates[laws.indexOf(w)];
+    return `${w}(${r}%)이 발목을 잡고 있습니다. 이번 주 ${w} 문풀을 늘리고, 사례 현출 1문을 ${w}로 배정하세요.`;}
+  if(x.cells>=11)return "최상위 페이스입니다. 파이널 조기 진입을 검토할 단계 — 다음 리포트에서 모의고사 배정을 안내드립니다.";
+  return "안정 궤도입니다. 현재 리듬을 유지하며 사례 현출 비중을 한 단계 올리세요.";
+}
+const UPQ=[
+ {no:"VOS-8241",n:"강O진",s:"충북대",y:"3학년",id:"kangj_law",ph:"010-52**-31**",cur:"단과 · 행정법",paid:true},
+ {no:"VOS-8256",n:"문O린",s:"전남대",y:"졸업생",id:"moonlaw27",ph:"010-77**-90**",cur:"단과 · 민법",paid:false},
+];
+function renderUpgQueue(){
+  document.getElementById("upgQueue").innerHTML=
+   `<div class="grow head" style="grid-template-columns:1fr 1.3fr 1fr 1fr .9fr auto"><span>신청번호</span><span>신청자</span><span>아이디</span><span>현재 상품</span><span>입금</span><span></span></div>`+
+   UPQ.map((q,i)=>`<div class="grow" style="grid-template-columns:1fr 1.3fr 1fr 1fr .9fr auto">
+     <span>${q.no}</span><span class="gn">${q.n}<small style="color:var(--mute);font-weight:300"> ${q.s} ${q.y} · ${q.ph}</small></span>
+     <span>${q.id}</span><span>${q.cur}</span>
+     <span class="${q.paid?"gok":"gwarn"}">${q.paid?"입금 확인":"비용 안내·입금 대기"}</span>
+     <button class="mini" ${q.paid?"":"disabled style=\"opacity:.35\""} onclick="toast('${q.n} 님에게 비밀번호를 발급·문자 발송했습니다 — 종합반 전환 완료')">비번 발급</button>
+   </div>`).join("");
+}
+function renderReports(){
+  document.getElementById("reportList").innerHTML=
+   `<div class="reprow head"><span>수강생</span><span>현재 위치</span><span>통과 칸</span><span>이번 주 핵심</span><span></span><span></span></div>`+
+   R.map((x,i)=>{const rp=rankPct(i);
+     return `<div class="reprow"><span class="rn">${x.n}<small>${x.s} ${x.y}</small></span>
+       <span class="pct">상위 ${rp.pct}%</span><span>${x.cells} / 28</span>
+       <span class="rep-note">${x.st==="warn"?"⚠ 재시동":x.weak.length?x.weak[0]+" 보강":"리듬 유지"}</span>
+       <button class="mini" onclick="previewReport(${i})">미리보기</button>
+       <button class="mini" onclick="toast('${x.n} 님에게 위치 진단 리포트를 발송했습니다')">발송</button></div>`;
+   }).join("");
+}
+function previewReport(i){
+  const x=R[i];const rp=rankPct(i);const stN=["기본","문풀","심화","파이널"];
+  const mini=laws.map((l,li)=>{const p=x.pos[li];
+    const cells=[0,1,2,3].map(si=>`<span class="ms ${si<p?"ms-done":si===p?"ms-now":""}"></span>`).join("");
+    return `<div class="mrow"><span class="ml ${x.weak.includes(l)?"weakl":""}">${l}</span>${cells}<span class="mstage">${stN[x.pos[li]]||"완료"} ${x.rates[li]}%</span></div>`;}).join("");
+  document.getElementById("studentBody").innerHTML=`
+   <div class="repcard">
+     <div class="repk">합격 OS · 주간 위치 진단 리포트</div>
+     <h2>${x.n} 님, 당신은 지금 여기입니다</h2>
+     <div class="repdate">기준일 2026. 8. 1(토) · ${x.s} ${x.y}</div>
+     <div class="bigpos">
+       <div class="bp"><b>상위 ${rp.pct}%</b><span>전체 ${R.length}명 중 ${rp.rank}위</span></div>
+       <div class="bp"><b>${x.cells} / 28</b><span>통과 칸</span></div>
+       <div class="bp"><b>${x.acc.toLocaleString()}문</b><span>누적 해소</span></div>
+       <div class="bp"><b>${Math.round(x.rates.reduce((a,b)=>a+b,0)/7)}%</b><span>평균 정답률</span></div>
+     </div>
+     <div class="stt">7법 현재 단계 · 정답률</div>${mini}
+     <div class="repmsg"><b>이번 주 권고</b> — ${weekAdvice(x)}<br><b>다음 목표</b> — ${nextGoal(x)}</div>
+     <div class="sacts" style="margin-top:16px;grid-template-columns:1fr 1fr">
+       <button class="extbtn" onclick="toast('${x.n} 님에게 이 리포트를 발송했습니다')">이대로 발송</button>
+       <button class="extbtn" onclick="closeStudent()">닫기</button>
+     </div>
+   </div>`;
+  document.getElementById("studentModal").classList.add("open");
+}
+function sendAllReports(){toast(R.length+"명 전원에게 위치 진단 리포트를 발송했습니다");}
+function openStudent(i){
+  const d=R[i];const stN=["기본","문풀","심화","파이널"];
+  const mini=laws.map((l,li)=>{const p=d.pos[li];
+    const cells=[0,1,2,3].map(si=>`<span class="ms ${si<p?"ms-done":si===p?"ms-now":""}"></span>`).join("");
+    return `<div class="mrow"><span class="ml ${d.weak.includes(l)?"weakl":""}">${l}</span>${cells}<span class="mstage">${stN[d.pos[li]]||"완료"}</span></div>`;}).join("");
+  const rateBars=laws.map((l,li)=>`
+    <div class="bar ${d.rates[li]<65?"weak":""}"><span class="bl">${l}</span><div class="track"><div class="fill" style="width:${d.rates[li]}%"></div></div><span class="bv">${d.rates[li]}%</span></div>`).join("");
+  document.getElementById("studentBody").innerHTML=`
+    <div class="shead"><h3>${d.n} <span style="color:var(--sub);font-weight:400;font-size:.85rem">· ${d.s} ${d.y}</span></h3>
+    <div class="smeta">통과 칸 <b>${d.cells}/28</b> · 누적 <b>${d.acc.toLocaleString()}문</b> · 종합지수 <b>${scoreOf(d)}</b> · 최근 활동 <b>${d.last}</b></div>
+    <div class="sfeed">${d.feed}</div></div>
+    <div class="sgrid">
+      <div><div class="stt">28칸 학습 위치</div>${mini}</div>
+      <div><div class="stt">과목별 정답률 (최근 2주)</div>${rateBars}
+        <div class="stt" style="margin-top:16px">AS 액션</div>
+        <div class="sacts">
+          <button class="extbtn" onclick="toast('${d.n} 님에게 1:1 상담 슬롯을 제안했습니다')">1:1 상담 제안</button>
+          <button class="extbtn" onclick="toast('${d.n} 님 로드맵 수동 재조정 (실서비스 연결 지점)')">로드맵 수동 조정</button>
+          <button class="extbtn" onclick="toast('${d.n} 님 첨삭을 우선 배정했습니다')">첨삭 우선 배정</button>
+          <button class="extbtn" onclick="toast('${d.n} 님에게 오프라인 5% 연계 안내를 발송했습니다')">오프라인 연계 안내</button>
+          <button class="extbtn" onclick="previewReport(${i})" style="grid-column:1/-1;border-color:var(--gold-dim);color:var(--gold)">📮 위치 진단 리포트 미리보기·발송</button>
+        </div></div>
+    </div>`;
+  document.getElementById("studentModal").classList.add("open");
+}
+function closeStudent(){document.getElementById("studentModal").classList.remove("open");}
+</script>
+</body>
+</html>

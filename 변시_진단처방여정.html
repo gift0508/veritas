@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>베리타스 PASS:ON — 진단이 강의를 골라줍니다 (헌법 · 금동흠)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1F3C; --navy2:#12294d; --panel:#152a4d; --panel2:#1b3358;
+  --line:#284872; --gold:#C9A227; --gold2:#e5be44;
+  --ink:#eaf0fb; --sub:#9db0cf; --dim:#6f85a8;
+  --ok:#4a9d7f; --okbg:#16302a; --blue:#4f86c6; --org:#d98a45; --warn:#c96a4a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--navy);color:var(--ink);font-family:'Noto Sans KR',sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+.top{background:linear-gradient(135deg,var(--navy),var(--navy2));border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40}
+.topin{display:flex;align-items:center;gap:16px;padding:13px 22px;max-width:1120px;margin:0 auto;flex-wrap:wrap}
+.brand{font-family:'Noto Serif KR',serif;font-weight:900;color:var(--gold);font-size:1.12rem}
+.brand small{font-family:'Noto Sans KR';font-weight:500;color:var(--sub);font-size:.72rem;margin-left:8px}
+.back{margin-left:auto;border:1px solid var(--gold);background:none;color:var(--gold);font-size:.76rem;font-weight:700;border-radius:999px;padding:7px 16px;cursor:pointer;transition:.2s}
+.back:hover{background:var(--gold);color:var(--navy)}
+.hero{padding:38px 0 14px}
+.eyebrow{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.14em;color:var(--navy);background:var(--gold);padding:4px 12px;border-radius:999px;margin-bottom:15px}
+.hero h1{font-family:'Noto Serif KR',serif;font-weight:900;font-size:2rem;margin:0 0 10px;letter-spacing:-.01em}
+.hero h1 .hl{color:var(--gold)}
+.hero p{color:var(--sub);font-size:.96rem;margin:0;max-width:750px}
+.mess{margin:24px 0 6px;background:#101d30;border:1px dashed var(--line);border-radius:14px;padding:16px 20px}
+.mess h3{margin:0 0 8px;font-size:.9rem;color:var(--dim)}
+.mchips{display:flex;gap:6px;flex-wrap:wrap}
+.mchip{font-size:.73rem;color:var(--sub);background:#16283f;border:1px solid var(--line);border-radius:7px;padding:5px 9px}
+.mess .cap{margin-top:11px;font-size:.82rem;color:var(--dim)}
+.mess .cap b{color:var(--gold2)}
+.journey{margin:26px 0 10px}
+.jhead{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
+.jhead .st{font-size:.72rem;font-weight:700;letter-spacing:.14em;color:var(--gold)}
+.jhead h2{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.32rem;margin:0}
+.jsub{color:var(--sub);font-size:.88rem;margin:0 0 16px}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.stepdot{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-size:.78rem;color:var(--sub);cursor:pointer;transition:.18s}
+.stepdot .n{width:20px;height:20px;border-radius:50%;background:#26364d;color:var(--sub);display:grid;place-items:center;font-size:.7rem;font-weight:700;flex:none}
+.stepdot.active{border-color:var(--gold);color:var(--ink);background:var(--panel2)}
+.stepdot.active .n{background:var(--gold);color:var(--navy)}
+.stepdot.done .n{background:var(--ok);color:#fff}
+.stepdot.done{color:var(--ink)}
+.stage{background:linear-gradient(160deg,var(--panel),var(--navy2));border:1px solid var(--line);border-radius:16px;padding:24px;min-height:360px}
+.stgtitle{font-weight:900;font-size:1.05rem;margin:0 0 4px}
+.stgnote{color:var(--sub);font-size:.86rem;margin:0 0 18px}
+.qcard{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:12px}
+.qcard .qn{font-size:.74rem;font-weight:700;color:var(--gold);margin-bottom:8px;letter-spacing:.05em}
+.qcard .qt{font-size:.93rem;font-weight:500;margin-bottom:14px;line-height:1.6}
+.qopt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:11px 15px;margin-bottom:7px;font-size:.86rem;cursor:pointer;transition:.14s}
+.qopt:hover{border-color:var(--gold)}
+.qopt.pick{border-color:var(--gold);background:#1c355c;box-shadow:inset 0 0 0 1px var(--gold)}
+.dxbar{display:flex;align-items:center;gap:12px;margin-top:6px}
+.dxbar .prog{flex:1;height:7px;border-radius:4px;background:#0c1a30;overflow:hidden}
+.dxbar .prog span{display:block;height:100%;background:var(--gold);width:0;transition:width .3s}
+.dxbar .cnt{font-size:.78rem;color:var(--sub)}
+.dxsubmit{margin-top:14px;width:100%;border:none;border-radius:11px;padding:14px;background:linear-gradient(90deg,var(--gold),var(--gold2));color:var(--navy);font-weight:900;font-size:.95rem;cursor:pointer;transition:.18s}
+.dxsubmit:disabled{opacity:.4;cursor:not-allowed}
+.dxsubmit:not(:disabled):hover{filter:brightness(1.06)}
+.verdict{background:linear-gradient(135deg,#1c355c,#12294d);border:1px solid var(--gold);border-radius:14px;padding:20px 22px;margin-bottom:20px;text-align:center}
+.verdict .lead{font-size:.82rem;color:var(--sub);margin-bottom:6px}
+.verdict .big{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.5rem;color:var(--gold2);margin-bottom:8px}
+.verdict .why{font-size:.85rem;color:var(--ink)}
+.verdict .why b{color:var(--gold2)}
+.ladder5{display:flex;flex-direction:column;gap:9px}
+.rung{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:var(--navy2);transition:.16s}
+.rung .lv{width:70px;flex:none;font-family:'Noto Serif KR';font-weight:900;font-size:.92rem;color:var(--sub)}
+.rung .body{flex:1;min-width:0}
+.rung .nm{font-weight:700;font-size:.92rem}
+.rung .desc{font-size:.78rem;color:var(--dim);margin-top:2px}
+.rung .stt{font-size:.74rem;font-weight:700;padding:4px 10px;border-radius:999px;flex:none}
+.rung.pass{opacity:.6}
+.rung.pass .stt{background:var(--okbg);color:var(--ok);border:1px solid var(--ok)}
+.rung.locked{opacity:.4}
+.rung.locked .stt{background:#26364d;color:var(--dim)}
+.rung.rx{border-color:var(--gold);background:linear-gradient(135deg,#1c355c,#173059);box-shadow:0 0 0 1px var(--gold)}
+.rung.rx .lv{color:var(--gold2)}
+.rung.rx .stt{background:var(--gold);color:var(--navy)}
+.rung.rx .go{border:none;border-radius:9px;padding:9px 16px;background:linear-gradient(90deg,var(--gold),var(--gold2));color:var(--navy);font-weight:900;font-size:.82rem;cursor:pointer;flex:none;transition:.16s}
+.rung.rx .go:hover{filter:brightness(1.07)}
+.rxnote{margin-top:16px;font-size:.8rem;color:var(--dim);text-align:center}
+.rxnote b{color:var(--gold2)}
+.lecrow{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.player{flex:1;min-width:300px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.pscreen{aspect-ratio:16/9;background:radial-gradient(circle at 30% 30%,#1c355c,#0c1a30);display:grid;place-items:center;position:relative}
+.pscreen .prof{text-align:center}
+.pscreen .prof .av{width:60px;height:60px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,var(--gold),#8a6f1a);display:grid;place-items:center;font-family:'Noto Serif KR';font-weight:900;font-size:1.3rem;color:var(--navy)}
+.pscreen .prof .nm{font-weight:700}
+.pscreen .prof .desc{font-size:.78rem;color:var(--sub);margin-top:3px}
+.pscreen .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;background:rgba(201,162,39,.92);color:var(--navy);display:grid;place-items:center;font-size:1.25rem;border:none;cursor:pointer}
+.pbar{height:5px;background:#0c1a30}
+.pbar span{display:block;height:100%;width:0;background:var(--gold);transition:width .1s linear}
+.pmeta{padding:11px 14px;background:var(--navy2);font-size:.8rem;color:var(--sub);display:flex;justify-content:space-between}
+.lecside{width:250px;flex:none}
+@media(max-width:820px){.lecside{width:100%}}
+.matbtn{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--navy2);color:var(--ink);border-radius:10px;padding:11px 14px;margin-bottom:8px;font-size:.82rem;cursor:pointer;transition:.14s}
+.matbtn:hover{border-color:var(--gold)}
+.matbtn .k{font-size:.7rem;color:var(--dim);display:block;margin-bottom:1px}
+.qbox{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:20px}
+.qmeta{font-size:.76rem;color:var(--gold);font-weight:700;margin-bottom:10px}
+.qtext{font-size:.95rem;font-weight:500;margin-bottom:16px;line-height:1.6}
+.opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:12px 15px;margin-bottom:8px;font-size:.87rem;cursor:pointer;transition:.14s}
+.opt:hover{border-color:var(--gold)}
+.opt.correct{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--warn);background:#2a1b18}
+.qresult{margin-top:14px;padding:13px 16px;border-radius:10px;font-size:.85rem;display:none}
+.qresult.show{display:block}
+.sixmini{display:flex;gap:5px;margin-top:16px;justify-content:center;flex-wrap:wrap}
+.sixmini .cell{flex:1;min-width:66px;text-align:center;padding:9px 6px;border-radius:8px;background:var(--panel);border:1px solid var(--line);font-size:.7rem;color:var(--sub);transition:.3s}
+.sixmini .cell .lv{font-weight:900;font-size:.8rem;color:var(--ink)}
+.sixmini .cell.lit{border-color:var(--gold);background:#1c355c}
+.sixmini .cell.lit .lv{color:var(--gold2)}
+.reflow{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.reflow{grid-template-columns:1fr}}
+.rcard{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:18px}
+.rcard h4{margin:0 0 12px;font-size:.9rem}
+.scorerow{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:.82rem}
+.scorerow .lbl{width:64px;color:var(--sub)}
+.track{flex:1;height:9px;border-radius:5px;background:#0c1a30;overflow:hidden}
+.track span{display:block;height:100%;border-radius:5px;transition:width 1.1s cubic-bezier(.2,.7,.2,1)}
+.scorerow .pct{width:40px;text-align:right;font-weight:700;font-size:.8rem}
+.mapcell{padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);margin-bottom:9px;transition:.5s}
+.mapcell .top{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:4px}
+.mapcell .state{font-size:.74rem;font-weight:700}
+.mapcell.moved{border-color:var(--gold);background:#1c355c;animation:pulse 1.4s ease}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(201,162,39,.5)}100%{box-shadow:0 0 0 14px rgba(201,162,39,0)}}
+.reflowbtn{margin-top:6px;border:none;border-radius:10px;padding:12px 18px;background:linear-gradient(90deg,var(--gold),var(--gold2));color:var(--navy);font-weight:900;font-size:.88rem;cursor:pointer}
+.stgnav{display:flex;gap:10px;margin-top:22px}
+.stgnav button{border-radius:10px;padding:11px 20px;font-size:.86rem;font-weight:700;cursor:pointer;transition:.16s;font-family:'Noto Sans KR'}
+.prevb{background:none;border:1px solid var(--line);color:var(--sub)}
+.prevb:hover{border-color:var(--sub)}
+.nextb{background:linear-gradient(90deg,var(--gold),var(--gold2));border:none;color:var(--navy);margin-left:auto}
+.nextb:disabled{opacity:.4;cursor:not-allowed;filter:none}
+.nextb:not(:disabled):hover{filter:brightness(1.06)}
+.foot{color:var(--dim);font-size:.72rem;text-align:center;padding:28px 22px 46px;line-height:1.7}
+.toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);background:var(--gold);color:var(--navy);font-weight:700;font-size:.84rem;padding:11px 20px;border-radius:999px;opacity:0;transition:.3s;pointer-events:none;z-index:80}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.pickbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:22px 0 2px;
+  padding:14px 18px;border-radius:13px;background:var(--panel2);border:1px solid var(--line)}
+.teacher{display:flex;align-items:center;gap:9px;font-size:.92rem}
+.teacher .tk{font-size:.72rem;color:var(--dim)}
+.teacher b{font-family:'Noto Serif KR',serif;font-weight:900;color:var(--ink)}
+.teacher .tsub{color:var(--sub);font-size:.84rem}
+.teacher .tchg{font-size:.74rem;color:var(--gold);cursor:pointer;margin-left:2px}
+.teacher .tchg:hover{text-decoration:underline}
+.prodtog{margin-left:auto;display:flex;gap:6px;background:#0c1a30;border-radius:999px;padding:4px}
+.ptog{border:none;background:none;color:var(--sub);border-radius:999px;padding:7px 15px;cursor:pointer;
+  font-family:'Noto Sans KR';font-size:.84rem;font-weight:700;transition:.16s;display:flex;flex-direction:column;line-height:1.15}
+.ptog small{font-weight:400;font-size:.66rem;color:var(--dim);margin-top:1px}
+.ptog.on{background:var(--gold);color:var(--navy)}
+.ptog.on small{color:#5a4a12}
+.rung .selfchk{font-size:.72rem;color:var(--org);margin-top:3px}
+.rung.open-weak{border-color:var(--org)}
+.rung .openbtn{border:1px solid var(--line);background:var(--navy2);color:var(--sub);
+  border-radius:9px;padding:8px 14px;font-size:.78rem;font-weight:700;cursor:pointer;flex:none;transition:.14s;font-family:'Noto Sans KR'}
+.rung .openbtn:hover{border-color:var(--gold);color:var(--gold)}
+.toclist{display:flex;flex-direction:column;gap:8px}
+.tocrow{border:1px solid var(--line);border-radius:11px;background:var(--navy2);overflow:hidden;transition:.14s}
+.tocrow.weak{border-color:var(--org)}
+.tocrow.open{border-color:var(--gold);background:#152c4e}
+.tochead{display:flex;align-items:center;gap:10px;padding:12px 15px;cursor:pointer}
+.tochead:hover{background:#173059}
+.tcaret{color:var(--gold);font-size:.8rem;width:14px;flex:none}
+.tcnm{font-size:.9rem;font-weight:500}
+.tcpg{font-size:.72rem;color:var(--dim)}
+.tocw{font-size:.68rem;font-weight:700;color:var(--navy);background:var(--org);border-radius:6px;padding:2px 8px}
+.tcmin{margin-left:auto;font-size:.76rem;color:var(--sub)}
+.toclinks{display:flex;gap:6px;flex-wrap:wrap;padding:0 15px 12px}
+.tlink{border:1px solid var(--line);background:var(--panel);color:var(--sub);border-radius:8px;
+  padding:7px 12px;font-size:.76rem;font-weight:500;cursor:pointer;transition:.14s;font-family:'Noto Sans KR'}
+.tlink:hover{border-color:var(--gold);color:var(--gold)}
+.tplayer{margin:0 15px 14px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.tlecrow{display:flex;gap:12px;margin:0 15px 14px;flex-wrap:wrap}
+.tlecrow .tplayer{flex:1;min-width:280px;margin:0}
+.qapanel{width:300px;flex:none;border:1px solid var(--line);border-radius:10px;background:var(--navy2);display:flex;flex-direction:column}
+@media(max-width:820px){.qapanel{width:100%}}
+.qahead{padding:10px 12px;border-bottom:1px solid var(--line);font-size:.8rem;font-weight:700;color:var(--gold);white-space:nowrap}
+.qahead span{font-weight:400;font-size:.68rem;color:var(--dim)}
+.qabody{flex:1;padding:12px;display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto}
+.qamsg{font-size:.8rem;line-height:1.5;padding:9px 12px;border-radius:10px;max-width:88%}
+.qamsg.ai{background:var(--panel);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:3px}
+.qamsg.ai b{color:var(--gold2)}
+.qamsg.me{background:var(--gold);color:var(--navy);align-self:flex-end;border-bottom-right-radius:3px;font-weight:500}
+.qain{display:flex;gap:6px;padding:10px;border-top:1px solid var(--line)}
+.qain input{flex:1;background:#0c1a30;border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:9px 12px;font-size:.8rem;font-family:'Noto Sans KR';outline:none}
+.qain input:focus{border-color:var(--gold)}
+.qain button{border:none;background:var(--gold);color:var(--navy);border-radius:8px;padding:9px 14px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Noto Sans KR'}
+.qahead{display:flex;align-items:center;gap:6px}
+.qadl{margin-left:auto;border:1px solid var(--line);background:var(--panel);color:var(--sub);
+  border-radius:7px;padding:4px 9px;font-size:.68rem;font-weight:700;cursor:pointer;font-family:'Noto Sans KR';transition:.14s}
+.qadl:hover{border-color:var(--gold);color:var(--gold)}
+.pmr{display:flex;align-items:center;gap:12px}
+.fsbtn{border:1px solid var(--line);background:var(--panel);color:var(--sub);border-radius:7px;
+  padding:4px 10px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Noto Sans KR';transition:.14s}
+.fsbtn:hover{border-color:var(--gold);color:var(--gold)}
+.fsover{position:fixed;inset:0;z-index:90;background:rgba(6,14,28,.88);display:none;align-items:center;justify-content:center;padding:24px}
+.fsover.on{display:flex}
+.fsbox{width:min(1000px,94vw);border-radius:14px;overflow:hidden;border:1px solid var(--gold);background:var(--navy2)}
+.fstop{display:flex;align-items:center;padding:12px 16px;background:linear-gradient(135deg,var(--navy),var(--navy2));border-bottom:1px solid var(--line)}
+.fstop b{font-family:'Noto Serif KR',serif;font-weight:900;color:var(--gold)}
+.fsx{margin-left:auto;border:1px solid var(--gold);background:none;color:var(--gold);border-radius:999px;padding:6px 14px;font-size:.76rem;font-weight:700;cursor:pointer}
+.fsx:hover{background:var(--gold);color:var(--navy)}
+.fsscreen{aspect-ratio:16/9;background:radial-gradient(circle at 30% 30%,#1c355c,#0c1a30);display:grid;place-items:center;position:relative}
+.fsscreen .prof{text-align:center}
+.fsscreen .prof .av{width:76px;height:76px;border-radius:50%;margin:0 auto 12px;background:linear-gradient(135deg,var(--gold),#8a6f1a);display:grid;place-items:center;font-family:'Noto Serif KR';font-weight:900;font-size:1.7rem;color:var(--navy)}
+.fsscreen .prof .nm{font-weight:700;font-size:1.05rem}
+.fsscreen .prof .desc{font-size:.85rem;color:var(--sub);margin-top:4px}
+.fsscreen .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(201,162,39,.92);color:var(--navy);display:grid;place-items:center;font-size:1.5rem;border:none;cursor:pointer}
+.prodpill{font-size:.68rem;font-weight:700;border-radius:6px;padding:3px 9px;margin-left:6px;vertical-align:middle}
+.prodpill.jong{background:var(--gold);color:var(--navy)}
+.prodpill.dan{background:#26364d;color:var(--sub)}
+.danwrap{display:flex;gap:14px;flex-wrap:wrap}
+.danwrap .tplayer{flex:1;min-width:320px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.dtoc{width:300px;flex:none;border:1px solid var(--line);border-radius:12px;background:var(--navy2);padding:14px 16px}
+@media(max-width:820px){.dtoc{width:100%}}
+.dtoch{font-size:.82rem;color:var(--sub);margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+.dtoch b{color:var(--gold2)}
+.dtoclist{margin:0;padding-left:20px;max-height:300px;overflow-y:auto}
+.dtoclist li{font-size:.82rem;margin-bottom:6px;color:var(--ink)}
+.dtoclist .dpg{font-size:.7rem;color:var(--dim)}
+.dtoclist .dmin{font-size:.7rem;color:var(--sub);float:right}
+.dnote{margin-top:11px;font-size:.72rem;color:var(--dim);border-top:1px solid var(--line);padding-top:10px}
+.tocbought{font-size:.68rem;font-weight:700;color:var(--navy);background:var(--ok);border-radius:6px;padding:2px 8px}
+.tocrow.locked .tochead:hover{background:none}
+.buybtn{margin-left:auto;border:1px solid var(--gold);background:none;color:var(--gold);border-radius:8px;
+  padding:6px 13px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Noto Sans KR';transition:.14s}
+.buybtn:hover{background:var(--gold);color:var(--navy)}
+.tcprice{font-size:.76rem;color:var(--gold2);font-weight:700;margin-left:auto;margin-right:10px}
+.tocrow.locked .buybtn{margin-left:0}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="topin">
+    <div class="brand">베리타스 PASS:ON <small>진단이 강의를 골라줍니다 · 헌법</small></div>
+    <button class="back" onclick="history.length>1?history.back():location.href='변시_학습포털.html'">← 데모로 돌아가기</button>
+  </div>
+</div>
+<div class="wrap">
+  <div class="hero">
+    <span class="eyebrow">STEP ①~④ · 진단 → 처방 → 순환</span>
+    <h1>당신이 <span class="hl">들어야 할 강의</span>가 모두 있습니다</h1>
+    <p>당신의 수준에 맞는 최적의 강의를 설계하여 최단기간 합격으로 인도합니다.</p>
+  </div>
+  <div class="pickbar">
+    <div class="teacher"><span class="tk">선택한 선생님</span><b>금동흠 원장</b><span class="tsub">· 헌법</span>
+      <span class="tchg" onclick="location.href='변시_초기화면.html'">초기 화면으로 돌아가기 ↩</span></div>
+    <div class="prodtog">
+      <button class="ptog on" id="pgJong" onclick="setProd('jong')">종합반 <small>전 범위 선불</small></button>
+      <button class="ptog" id="pgDan" onclick="setProd('dan')">단과반 <small>목차별 신청</small></button>
+    </div>
+  </div>
+  <div class="mess">
+    <h3>현재 · 고시닷컴에 쏟아지는 금동흠 헌법 강의(발췌)</h3>
+    <div class="mchips">
+      <span class="mchip">기본이론강의</span><span class="mchip">이론·사례 단권화</span><span class="mchip">심화강의</span>
+      <span class="mchip">집중강의</span><span class="mchip">객관식 완벽대비</span><span class="mchip">판례정리 특강</span>
+      <span class="mchip">고득점 사례정리</span><span class="mchip">8일 80점 특강</span><span class="mchip">진도별 심화강의</span>
+      <span class="mchip">FINAL 모의고사</span><span class="mchip">핵심암기장</span><span class="mchip">… 28개+</span>
+    </div>
+  </div>
+  <div class="journey">
+    <div class="jhead">
+      <h2 id="jTitle">① 자가진단 테스트</h2>
+    </div>
+    <p class="jsub" id="jSub">나에게 적합한 강의를 추천받는 자가진단입니다. 문항은 구성하기 나름이며, 시연에서는 헌법 대표 4문항만 보여드립니다.</p>
+    <div class="steps" id="steps"></div>
+    <div class="stage" id="stage"></div>
+    <div class="stgnav">
+      <button class="prevb" id="prevb" onclick="go(step-1)">← 이전</button>
+      <button class="nextb" id="nextb" onclick="go(step+1)">다음 →</button>
+    </div>
+  </div>
+</div>
+<div class="foot">
+  본 화면은 시연용 데모이며 수험생·수치·문항은 가상의 예시입니다. 강의 단계와 목록은 금동흠 원장 헌법 강의(고시닷컴, 2027 대비)를 참고했습니다.<br>
+  1행2필 행정법구조연구소 × 베리타스법학원 제안 자료 · 2026. 8.
+</div>
+<div class="fsover" id="fsover" onclick="if(event.target.id==='fsover')closeFull()">
+  <div class="fsbox">
+    <div class="fstop"><b id="fsTitle">헌법 강의</b><button class="fsx" onclick="closeFull()">닫기 ✕</button></div>
+    <div class="fsscreen"><div class="prof"><div class="av">金</div><div class="nm">금동흠 원장</div><div class="desc" id="fsDesc"></div></div>
+      <button class="play" id="fsPlay" onclick="fsPlayToggle()">▶</button></div>
+    <div class="pbar"><span id="fsbar"></span></div>
+    <div class="pmeta"><span id="fsTime">00:00 / 68:00</span><span>고시닷컴 스트리밍 · 0원 · ESC 또는 닫기</span></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const STAGES=[
+  {lv:"입문", nm:"입문 강의", desc:"헌법을 처음 접하는 단계 — 전체 그림과 용어에 익숙해지기"},
+  {lv:"기본", nm:"기본이론 강의", desc:"7법 기본이론을 목차대로 완주 — 개념의 뼈대 세우기"},
+  {lv:"심화", nm:"심화 강의", desc:"판례·쟁점을 깊이 — 개념은 되는데 답이 안 나오는 구간 해소"},
+  {lv:"집중", nm:"집중 강의", desc:"약한 목차를 골라 문제로 조지기 — 선택형·사례 실전 훈련"},
+  {lv:"파이널", nm:"최종 파이널 강의", desc:"전범위 압축·모의고사 — 시험 직전 마무리 점검"},
+];
+const DX=[
+ {qn:"진단 1 / 4 · 개념 이해",qt:"\u2018위헌법률심판\u2019과 \u2018위헌소원(\u00a768\u2461)\u2019의 차이를 설명할 수 있습니까?",
+  opts:[["두 제도가 무엇인지 아직 낯설다",0],["이름은 알지만 차이는 헷갈린다",1],["차이는 알지만 요건이 가물가물하다",2],["요건까지 정확히 구분한다",3]]},
+ {qn:"진단 2 / 4 · 판례·쟁점",qt:"기본권 제한의 위헌심사 기준(과잉금지원칙 4요소)을 사례에 적용할 수 있습니까?",
+  opts:[["4요소가 무엇인지 잘 모른다",0],["4요소는 외웠으나 적용이 어렵다",1],["적용은 하나 논증이 엉성하다",2],["능숙하게 논증한다",3]]},
+ {qn:"진단 3 / 4 · 객관식 실전",qt:"최근 3개년 헌법 기출 객관식에서 안정적으로 정답률이 나옵니까?",
+  opts:[["기출을 거의 안 풀어봤다",0],["절반쯤 맞는다",1],["70~80% 맞지만 함정에 걸린다",2],["대부분 맞는다",3]]},
+ {qn:"진단 4 / 4 · 서술·사례",qt:"헌법 사례형 답안을 시간 안에 목차 잡아 쓸 수 있습니까?",
+  opts:[["답안 작성 경험이 거의 없다",0],["쓰긴 쓰는데 목차가 흔들린다",1],["목차는 잡으나 현출이 부족하다",2],["안정적으로 완성한다",3]]},
+];
+let answers=Array(DX.length).fill(null);
+function verdict(){
+  const sum=answers.reduce((a,b)=>a+(b||0),0);
+  let idx; if(sum<=2)idx=0; else if(sum<=5)idx=1; else if(sum<=8)idx=2; else if(sum<=10)idx=3; else idx=4;
+  return idx;
+}
+const STEPS=[
+ {t:"① 자가진단 테스트", s:"나에게 적합한 강의를 추천받는 자가진단입니다. 문항은 구성하기 나름이며, 시연에서는 헌법 대표 4문항만 보여드립니다."},
+ {t:"② 진단 결과 · 강의 처방", s:"5단계 강의 위계에서 당신이 시작할 지점을 짚어 드립니다. 앞 단계는 통과, 뒷 단계는 잠금."},
+ {t:"③ 강의 수강", s:"처방된 강의를 듣습니다. 강의는 고시닷컴 영상, 교재·자료는 북라인으로 이어집니다."},
+ {t:"④ 문제 풀이 · 로드맵 반영", s:"강의가 끝나면 문제가 열리고, 푼 결과가 점수와 로드맵으로 이어집니다."},
+];
+
+
+const HTOC=[
+ {nm:"헌법소원 요건 중 청구인능력",pg:"",min:62},
+ {nm:"헌법소원 요건 중 대상",pg:"",min:58},
+ {nm:"위헌소원",pg:"p.23",min:68,weak:true},
+ {nm:"위헌소원 사례풀이",pg:"",min:54,weak:true},
+ {nm:"권한쟁의심판",pg:"p.31",min:49},
+ {nm:"헌법개정과 개정의 한계",pg:"p.48",min:56},
+ {nm:"대한민국 경제질서",pg:"p.69",min:49},
+ {nm:"기본권 총론",pg:"p.92",min:56},
+ {nm:"일반적 행동자유권",pg:"",min:47},
+ {nm:"생명권과 사형제도·안락사",pg:"p.117",min:61},
+ {nm:"영장주의원칙",pg:"p.122",min:45},
+ {nm:"진술거부권",pg:"p.128",min:45},
+ {nm:"거주 이전의 자유",pg:"p.136",min:64},
+ {nm:"종교의 자유",pg:"p.141",min:43},
+ {nm:"재산권",pg:"p.152",min:52},
+ {nm:"특별부담금",pg:"p.157",min:41},
+ {nm:"법률의 위헌 유보원칙",pg:"p.179",min:45},
+];
+let openToc=2; // 펼쳐진 목차 index(기본: 위헌소원)
+let danPaid=new Set([2,3]); // 단과반: 결제(수강 중)한 목차 index — 시연 기본 2개
+const DAN_UNIT=9900;
+let prod='jong'; // 'jong'(종합반) | 'dan'(단과반)
+function setProd(p){ prod=p;
+  document.getElementById('pgJong').className='ptog'+(p==='jong'?' on':'');
+  document.getElementById('pgDan').className='ptog'+(p==='dan'?' on':'');
+  if(step===1) document.getElementById('stage').innerHTML=viewRx();
+  if(step===2){ if(prod==='dan' && !danPaid.has(openToc)) openToc=[...danPaid][0]!==undefined?[...danPaid][0]:2; document.getElementById('stage').innerHTML=viewLecture(); }
+  toast(p==='jong'?'종합반 — 전 범위가 열려 있어 약점 단계도 스스로 보강할 수 있습니다':'단과반 — 처방 단계를 신청해 수강합니다');
+}
+// 진단 응답에서 앞 단계 약점 신호: 문항별 점수가 낮으면 그 단계가 약점
+function weakStages(){
+  // DX[0]=개념→입문/기본, DX[1]=판례→심화, DX[2]=객관식→집중, DX[3]=사례→집중/파이널
+  const w=new Set();
+  if((answers[0]||0)<=1) w.add(1);         // 기본
+  if((answers[0]||0)<=0) w.add(0);         // 입문
+  if((answers[1]||0)<=1) w.add(2);         // 심화
+  if((answers[2]||0)<=1) w.add(3);         // 집중
+  return w;
+}
+let step=0, rxIdx=2;
+function renderSteps(){
+  const wrap=document.getElementById('steps'); wrap.innerHTML='';
+  STEPS.forEach((s,i)=>{
+    const d=document.createElement('div');
+    d.className='stepdot'+(i===step?' active':'')+(i<step?' done':'');
+    d.innerHTML='<span class="n">'+(i<step?'\u2713':i+1)+'</span>'+s.t.replace(/^[\u2460\u2461\u2462\u2463]\s/,'');
+    d.onclick=()=>{ if(i<=maxStep()) go(i); };
+    wrap.appendChild(d);
+  });
+  document.getElementById('jTitle').textContent=STEPS[step].t;
+  document.getElementById('jSub').textContent=STEPS[step].s;
+  document.getElementById('prevb').style.visibility=step===0?'hidden':'visible';
+  const nb=document.getElementById('nextb');
+  nb.textContent = step===3?'처음으로 \u21ba':'다음 \u2192';
+  nb.disabled = !canAdvance();
+}
+function maxStep(){ return answers.every(a=>a!==null)?3:0; }
+function canAdvance(){ if(step===0) return answers.every(a=>a!==null); return true; }
+function go(i){
+  if(i<0) return;
+  if(i>3){ step=0; answers=Array(DX.length).fill(null); render(); return; }
+  if(i>0 && !answers.every(a=>a!==null)){ toast('먼저 진단 4문항에 답해 주세요'); return; }
+  if(i===1) rxIdx=verdict();
+  step=i; render();
+}
+function render(){
+  renderSteps();
+  const st=document.getElementById('stage');
+  if(step===0) st.innerHTML=viewDx();
+  if(step===1) st.innerHTML=viewRx();
+  if(step===2) st.innerHTML=viewLecture();
+  if(step===3){ st.innerHTML=viewEngineThenReflow(); }
+}
+function viewDx(){
+  const cards=DX.map((q,qi)=>'<div class="qcard"><div class="qn">'+q.qn+'</div><div class="qt">'+q.qt+'</div>'+
+    q.opts.map(function(o){return '<button class="qopt '+(answers[qi]===o[1]?'pick':'')+'" onclick="pick('+qi+','+o[1]+')">'+o[0]+'</button>';}).join('')+'</div>').join('');
+  const done=answers.filter(a=>a!==null).length;
+  return cards+'<div class="dxbar"><span class="prog"><span style="width:'+(done/DX.length*100)+'%"></span></span><span class="cnt">'+done+' / '+DX.length+' 응답</span></div>'+
+    '<button class="dxsubmit" id="dxSub" '+(done<DX.length?'disabled':'')+' onclick="go(1)">'+(done<DX.length?(DX.length-done)+'문항 더 답해 주세요':'진단 결과 보기 \u2192')+'</button>';
+}
+function pick(qi,val){ answers[qi]=val; document.getElementById('stage').innerHTML=viewDx(); document.getElementById('nextb').disabled=!canAdvance(); }
+function viewRx(){
+  const names=["입문","기본","심화","집중","파이널"];
+  const whyMap={
+    0:"개념 자체가 아직 낯선 단계입니다. 전체 그림부터 잡는 <b>입문 강의</b>가 가장 빠른 길입니다.",
+    1:"용어는 익숙하나 뼈대가 덜 섰습니다. <b>기본이론 강의</b>로 목차를 완주하는 것이 우선입니다.",
+    2:"개념은 되는데 답이 안 나오는 구간입니다. 판례·쟁점을 파고드는 <b>심화 강의</b>부터 시작하세요.",
+    3:"이해는 충분합니다. 약한 목차를 골라 문제로 조지는 <b>집중 강의</b>가 지금 필요합니다.",
+    4:"실전 수준에 올라 있습니다. 전범위를 압축하는 <b>최종 파이널 강의</b>로 마무리하세요.",
+  };
+  const weak=weakStages();
+  const rungs=STAGES.map(function(s,i){
+    var cls='', body='<div class="body"><div class="nm">'+s.nm+'</div><div class="desc">'+s.desc+'</div>', right='';
+    var isWeak=weak.has(i);
+    if(i===rxIdx){
+      cls='rx';
+      right='<span class="stt">여기부터</span> <button class="go" onclick="go(2)">이 강의 시작 \u2192</button>';
+    } else if(i<rxIdx){
+      if(prod==='jong'){
+        // 종합반: 앞 단계도 열림. 약점이면 보강 권장 자가체크
+        if(isWeak){ cls='open-weak';
+          body+='<div class="selfchk">\u26a0 진단상 이 단계가 약합니다 — 스스로 점검·보강 권장</div>';
+          right='<button class="openbtn" onclick="go(2)">열기 · 보강</button>';
+        } else {
+          right='<span class="stt">통과</span> <button class="openbtn" onclick="go(2)">열기</button>';
+        }
+      } else {
+        cls='pass'; right='<span class="stt">통과</span>';
+      }
+    } else { // 뒤 단계
+      if(prod==='jong'){ right='<button class="openbtn" onclick="go(2)">열림</button>'; }
+      else { cls='locked'; right='<span class="stt">잠금</span>'; }
+    }
+    body+='</div>';
+    return '<div class="rung '+cls+'"><div class="lv">'+s.lv+'</div>'+body+right+'</div>';
+  }).join('');
+  var foot = prod==='jong'
+    ? '종합반은 전 범위를 이미 지불했습니다 — 진단이 <b>시작점</b>을 짚어 주되, 약한 앞 단계는 언제든 열어 스스로 보강하세요.'
+    : '단과반은 처방된 단계를 신청해 수강합니다. 28개 강의가 <b>한 곳</b>으로 좁혀졌습니다 — 전화 상담 없이.';
+  return '<div class="verdict"><div class="lead">헌법 진단 결과 — 당신이 시작할 지점</div><div class="big">'+names[rxIdx]+' 단계부터</div><div class="why">'+whyMap[rxIdx]+'</div></div>'+
+    '<div class="ladder5">'+rungs+'</div>'+
+    '<div class="rxnote">'+foot+'</div>';
+}
+function lecName(){
+  return {0:"헌법 입문 — 전체 구조 잡기",1:"헌법 기본이론 — 위헌소원 요건",2:"헌법 심화 — 위헌소원 쟁점·판례",3:"헌법 집중 — 위헌소원 객관식·사례",4:"헌법 파이널 — 전범위 압축정리"}[rxIdx];
+}
+function viewLecture(){
+  return prod==='jong' ? viewLectureJong() : viewLectureDan();
+}
+
+/* 종합반 — 목차별 아코디언(재생·AI Q&A·저장) */
+function viewLectureJong(){
+  const nm=lecName();
+  const rows=HTOC.map(function(t,i){
+    const open=(i===openToc);
+    const badge=t.weak?'<span class="tocw">진단 취약 · 여기부터</span>':'';
+    const player = open ? (
+      '<div class="tlecrow">'+
+        '<div class="tplayer">'+
+          '<div class="pscreen"><div class="prof"><div class="av">\u91d1</div><div class="nm">금동흠 원장</div><div class="desc">헌법 · '+t.nm+(t.pg?' · '+t.pg:'')+'</div></div>'+
+          '<button class="play" id="playBtn" onclick="playLec()">\u25b6</button></div>'+
+          '<div class="pbar"><span id="pbar"></span></div>'+
+          '<div class="pmeta"><span id="pTime">00:00 / '+t.min+':00</span><span class="pmr"><button class="fsbtn" onclick="event.stopPropagation();openFull()">\u2922 전체화면</button><span>고시닷컴 스트리밍 · 0원</span></span></div>'+
+        '</div>'+
+        '<div class="qapanel">'+
+          '<div class="qahead">\ud83d\udcac AI 조교 <span>· 바로 질문</span><button class="qadl" onclick="qaDownload()">\u2b07 저장</button></div>'+
+          '<div class="qabody" id="qabody">'+
+            '<div class="qamsg ai">헌법 · '+t.nm+' 강의를 듣는 중이군요. 막히는 부분을 물어보세요.</div>'+
+            '<div class="qamsg me">위헌소원이랑 위헌법률심판, 뭐가 다른 거예요?</div>'+
+            '<div class="qamsg ai">위헌법률심판은 <b>법원</b>이 제청하는 것이고, 위헌소원(\u00a768\u2461)은 그 제청 신청이 <b>기각</b>됐을 때 <b>당사자</b>가 직접 청구하는 겁니다. 주체가 다릅니다.</div>'+
+          '</div>'+
+          '<div class="qain"><input id="qaInput" placeholder="이 목차에 대해 질문하기…" onkeydown="if(event.key===\'Enter\')qaSend()"><button onclick="qaSend()">보내기</button></div>'+
+        '</div>'+
+      '</div>') : '';
+    return '<div class="tocrow '+(open?'open':'')+(t.weak?' weak':'')+'">'+
+      '<div class="tochead" onclick="toggleToc('+i+')">'+
+        '<span class="tcaret">'+(open?'\u25be':'\u25b8')+'</span>'+
+        '<span class="tcnm">'+t.nm+'</span>'+
+        (t.pg?'<span class="tcpg">'+t.pg+'</span>':'')+
+        badge+
+        '<span class="tcmin">'+t.min+'분</span>'+
+      '</div>'+
+      '<div class="toclinks">'+
+        '<button class="tlink" onclick="event.stopPropagation();toast(\'고시닷컴 해당 강의로 이동합니다\')">\u25b6 고시닷컴 재생</button>'+
+        '<button class="tlink" onclick="event.stopPropagation();toast(\'북라인 교재 구매처로 이동합니다\')">\u25a0 북라인 서점</button>'+
+        '<button class="tlink" onclick="event.stopPropagation();toast(\'이 목차의 낱개 PDF 구매입니다\')">\u25a4 낱개 PDF 구매</button>'+
+      '</div>'+
+      player+
+    '</div>';
+  }).join('');
+  return '<div class="stgtitle">지금 수강 — '+nm+' <span class="prodpill jong">종합반 · 목차별</span></div>'+
+    '<div class="stgnote">종합반은 전 범위를 지불했으므로 <b>목차 단위</b>로 진단·수강합니다. 진단이 짚은 목차를 펼쳐 강의를 듣고, 강의 옆에서 바로 질문하세요.</div>'+
+    '<div class="toclist">'+rows+'</div>';
+}
+
+/* 단과반 — 목차 아코디언(산 목차만 열림 · 관리 없음) */
+function viewLectureDan(){
+  const nm=lecName();
+  const rows=HTOC.map(function(t,i){
+    const bought=danPaid.has(i);
+    const open=(i===openToc && bought);
+    const player = open ? (
+      '<div class="tplayer" style="margin:0 15px 14px">'+
+        '<div class="pscreen"><div class="prof"><div class="av">\u91d1</div><div class="nm">금동흠 원장</div><div class="desc">헌법 · '+t.nm+(t.pg?' · '+t.pg:'')+'</div></div>'+
+        '<button class="play" id="playBtn" onclick="playLec()">\u25b6</button></div>'+
+        '<div class="pbar"><span id="pbar"></span></div>'+
+        '<div class="pmeta"><span id="pTime">00:00 / '+t.min+':00</span><span class="pmr"><button class="fsbtn" onclick="event.stopPropagation();openFull()">\u2922 전체화면</button><span>고시닷컴 스트리밍 · 0원</span></span></div>'+
+      '</div>') : '';
+    if(bought){
+      return '<div class="tocrow '+(open?'open':'')+'">'+
+        '<div class="tochead" onclick="toggleToc('+i+')">'+
+          '<span class="tcaret">'+(open?'\u25be':'\u25b8')+'</span>'+
+          '<span class="tcnm">'+t.nm+'</span>'+
+          (t.pg?'<span class="tcpg">'+t.pg+'</span>':'')+
+          '<span class="tocbought">수강 중</span>'+
+          '<span class="tcmin">'+t.min+'분</span>'+
+        '</div>'+
+        '<div class="toclinks">'+
+          '<button class="tlink" onclick="event.stopPropagation();toast(\'고시닷컴 해당 강의로 이동합니다\')">\u25b6 고시닷컴 재생</button>'+
+          '<button class="tlink" onclick="event.stopPropagation();toast(\'북라인 교재 구매처로 이동합니다\')">\u25a0 북라인 서점</button>'+
+          '<button class="tlink" onclick="event.stopPropagation();toast(\'이 목차의 낱개 PDF 구매입니다\')">\u25a4 낱개 PDF 구매</button>'+
+        '</div>'+
+        player+
+      '</div>';
+    } else {
+      return '<div class="tocrow locked">'+
+        '<div class="tochead" style="cursor:default">'+
+          '<span class="tcaret">\ud83d\udd12</span>'+
+          '<span class="tcnm" style="color:var(--dim)">'+t.nm+'</span>'+
+          (t.pg?'<span class="tcpg">'+t.pg+'</span>':'')+
+          '<span class="tcmin">'+t.min+'분</span>'+
+          '<span class="tcprice">'+DAN_UNIT.toLocaleString('ko-KR')+'원</span>'+
+        '<button class="buybtn" onclick="event.stopPropagation();payToc('+i+')">지금 결제</button>'+
+        '</div>'+
+      '</div>';
+    }
+  }).join('');
+  return '<div class="stgtitle">지금 수강 — '+nm+' <span class="prodpill dan">단과반 · 신청한 목차</span></div>'+
+    '<div class="stgnote">단과반은 <b>신청한 목차만</b> 열립니다. 콘텐츠는 종합반과 같지만, 진단·로드맵 관리와 AI 조교는 종합반 전용입니다. 수강 중 옆 목차가 필요하면 그 자리에서 바로 결제해 열 수 있습니다.</div>'+
+    '<div class="toclist">'+rows+'</div>';
+}
+function payToc(i){
+  danPaid.add(i); openToc=i;
+  document.getElementById('stage').innerHTML=viewLecture();
+  toast(HTOC[i].nm+' 결제 완료 — 바로 수강할 수 있습니다');
+}
+function toggleToc(i){
+  if(prod==='dan' && !danPaid.has(i)){ toast('결제한 목차만 열 수 있습니다'); return; }
+  openToc=(openToc===i?-1:i); document.getElementById('stage').innerHTML=viewLecture();
+}
+let lecTimer=null;
+function playLec(){
+  const bar=document.getElementById('pbar'),t=document.getElementById('pTime'),btn=document.getElementById('playBtn');
+  if(!bar) return; btn.textContent='\u275a\u275a'; let p=parseFloat(bar.style.width)||0; clearInterval(lecTimer);
+  // 분모(총 분)를 현재 라벨에서 읽음
+  const totMatch=(t.textContent.split('/')[1]||'68:00').trim(); const totMin=parseInt(totMatch)||68;
+  lecTimer=setInterval(function(){ p+=4; if(p>=100){p=100;clearInterval(lecTimer);t.textContent=totMin+':00 / '+totMin+':00';toast('강의 완료 — 문제가 열렸습니다');document.getElementById('nextb').textContent='문제 풀이 \u2192';}
+    bar.style.width=p+'%'; const cur=Math.round(totMin*p/100); t.textContent=String(cur).padStart(2,'0')+':00 / '+totMin+':00'; },110);
+}
+const QUIZ={
+  q:"위헌법률심판형 헌법소원(위헌소원)의 청구 요건으로 옳지 않은 것은?",
+  opts:["법원에 위헌제청을 신청했으나 기각된 당사자가 청구한다.","재판의 전제성이 인정되어야 한다.","제청신청 기각 통지일부터 30일 내에 청구한다.","법원의 위헌제청결정이 있어야만 청구할 수 있다."],
+  answer:3,
+  why:"위헌소원(헌재법 \u00a768\u2461)은 법원이 제청을 <b>기각</b>했을 때 당사자가 직접 청구하는 제도입니다. 제청결정이 있으면 그 자체가 위헌법률심판(\u00a741)이므로 \u2463가 옳지 않습니다."
+};
+const SUBS=[{nm:"헌법",b:78,a:88,moved:true},{nm:"민법",b:76,a:76},{nm:"형법",b:88,a:88},{nm:"행정법",b:54,a:54},{nm:"민소법",b:71,a:71},{nm:"형소법",b:79,a:79},{nm:"상법",b:61,a:61}];
+let answered=false;
+function viewEngineThenReflow(){
+  const opts=QUIZ.opts.map(function(o,i){return '<button class="opt" id="opt'+i+'" onclick="answer('+i+')">'+['\u2460','\u2461','\u2462','\u2463'][i]+' '+o+'</button>';}).join('');
+  const rows=SUBS.map(function(s,i){return '<div class="scorerow"><span class="lbl">'+s.nm+'</span><span class="track"><span id="trk'+i+'" style="width:'+s.b+'%;background:'+(s.moved?'var(--gold)':'var(--blue)')+'"></span></span><span class="pct" id="pct'+i+'">'+s.b+'%</span></div>';}).join('');
+  const cells=['1','2','3','4','5','클리어'].map(function(n,i){return '<div class="cell" id="c'+i+'"><div class="lv">'+(i<5?'STAGE '+(i+1):'CLEAR')+'</div></div>';}).join('');
+  return '<div class="stgtitle">문제 풀이 — '+lecName()+'</div>'+
+    '<div class="stgnote">강의 시청이 여기서 <b>엔진 실행</b>으로 완결됩니다. 틀리면 이 문항은 2·4·8일 뒤 다시 나옵니다.</div>'+
+    '<div class="qbox"><div class="qmeta">헌법 · 위헌소원 · 선택형 6단계 자율학습</div><div class="qtext">'+QUIZ.q+'</div>'+opts+
+    '<div class="qresult" id="qres"></div><div class="sixmini" id="six">'+cells+'</div></div>'+
+    '<div id="reflowWrap" style="display:none;margin-top:16px"><div class="reflow">'+
+    '<div class="rcard"><h4>과목별 선택형 정답률 — 이번 주</h4>'+rows+'</div>'+
+    '<div class="rcard"><h4>로드맵 반영</h4><div class="mapcell" id="mc"><div class="top"><b>헌법 · 위헌소원</b><span class="state" id="mcState" style="color:var(--org)">보강 필요</span></div><div style="font-size:.78rem;color:var(--sub)" id="mcDesc">정답률 78% — 문풀 칸에 위헌소원 1문 추가 예정</div></div>'+
+    '<button class="reflowbtn" id="reBtn" onclick="doReflow()">\u21bb 이번 결과 반영 — 로드맵 재조정</button>'+
+    '<div style="font-size:.76rem;color:var(--dim);margin-top:10px" id="reNote">버튼을 누르면 헌법 행이 실제로 바뀝니다.</div></div></div></div>';
+}
+function answer(i){
+  if(answered) return; answered=true;
+  const res=document.getElementById('qres');
+  document.querySelectorAll('.opt').forEach(function(b,idx){ b.style.cursor='default';
+    if(idx===QUIZ.answer) b.classList.add('correct'); if(idx===i&&i!==QUIZ.answer) b.classList.add('wrong'); });
+  if(i===QUIZ.answer){ res.className='qresult show';res.style.background='var(--okbg)';res.style.border='1px solid var(--ok)';res.style.color='#a7e0c8';
+    res.innerHTML='\u2713 정답입니다. '+QUIZ.why+'<br><b>이 문항이 다음 단계로 승급합니다.</b>'; for(var k=0;k<=1;k++){(function(kk){setTimeout(function(){document.getElementById('c'+kk).classList.add('lit');},kk*160);})(k);} }
+  else{ res.className='qresult show';res.style.background='#2a1b18';res.style.border='1px solid var(--warn)';res.style.color='#e3b3a3';
+    res.innerHTML='\u2717 아쉽습니다. '+QUIZ.why+'<br><b>이 문항은 1단계로 내려가 2·4·8일 뒤 다시 출제됩니다.</b>'; document.getElementById('c0').classList.add('lit'); }
+  document.getElementById('reflowWrap').style.display='block';
+  SUBS.forEach(function(s,i){var t=document.getElementById('trk'+i);if(t){t.style.width='0%';setTimeout(function(){t.style.width=s.b+'%';},80+i*40);}});
+}
+function doReflow(){
+  SUBS.forEach(function(s,i){ if(s.a!==s.b){var t=document.getElementById('trk'+i),p=document.getElementById('pct'+i);t.style.width=s.a+'%';var v=s.b;var id=setInterval(function(){v++;p.textContent=v+'%';if(v>=s.a)clearInterval(id);},40);} });
+  var mc=document.getElementById('mc'); mc.classList.add('moved');
+  document.getElementById('mcState').textContent='통과'; document.getElementById('mcState').style.color='var(--ok)';
+  document.getElementById('mcDesc').textContent='정답률 88%로 상승 — 위헌소원 통과, 심화 칸 개방';
+  document.getElementById('reNote').innerHTML='<b style="color:var(--gold2)">반영 완료</b> — 진단이 고른 강의 하나가 로드맵을 실제로 고쳤습니다. 이것이 순환의 한 바퀴입니다.';
+  document.getElementById('reBtn').disabled=true; document.getElementById('reBtn').style.opacity=.5;
+  toast('로드맵 재조정 완료 — 순환 한 바퀴가 돌았습니다');
+}
+function qaSend(){
+  const inp=document.getElementById('qaInput'); if(!inp||!inp.value.trim())return;
+  const body=document.getElementById('qabody');
+  const me=document.createElement('div'); me.className='qamsg me'; me.textContent=inp.value; body.appendChild(me);
+  const q=inp.value; inp.value='';
+  setTimeout(function(){
+    const ai=document.createElement('div'); ai.className='qamsg ai';
+    ai.innerHTML='좋은 질문입니다. (시연에서는 예시 응답입니다) 실제로는 이 목차 맥락을 알고 있는 AI 조교가 24시간 즉답합니다.';
+    body.appendChild(ai); body.scrollTop=body.scrollHeight;
+  },500);
+  body.scrollTop=body.scrollHeight;
+}
+function qaDownload(){
+  const body=document.getElementById('qabody'); if(!body)return;
+  const open=HTOC[openToc]; const title=open?open.nm:'목차';
+  let lines=['[베리타스 PASS:ON] 헌법 · '+title+' — AI 조교 Q&A 노트','생성일 '+new Date().toLocaleString('ko-KR'),'—'.repeat(28),''];
+  body.querySelectorAll('.qamsg').forEach(function(m){
+    const who=m.classList.contains('me')?'Q':'A';
+    lines.push(who+'. '+m.textContent.trim()); lines.push('');
+  });
+  lines.push('—'.repeat(28)); lines.push('※ 본 노트는 수강 중 나눈 질문을 정리한 개인 복습 자료입니다.');
+  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='헌법_'+title.replace(/[\\/:*?"<>|]/g,'')+'_QA노트.txt';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  toast('이 목차의 질문 정리를 저장했습니다');
+}
+function openFullDan(){
+  const nm=lecName(); const totMin=HTOC.reduce(function(a,t){return a+t.min;},0);
+  document.getElementById('fsTitle').textContent=nm;
+  document.getElementById('fsDesc').textContent=nm;
+  const inbar=document.getElementById('pbar'); const w=inbar?parseFloat(inbar.style.width)||0:0;
+  document.getElementById('fsbar').style.width=w+'%'; fsTotMin=totMin; syncFsTime(w,totMin);
+  document.getElementById('fsover').classList.add('on');
+}
+function openFull(){
+  const t=HTOC[openToc]; if(!t)return;
+  document.getElementById('fsTitle').textContent='헌법 · '+t.nm;
+  document.getElementById('fsDesc').textContent='헌법 · '+t.nm+(t.pg?' · '+t.pg:'');
+  // 인라인 재생 상태 동기화
+  const inbar=document.getElementById('pbar'); const w=inbar?parseFloat(inbar.style.width)||0:0;
+  document.getElementById('fsbar').style.width=w+'%'; fsTotMin=t.min;
+  syncFsTime(w,t.min);
+  document.getElementById('fsover').classList.add('on');
+}
+function closeFull(){
+  clearInterval(fsTimer);
+  // 전체화면 진척을 인라인에 반영
+  const fb=document.getElementById('fsbar'); const w=fb?parseFloat(fb.style.width)||0:0;
+  const inbar=document.getElementById('pbar'); if(inbar){inbar.style.width=w+'%'; const t=HTOC[openToc]; const cur=Math.round(t.min*w/100); const inT=document.getElementById('pTime'); if(inT)inT.textContent=String(cur).padStart(2,'0')+':00 / '+t.min+':00';}
+  document.getElementById('fsover').classList.remove('on');
+}
+let fsTimer=null; let fsTotMin=68;
+function syncFsTime(w,min){ const cur=Math.round(min*w/100); document.getElementById('fsTime').textContent=String(cur).padStart(2,'0')+':00 / '+min+':00'; }
+function fsPlayToggle(){
+  const bar=document.getElementById('fsbar'); const btn=document.getElementById('fsPlay');
+  btn.textContent='\u275a\u275a'; let p=parseFloat(bar.style.width)||0; clearInterval(fsTimer);
+  fsTimer=setInterval(function(){ p+=4; if(p>=100){p=100;clearInterval(fsTimer);toast('강의 완료 — 문제가 열렸습니다');document.getElementById('nextb').textContent='문제 풀이 \u2192';}
+    bar.style.width=p+'%'; syncFsTime(p,fsTotMin); },110);
+}
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'){const o=document.getElementById('fsover'); if(o&&o.classList.contains('on'))closeFull();} });
+let tt=null;
+function toast(m){var el=document.getElementById('toast');el.textContent=m;el.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){el.classList.remove('show');},2200);}
+render();
+</script>
+</body>
+</html>

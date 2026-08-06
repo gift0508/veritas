@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>베리타스 PASS:ON — 학습포털 · 변시 합격의 24h 동반자</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0d1f3c; --navy2:#1a2a4a; --line:#2e4a7d;
+  --gold:#e8b93c; --gold-dim:#c9a227;
+  --ink:#eef2fa; --sub:#9fb0cd; --mute:#63799f; --ok:#5ec98f;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Noto Sans KR',sans-serif;font-weight:300;color:var(--ink);
+  background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 60%,#16264a 100%);
+  min-height:100vh;letter-spacing:-.01em;
+}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px 70px}
+.topbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 22px;padding:24px 0 16px;border-bottom:1px solid var(--line)}
+.brand{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.4rem;color:var(--gold)}
+.brand small{font-family:'Noto Sans KR';font-weight:400;font-size:.72rem;color:var(--sub);margin-left:10px;letter-spacing:.06em}
+.userchip{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:.78rem;color:var(--sub)}
+.userchip b{color:var(--ink);font-weight:700}
+.ubadge{font-size:.66rem;font-weight:700;color:var(--navy);background:var(--gold);border-radius:999px;padding:3px 10px}
+.mini{border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);
+  font-family:'Noto Sans KR';font-size:.7rem;font-weight:500;border-radius:7px;padding:4px 10px;cursor:pointer}
+.mini:hover{border-color:var(--gold);color:var(--gold)}
+
+.hero{margin-top:40px;text-align:center}
+.hero .k{font-size:.72rem;letter-spacing:.28em;color:var(--gold);font-weight:700}
+.hero h1{font-family:'Noto Serif KR',serif;font-weight:900;font-size:2rem;margin:10px 0 8px}
+.hero p{color:var(--sub);font-size:.9rem;max-width:560px;margin:0 auto;line-height:1.75}
+.cyc{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin-top:18px;font-size:.7rem;color:var(--sub)}
+.cn{border:1px solid var(--line);border-radius:999px;padding:6px 13px;background:rgba(255,255,255,.03)}
+.ca{color:var(--mute)}
+.ca.b{color:var(--gold);font-weight:700}
+
+.shelf{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-top:42px}
+.tile{
+  display:block;text-decoration:none;color:var(--ink);position:relative;
+  background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:16px;
+  padding:24px 24px 20px;transition:.25s;overflow:hidden;
+}
+.tile:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.35)}
+.tile .step{font-size:.64rem;letter-spacing:.18em;font-weight:700;color:var(--gold);margin-bottom:9px}
+.tile h3{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.18rem;margin-bottom:7px}
+.tile p{font-size:.8rem;color:var(--sub);line-height:1.7;min-height:66px}
+.tile .go{display:inline-block;margin-top:13px;font-size:.76rem;font-weight:700;color:var(--gold)}
+.tile .icon{position:absolute;right:18px;top:16px;font-size:1.5rem;opacity:.85}
+.tile.demo{border-style:dashed}
+
+.extrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:30px}
+.extcard{
+  display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.16);border:1px solid var(--line);
+  border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--sub);font-size:.8rem;transition:.2s;
+}
+.extcard:hover{border-color:var(--gold);color:var(--gold)}
+.extcard b{color:var(--ink);font-weight:700}
+.extcard:hover b{color:var(--gold)}
+.extcard .em{font-size:1.2rem}
+
+footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);font-size:.7rem;color:var(--mute);line-height:1.8}
+
+/* 게이트 */
+.gate{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 60%,#16264a 100%);padding:20px;overflow-y:auto}
+.gate.hidden{display:none}
+.gatecard{width:100%;max-width:400px;background:rgba(255,255,255,.045);border:1px solid var(--line);
+  border-radius:18px;padding:32px 30px 26px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.gbrand{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.55rem;color:var(--gold);text-align:center;letter-spacing:.01em}
+.gsub{font-size:.75rem;color:var(--sub);text-align:center;margin:6px 0 22px;letter-spacing:.04em}
+.gl{display:block;font-size:.72rem;color:var(--sub);letter-spacing:.1em;margin:13px 0 6px;font-weight:500}
+select,input[type=text]{width:100%;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);font-family:'Noto Sans KR';font-size:.92rem;padding:11px 13px;outline:none;transition:.2s}
+select:focus,input:focus{border-color:var(--gold)}
+select option{background:var(--navy2);color:var(--ink)}
+.gerr{font-size:.74rem;color:#e86a5a;min-height:20px;margin-top:9px}
+.btn{width:100%;background:var(--gold);color:var(--navy);font-weight:700;font-size:.92rem;font-family:'Noto Sans KR';
+  border:none;border-radius:999px;padding:13px;cursor:pointer;transition:.2s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(232,185,60,.35)}
+.quickbtn{width:100%;margin-top:10px;background:none;border:1px dashed var(--gold-dim);color:var(--gold);
+  font-family:'Noto Sans KR';font-size:.82rem;font-weight:500;border-radius:999px;padding:11px;cursor:pointer;transition:.2s}
+.quickbtn:hover{background:rgba(232,185,60,.1)}
+.gnote{font-size:.7rem;color:var(--mute);line-height:1.8;margin-top:16px;text-align:center}
+.gnote b{color:var(--sub);font-weight:500}
+@media(max-width:640px){.hero h1{font-size:1.5rem}.tile p{min-height:0}}
+.startcta{display:flex;align-items:center;gap:14px;margin:18px auto 0;max-width:620px;
+  padding:15px 22px;border-radius:14px;text-decoration:none;
+  background:linear-gradient(90deg,rgba(201,162,39,.16),rgba(201,162,39,.05));
+  border:1px solid var(--gold);transition:.16s}
+.startcta:hover{background:linear-gradient(90deg,rgba(201,162,39,.28),rgba(201,162,39,.1))}
+.startcta .scta-k{font-size:.74rem;color:var(--gold2);font-weight:700;flex:none}
+.startcta .scta-b{color:var(--ink);font-weight:700;font-size:.92rem;flex:1;text-align:left}
+.startcta .scta-go{color:var(--gold);font-weight:700;font-size:.86rem;flex:none}
+@media(max-width:640px){.startcta{flex-direction:column;gap:6px;text-align:center}.startcta .scta-b{text-align:center}}
+.tile.feat{border-color:var(--gold);background:linear-gradient(160deg,rgba(201,162,39,.09),rgba(21,42,77,.6))}
+.tile.feat .step{color:var(--gold2)}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="gatecard">
+    <div class="gbrand">베리타스 PASS:ON</div>
+    <div class="gsub">변시 합격의 24h 동반자 · 학습포털 로그인</div>
+    <label class="gl">로스쿨</label>
+    <select id="fSchool">
+      <option value="">선택하세요</option>
+      <option>강원대</option><option>건국대</option><option>경북대</option><option>경희대</option>
+      <option>고려대</option><option>동아대</option><option>부산대</option><option>서강대</option>
+      <option>서울대</option><option>서울시립대</option><option>성균관대</option><option>아주대</option>
+      <option>연세대</option><option>영남대</option><option>원광대</option><option>이화여대</option>
+      <option>인하대</option><option>전남대</option><option>전북대</option><option>제주대</option>
+      <option>중앙대</option><option>충남대</option><option>충북대</option><option>한국외대</option><option>한양대</option>
+    </select>
+    <label class="gl">학년</label>
+    <select id="fYear">
+      <option value="">선택하세요</option>
+      <option>1학년</option><option>2학년</option><option>3학년</option><option>졸업생</option>
+    </select>
+    <label class="gl">성명</label>
+    <input id="fName" type="text" placeholder="이름을 입력하세요" maxlength="10" onkeydown="if(event.key==='Enter')login()">
+    <div class="gerr" id="gerr"></div>
+    <button class="btn" onclick="login()">입장하기 →</button>
+    <button class="quickbtn" onclick="quickLogin()">⚡ 시연용 바로 입장 (입력 생략)</button>
+    <div class="gnote">교재 결제는 <b>북라인</b>, 강의 영상은 <b>고시닷컴</b> — 이곳은 나의 학습을 관리하는 관제탑입니다.<br>등록 정보로 오프라인 특강 연계 시 <b>5% 추가 할인</b>이 적용됩니다.</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">베리타스 PASS:ON <small>학습포털 · 매대</small></div>
+    <div class="userchip" id="userchip" style="display:none">
+      <span id="uinfo"></span>
+      <span class="ubadge">오프라인 연계 5% 할인 대상</span>
+      <button class="mini" onclick="logout()">로그아웃</button>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="k">VERITAS ONLINE · 1행2필</div>
+    <h1 id="heroTitle">오늘도, 순서대로 밟아 올라갑니다</h1>
+    <p>진단으로 위치를 찾고, 로드맵으로 길을 그리고, 6단계 시스템으로 매일 해소합니다. 아래 프로그램들이 그 순환의 부품입니다.</p>
+    <div class="cyc">
+      <span class="cn">① 자가진단</span><span class="ca">→</span>
+      <span class="cn">② 연간 로드맵</span><span class="ca">→</span>
+      <span class="cn">③ 일일 과업</span><span class="ca">→</span>
+      <span class="cn">④ 엔진 실행</span><span class="ca">→</span>
+      <span class="cn">⑤ 데이터</span><span class="ca b">⟲</span>
+      <span class="cn">⑥ 재조정</span>
+    </div>
+    <a class="startcta" href="변시_초기화면.html">
+      <span class="scta-k">처음이신가요?</span>
+      <span class="scta-b">여기서 시작 — 과목·선생님 고르고 진단받기</span>
+      <span class="scta-go">시작하기 →</span>
+    </a>
+  </div>
+
+  <div class="shelf">
+    <a class="tile feat" href="변시_비교_첫화면.html">
+      <span class="icon">⚖️</span>
+      <div class="step">BEFORE / AFTER · 첫 화면</div>
+      <h3>첫 화면부터 다릅니다</h3>
+      <p>실제 고시닷컴 첫 화면(배너·추천 가득, 내 기준 없음)과 PASS:ON 초기화면(과목·선생님 선택→진단)을 위아래로 — 접속 첫 순간의 대조.</p>
+      <span class="go">첫 화면 비교 →</span>
+    </a>
+    <a class="tile feat" href="변시_비교.html">
+      <span class="icon">💳</span>
+      <div class="step">BEFORE / AFTER · 판매</div>
+      <h3>이렇게 팔립니다</h3>
+      <p>고시닷컴 25강 통묶음과 PASS:ON 목차별 진단·처방을 위아래로 — 판단 불가→진단, 쌓이는 동영상→매출, 통묶음→강의·교재·PDF 3중 판매.</p>
+      <span class="go">판매 비교 →</span>
+    </a>
+    <a class="tile feat" href="변시_비교_종합반.html">
+      <span class="icon">📦</span>
+      <div class="step">BEFORE / AFTER · 종합반</div>
+      <h3>약점만 메꿉니다</h3>
+      <p>고시닷컴 185만원 종합반 통묶음(약점은 한 곳인데 전부 결제)과 PASS:ON(단계로 들어가되 목차별 약점만·강의+교재+PDF)을 위아래로.</p>
+      <span class="go">종합반 비교 →</span>
+    </a>
+    <a class="tile feat" href="변시_비교_강의목록.html">
+      <span class="icon">🔁</span>
+      <div class="step">BEFORE / AFTER · 선생님 선택 후</div>
+      <h3>나열이 아니라 순환</h3>
+      <p>선생님을 골라도 28개+ 강의 앞에서 막히는 고시닷컴 교수 페이지와, PASS:ON의 진단→수강→재진단→다음 강의 순환을 위아래로.</p>
+      <span class="go">순환 비교 →</span>
+    </a>
+    <a class="tile feat" href="변시_진단처방여정.html">
+      <span class="icon">🩺</span>
+      <div class="step">학생 여정 · 대표 시연</div>
+      <h3>진단 → 처방 → 순환</h3>
+      <p>금동흠 원장 헌법으로 보는 한 바퀴 — 자가진단이 들을 강의를 골라 주고(처방), 강의·문제·점수·로드맵으로 이어집니다. 종합반/단과반 차이까지.</p>
+      <span class="go">진단받고 시작 →</span>
+    </a>
+    <a class="tile feat" href="변시_목차신청여정.html">
+      <span class="icon">🧱</span>
+      <div class="step">학생 여정 · 목차 판매</div>
+      <h3>목차 단위 신청과 순환</h3>
+      <p>고시닷컴 25강 통묶음 vs PASS:ON 목차별 신청 — 시험범위만 골라 담고, 그 목차가 강의·문제·로드맵으로 이어지는 과정을 보여줍니다.</p>
+      <span class="go">목차 담기 시연 →</span>
+    </a>
+    <a class="tile" href="변시_schedule.html">
+      <span class="icon">🧭</span>
+      <div class="step">STEP ① 자가진단</div>
+      <h3>학습 스케줄 · 자가진단</h3>
+      <p>진입→습득→풀이→1행→2필의 5단계 기준으로 7법 각각의 현재 위치를 진단합니다. 어느 강의를 들을 국면인지가 여기서 정해집니다.</p>
+      <span class="go">진단 시작 →</span>
+    </a>
+    <a class="tile" href="변시_roadmap.html">
+      <span class="icon">🗺️</span>
+      <div class="step">STEP ② 연간 로드맵</div>
+      <h3>로드맵 계산기</h3>
+      <p>들을 과정과 하루 강의수를 정하면 변시일까지 완주 가능한지 자동 판정합니다. 여유·빠듯·초과 신호를 보며 나만의 연간 계획을 완성하세요.</p>
+      <span class="go">로드맵 만들기 →</span>
+    </a>
+    <a class="tile" href="변시_자율학습시스템.html">
+      <span class="icon">⚙️</span>
+      <div class="step">일일 과업 엔진 ① 선택형</div>
+      <h3>6단계 자율학습시스템</h3>
+      <p>문제를 등록하면 1단계에서 출발 — 맞으면 승급(2·4·8일 재점검), 틀리면 재학습. 매일의 풀이가 곧 과업이고, 그 기록이 곧 데이터입니다.</p>
+      <span class="go">오늘의 풀이 시작 →</span>
+    </a>
+    <a class="tile" href="변시_사례형엔진.html">
+      <span class="icon">📝</span>
+      <div class="step">일일 과업 엔진 ② 사례형</div>
+      <h3>사례형 답안 학습엔진</h3>
+      <p>선택형과 한 세트로 도는 사례 현출 엔진 — 쟁점 파악·판례·학설 훈련, 누적 관리와 스테이지 승급. 오늘 푼 쟁점을 오늘 답안으로 씁니다.</p>
+      <span class="go">사례 훈련 시작 →</span>
+    </a>
+    <a class="tile" href="변시_관리자.html">
+      <span class="icon">👑</span>
+      <div class="step">관리자 전용</div>
+      <h3>운영 관제실</h3>
+      <p>수강생 랭킹, 조언 큐(누구에게 어떤 조언), 로스쿨별 유입, 학년별 분석, 전체 히트맵과 학생 상세까지 — 관리자 코드로 입장합니다.</p>
+      <span class="go">관제실 입장 →</span>
+    </a>
+    <a class="tile demo" href="합격OS_운영데모.html">
+      <span class="icon">🛰️</span>
+      <div class="step">통합 시연 · 관리자 · AI</div>
+      <h3>합격 OS 운영데모</h3>
+      <p>순환 자동 시연, 28칸 매트릭스, 강의별 해소 현황판, 관리자 대시보드, 24시간 AI 조교까지 — 시스템 전체의 청사진입니다.</p>
+      <span class="go">데모 열기 →</span>
+    </a>
+  </div>
+
+  <div class="extrow">
+    <a class="extcard" href="#" onclick="alert('실서비스에서 고시닷컴 강의실로 연결됩니다');return false">
+      <span class="em">▶</span><span><b>고시닷컴</b> — 강의 영상 보러가기</span>
+    </a>
+    <a class="extcard" href="#" onclick="alert('실서비스에서 북라인 교재 결제로 연결됩니다');return false">
+      <span class="em">📕</span><span><b>북라인</b> — 교재 구매하러가기</span>
+    </a>
+  </div>
+
+  <footer>
+    본 포털과 각 프로그램 파일은 <b style="color:var(--sub)">같은 폴더</b>에 있어야 타일 연결이 작동합니다.<br>
+    합격 OS 학습포털 · 1행2필 × 베리타스법학원 제안 시제품 · 2026. 8.
+  </footer>
+</div>
+
+<script>
+const KEY="hapgyeok_os_portal_user";
+let user=null;
+function saveUser(u){try{localStorage.setItem(KEY,JSON.stringify(u));}catch(e){}}
+function loadUser(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null;}catch(e){return null;}}
+function clearUser(){try{localStorage.removeItem(KEY);}catch(e){}}
+function applyUser(u){
+  user=u;
+  document.getElementById("gate").classList.add("hidden");
+  document.getElementById("userchip").style.display="flex";
+  document.getElementById("uinfo").innerHTML=`<b>${u.name}</b> · ${u.school} ${u.year}`;
+  document.getElementById("heroTitle").textContent=u.name+"님, 오늘도 순서대로 밟아 올라갑니다";
+}
+function login(){
+  const school=document.getElementById("fSchool").value;
+  const year=document.getElementById("fYear").value;
+  const name=document.getElementById("fName").value.trim();
+  const err=document.getElementById("gerr");
+  if(!school||!year||!name){err.textContent="로스쿨·학년·성명을 모두 입력해 주세요. (또는 아래 \u2018시연용 바로 입장\u2019)";return;}
+  err.textContent="";
+  const u={school,year,name};saveUser(u);applyUser(u);
+}
+function quickLogin(){const u={school:"베리타스",year:"시연",name:"조홍주"};saveUser(u);applyUser(u);}
+function logout(){clearUser();user=null;
+  document.getElementById("userchip").style.display="none";
+  document.getElementById("gate").classList.remove("hidden");
+  document.getElementById("heroTitle").textContent="오늘도, 순서대로 밟아 올라갑니다";}
+const u=loadUser();if(u)applyUser(u);
+</script>
+</body>
+</html>

@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>베리타스 PASS:ON — 변시 합격의 24h 동반자 · 운영 데모</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0d1f3c; --navy2:#1a2a4a; --navy3:#243a63; --line:#2e4a7d;
+  --gold:#e8b93c; --gold-dim:#c9a227;
+  --ink:#eef2fa; --sub:#9fb0cd; --mute:#63799f;
+  --done:#3d5a8a; --alert:#e86a5a; --ok:#5ec98f;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Noto Sans KR',sans-serif;font-weight:300;color:var(--ink);
+  background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 60%,#16264a 100%);
+  min-height:100vh;letter-spacing:-.01em;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:14px 26px;
+  padding:26px 0 18px;border-bottom:1px solid var(--line);
+}
+.brand{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.35rem;color:var(--gold)}
+.brand small{font-family:'Noto Sans KR';font-weight:400;font-size:.72rem;color:var(--sub);margin-left:10px;letter-spacing:.06em}
+.top-stats{margin-left:auto;display:flex;gap:26px}
+.tstat{text-align:right}
+.tstat .v{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.5rem;line-height:1;color:var(--ink)}
+.tstat .v em{font-style:normal;color:var(--gold)}
+.tstat .l{font-size:.68rem;color:var(--mute);letter-spacing:.14em;margin-top:4px}
+
+/* ---------- section frame ---------- */
+section{margin-top:54px}
+.step-tag{
+  display:inline-flex;align-items:center;gap:10px;font-size:.72rem;letter-spacing:.22em;
+  color:var(--gold);font-weight:500;
+}
+.step-tag::before{content:"";width:26px;height:1px;background:var(--gold)}
+h2{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.7rem;margin:10px 0 6px}
+.lede{color:var(--sub);font-size:.92rem;max-width:640px;line-height:1.75}
+
+/* ---------- ① 진단 ---------- */
+.profiles{display:flex;gap:14px;margin-top:22px;flex-wrap:wrap}
+.pcard{
+  flex:1;min-width:260px;background:rgba(255,255,255,.03);border:1px solid var(--line);
+  border-radius:14px;padding:20px 22px;cursor:pointer;transition:.25s;
+}
+.pcard:hover{border-color:var(--gold-dim);transform:translateY(-2px)}
+.pcard.on{border-color:var(--gold);background:rgba(232,185,60,.07);box-shadow:0 0 0 1px var(--gold)}
+.pcard h3{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.06rem;margin-bottom:6px}
+.pcard p{font-size:.8rem;color:var(--sub);line-height:1.7}
+.pcard .diag{margin-top:12px;font-size:.75rem;color:var(--gold);font-weight:500;display:none}
+.pcard.on .diag{display:block}
+
+/* ---------- ② 매트릭스 ---------- */
+.matrix-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.legend{display:flex;gap:16px;font-size:.72rem;color:var(--sub);align-items:center;flex-wrap:wrap}
+.chip{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.chip.c-done{background:var(--done)}
+.chip.c-now{background:var(--gold)}
+.chip.c-todo{border:1px solid var(--line)}
+.chip.c-skip{background:repeating-linear-gradient(45deg,var(--navy3) 0 3px,transparent 3px 6px);border:1px solid var(--line)}
+.grid{
+  margin-top:18px;display:grid;grid-template-columns:88px repeat(4,1fr);gap:7px;
+}
+.gh{
+  font-size:.74rem;color:var(--sub);letter-spacing:.1em;text-align:center;padding:8px 0;font-weight:500;
+}
+.gl{
+  font-family:'Noto Serif KR',serif;font-weight:900;font-size:.9rem;color:var(--ink);
+  display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.03);
+  border-radius:10px;border:1px solid transparent;
+}
+.cell{
+  position:relative;border-radius:10px;padding:10px 11px 9px;min-height:74px;cursor:pointer;
+  border:1px solid var(--line);background:rgba(255,255,255,.02);transition:.25s;
+}
+.cell:hover{border-color:var(--gold-dim)}
+.cell .period{font-size:.7rem;color:var(--mute);letter-spacing:.02em}
+.cell .st{font-size:.76rem;font-weight:500;margin-top:3px}
+.cell .dots{position:absolute;right:9px;top:9px;display:flex;gap:4px}
+.dot{width:7px;height:7px;border-radius:50%}
+.d-sel{background:#5aa8e8}.d-case{background:#e8925a}.d-rec{background:var(--ok)}
+.cell.done{background:rgba(61,90,138,.35);border-color:var(--done)}
+.cell.done .st{color:var(--sub)}
+.cell.now{background:rgba(232,185,60,.14);border-color:var(--gold)}
+.cell.now .st{color:var(--gold);font-weight:700}
+.cell.skip{background:repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0 4px,transparent 4px 9px)}
+.cell.skip .st{color:var(--mute)}
+.cell.pulse{animation:pulse 1.6s ease 2}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,185,60,0)}40%{box-shadow:0 0 0 6px rgba(232,185,60,.35);border-color:var(--gold)}}
+.cell .ext{position:absolute;left:11px;bottom:7px;font-size:.66rem;color:var(--alert);font-weight:500;display:none}
+.cell.extended .ext{display:block}
+
+/* ---------- detail panel ---------- */
+.detail{
+  margin-top:16px;background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:14px;
+  padding:22px 24px;display:none;
+}
+.detail.open{display:block;animation:fadein .3s}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.detail h3{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.15rem}
+.detail h3 span{color:var(--gold)}
+.detail .meta{font-size:.78rem;color:var(--sub);margin:4px 0 14px}
+.layers{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.layer{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:rgba(0,0,0,.14)}
+.layer .tag{font-size:.68rem;letter-spacing:.16em;font-weight:700;margin-bottom:7px}
+.layer.sel .tag{color:#5aa8e8}.layer.case .tag{color:#e8925a}.layer.rec .tag{color:var(--ok)}
+.layer .eng{font-weight:500;font-size:.9rem;margin-bottom:5px}
+.layer p{font-size:.76rem;color:var(--sub);line-height:1.65}
+.layer.off{opacity:.38}
+.layer.off .eng::after{content:" · 이 단계 미배치";font-size:.7rem;color:var(--mute);font-weight:300}
+
+/* ---------- ③ 오늘의 과업 ---------- */
+.today{display:grid;grid-template-columns:1.25fr .9fr;gap:22px;margin-top:22px}
+@media(max-width:860px){.today{grid-template-columns:1fr}}
+.panel{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+.panel h3{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.05rem;margin-bottom:4px}
+.panel .sub{font-size:.76rem;color:var(--sub);margin-bottom:14px}
+.task{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-top:1px solid rgba(255,255,255,.06)}
+.task:first-of-type{border-top:none}
+.task input{margin-top:4px;width:16px;height:16px;accent-color:var(--gold);cursor:pointer;flex:none}
+.task .tt{font-size:.87rem;font-weight:400}
+.task .tt b{font-weight:700}
+.task .ty{font-size:.68rem;margin-top:3px;letter-spacing:.08em}
+.ty.sel{color:#5aa8e8}.ty.case{color:#e8925a}.ty.rec{color:var(--ok)}
+.task.donetask .tt{color:var(--mute);text-decoration:line-through}
+.setnote{font-size:.74rem;color:var(--sub);line-height:1.6;margin-top:3px}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.badges .ty{letter-spacing:.04em}
+.mini-rate{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);font-size:.8rem;color:var(--sub)}
+.mini-rate b{font-family:'Noto Serif KR',serif;font-weight:900;color:var(--gold);font-size:1.02rem;margin-left:4px}
+.mini-note{font-size:.7rem;color:var(--mute);margin-left:8px}
+/* 강의 해소 카드 */
+.lcard{border:1px solid var(--line);border-radius:12px;padding:14px 16px 12px;margin-top:12px;background:rgba(0,0,0,.14);transition:.3s}
+.lcard:first-child{margin-top:0}
+.lcard.lc-done{border-color:var(--gold);background:rgba(232,185,60,.08)}
+.lhead{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+.lhead b{font-family:'Noto Serif KR',serif;font-weight:900;font-size:.95rem}
+.ltitle{font-size:.78rem;color:var(--sub)}
+.ldue{margin-left:auto;font-size:.7rem;color:var(--mute)}
+.pc{font-size:.66rem;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.04em}
+.pc.ok{color:var(--ok);border:1px solid rgba(94,201,143,.4)}
+.pc.warn{color:var(--alert);border:1px solid rgba(232,106,90,.5);animation:blink 2.2s infinite}
+.pc.near{color:var(--gold);border:1px solid rgba(232,185,60,.45)}
+.pc.done{color:var(--navy);background:var(--gold)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.45}}
+.lrow{display:flex;align-items:center;gap:9px;margin:7px 0}
+.lt{width:44px;font-size:.68rem;font-weight:700;letter-spacing:.06em;flex:none}
+.lt.sel{color:#5aa8e8}.lt.case{color:#e8925a}.lt.rec{color:var(--ok)}
+.ltrack{flex:1;height:9px;background:rgba(0,0,0,.3);border-radius:5px;overflow:hidden}
+.lfill{height:100%;border-radius:5px;transition:width .5s cubic-bezier(.2,.8,.3,1)}
+.lfill.sel{background:linear-gradient(90deg,#3d6cb8,#5aa8e8)}
+.lfill.case{background:linear-gradient(90deg,#c07a48,#e8925a)}
+.lfill.rec{background:linear-gradient(90deg,#3e9c6d,#5ec98f)}
+.lnum{width:66px;text-align:right;font-size:.74rem;color:var(--sub);font-variant-numeric:tabular-nums;flex:none}
+.mini{
+  border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);
+  font-family:'Noto Sans KR';font-size:.7rem;font-weight:500;border-radius:7px;padding:4px 9px;cursor:pointer;transition:.15s;flex:none;
+}
+.mini:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+.mini:disabled{opacity:.3;cursor:default}
+/* 누적탑 */
+.arow{padding:10px 0;border-top:1px solid rgba(255,255,255,.06)}
+.arow:first-child{border-top:none}
+.arow .top{display:flex;align-items:baseline;gap:10px}
+.arow .nm{font-family:'Noto Serif KR',serif;font-weight:900;font-size:.92rem;width:56px;flex:none}
+.arow .cnt{font-variant-numeric:tabular-nums;font-weight:700;font-size:1.02rem;color:var(--ink)}
+.arow .cnt small{font-weight:300;font-size:.72rem;color:var(--mute);margin-left:2px}
+.arow .plus{margin-left:auto;font-size:.74rem;font-weight:700;color:var(--gold);opacity:0;transform:translateY(3px);transition:.35s}
+.arow.gain .plus{opacity:1;transform:none}
+.arow .track2{height:9px;background:rgba(0,0,0,.28);border-radius:5px;overflow:hidden;margin-top:7px}
+.arow .fill2{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--gold-dim),var(--gold));transition:width .7s cubic-bezier(.2,.8,.3,1)}
+.arow .subcnt{font-size:.68rem;color:var(--mute);margin-top:5px;letter-spacing:.02em}
+.arow .subcnt b{color:var(--sub);font-weight:500}
+.arow.gain .track2 .fill2{box-shadow:0 0 12px rgba(232,185,60,.5)}
+.accum-total{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);font-size:.82rem;color:var(--sub)}
+.accum-total b{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.35rem;color:var(--gold);margin:0 3px;font-variant-numeric:tabular-nums}
+#todayAdd{color:var(--ok);font-weight:700;font-size:.78rem;margin-left:8px}
+
+/* ---------- ⑤⑥ 데이터·재조정 ---------- */
+.datazone{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px}
+@media(max-width:860px){.datazone{grid-template-columns:1fr}}
+.bars{margin-top:8px}
+.bar{display:flex;align-items:center;gap:12px;margin:10px 0}
+.bar .bl{width:56px;font-size:.8rem;font-weight:500;flex:none}
+.bar .track{flex:1;height:13px;background:rgba(0,0,0,.28);border-radius:7px;overflow:hidden}
+.bar .fill{height:100%;border-radius:7px;background:linear-gradient(90deg,#4a7bd0,#5aa8e8);transition:width .8s ease}
+.bar.weak .fill{background:linear-gradient(90deg,#c0533f,var(--alert))}
+.bar .bv{width:44px;text-align:right;font-size:.8rem;color:var(--sub);flex:none;font-variant-numeric:tabular-nums}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;margin-top:18px;
+  background:var(--gold);color:var(--navy);font-weight:700;font-size:.9rem;font-family:'Noto Sans KR';
+  border:none;border-radius:999px;padding:13px 26px;cursor:pointer;transition:.2s;
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(232,185,60,.35)}
+.btn:disabled{opacity:.4;cursor:default;transform:none;box-shadow:none}
+.log{margin-top:14px}
+.log .li{
+  font-size:.8rem;line-height:1.7;color:var(--sub);padding:9px 12px;border-left:2px solid var(--gold-dim);
+  background:rgba(0,0,0,.16);border-radius:0 8px 8px 0;margin-top:8px;opacity:0;transform:translateX(-6px);
+  transition:.45s;
+}
+.log .li.show{opacity:1;transform:none}
+.log .li b{color:var(--gold);font-weight:700}
+.log .li.safety b{color:var(--ok)}
+.empty-log{font-size:.78rem;color:var(--mute);margin-top:12px;line-height:1.7}
+
+/* ---------- cycle strip ---------- */
+.cycle{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;align-items:center;font-size:.74rem;color:var(--sub);
+}
+.cnode{border:1px solid var(--line);border-radius:999px;padding:7px 14px;background:rgba(255,255,255,.03)}
+.cnode.hot{border-color:var(--gold);color:var(--gold);font-weight:500}
+.carr{color:var(--mute)}
+.carr.back{color:var(--gold);font-weight:700}
+footer{margin-top:70px;padding-top:18px;border-top:1px solid var(--line);font-size:.72rem;color:var(--mute);line-height:1.8}
+/* 로그인 게이트 */
+.gate{
+  position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 60%,#16264a 100%);padding:20px;
+}
+.gate.hidden{display:none}
+.gatecard{
+  width:100%;max-width:400px;background:rgba(255,255,255,.045);border:1px solid var(--line);
+  border-radius:18px;padding:34px 32px 28px;box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+.gbrand{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.55rem;color:var(--gold);text-align:center;letter-spacing:.01em}
+.gsub{font-size:.76rem;color:var(--sub);text-align:center;margin:6px 0 24px;letter-spacing:.04em}
+.gl2{display:block;font-size:.72rem;color:var(--sub);letter-spacing:.1em;margin:14px 0 6px;font-weight:500}
+.gatecard select,.gatecard input{
+  width:100%;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);font-family:'Noto Sans KR';font-size:.92rem;padding:11px 13px;outline:none;transition:.2s;
+}
+.gatecard select:focus,.gatecard input:focus{border-color:var(--gold)}
+.gatecard select option{background:var(--navy2);color:var(--ink)}
+.gerr{font-size:.74rem;color:var(--alert);min-height:20px;margin-top:10px}
+.gbtn{width:100%;justify-content:center;margin-top:4px}
+.quickbtn{
+  width:100%;margin-top:10px;background:none;border:1px dashed var(--gold-dim);color:var(--gold);
+  font-family:'Noto Sans KR';font-size:.82rem;font-weight:500;border-radius:999px;padding:11px;cursor:pointer;transition:.2s;
+}
+.quickbtn:hover{background:rgba(232,185,60,.1)}
+.planrow{display:flex;gap:8px}
+.planopt{flex:1;text-align:center;border:1px solid var(--line);border-radius:10px;padding:10px 6px;cursor:pointer;
+font-size:.84rem;font-weight:700;color:var(--sub);transition:.2s}
+.planopt small{display:block;font-weight:300;font-size:.64rem;color:var(--mute);margin-top:2px}
+.planopt.on{border-color:var(--gold);color:var(--gold);background:rgba(232,185,60,.08)}
+.ubadge.single{background:#8fa0c0}
+.upgbtn{border:none;background:var(--gold);color:var(--navy);font-family:'Noto Sans KR';font-size:.7rem;font-weight:700;
+border-radius:999px;padding:5px 13px;cursor:pointer;transition:.2s}
+.upgbtn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(232,185,60,.4)}
+.upmodal{position:fixed;inset:0;z-index:72;background:rgba(5,12,26,.72);display:none;align-items:center;justify-content:center;overflow-y:auto;padding:24px 16px}
+.upmodal.open{display:flex}
+.upcard{width:100%;max-width:420px;background:linear-gradient(160deg,#122241,#1a2a4a);border:1px solid var(--gold);
+border-radius:16px;padding:26px 26px 22px;position:relative;box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.upcard h3{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.2rem;color:var(--gold)}
+.upcard .upsub{font-size:.76rem;color:var(--sub);margin:5px 0 14px;line-height:1.65}
+.upcard label{display:block;font-size:.68rem;color:var(--sub);letter-spacing:.1em;margin:10px 0 5px;font-weight:500}
+.upcard select,.upcard input{width:100%;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:9px;
+color:var(--ink);font-family:'Noto Sans KR';font-size:.88rem;padding:10px 12px;outline:none}
+.upcard select:focus,.upcard input:focus{border-color:var(--gold)}
+.upcard select option{background:var(--navy2)}
+.uperr{font-size:.72rem;color:var(--alert);min-height:18px;margin-top:8px}
+.updone{border:1px dashed var(--gold-dim);border-radius:11px;padding:14px;background:rgba(232,185,60,.06);
+font-size:.8rem;line-height:1.75;margin-top:6px}
+.updone b{color:var(--gold)}
+.updiv{height:1px;background:rgba(255,255,255,.1);margin:16px 0 10px}
+.upclose{position:absolute;right:16px;top:14px;background:none;border:1px solid var(--line);color:var(--sub);
+border-radius:999px;padding:4px 12px;font-size:.7rem;cursor:pointer;font-family:'Noto Sans KR'}
+.upclose:hover{border-color:var(--gold);color:var(--gold)}
+.upfeat{color:var(--gold)}
+.portallink{text-decoration:none;display:inline-flex;align-items:center}
+.realbtn{
+  display:inline-flex;align-items:center;gap:8px;margin-top:16px;text-decoration:none;
+  border:1px solid var(--gold);color:var(--gold);font-size:.8rem;font-weight:700;
+  border-radius:999px;padding:10px 20px;transition:.2s;background:rgba(232,185,60,.07);
+}
+.realbtn:hover{background:var(--gold);color:var(--navy)}
+.realbtn small{font-weight:400;color:inherit;opacity:.75;font-size:.68rem}
+.pairlabel{margin-top:18px;font-size:.72rem;letter-spacing:.14em;color:var(--gold);font-weight:700}
+.pairrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.pairrow .realbtn{margin-top:0;flex:1;min-width:260px;justify-content:center}
+.engbtn{border-color:var(--gold-dim);color:var(--gold)}
+/* 순환 자동 시연 */
+.tourbtn{
+  margin-left:auto;background:var(--gold);color:var(--navy);border:none;border-radius:999px;
+  padding:8px 18px;font-family:'Noto Sans KR';font-size:.78rem;font-weight:700;cursor:pointer;transition:.2s;
+}
+.tourbtn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(232,185,60,.35)}
+.tourbtn.stop{background:var(--alert);color:#fff}
+.cnode.active{border-color:var(--gold);color:var(--gold);font-weight:700;box-shadow:0 0 0 3px rgba(232,185,60,.25);background:rgba(232,185,60,.1)}
+.narr{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:57;
+  width:min(680px,calc(100vw - 28px));background:linear-gradient(135deg,#16294e,#1d3158);
+  border:1px solid var(--gold);border-radius:14px;padding:15px 20px;display:none;
+  box-shadow:0 16px 50px rgba(0,0,0,.55);animation:fadein .3s;
+}
+.narr.show{display:block}
+.narr .nstep{font-size:.68rem;letter-spacing:.2em;color:var(--gold);font-weight:700;margin-bottom:5px}
+.narr .ntext{font-size:.88rem;line-height:1.65}
+.narr .ntext b{color:var(--gold);font-weight:700}
+.hl{outline:2px solid var(--gold);outline-offset:3px;border-radius:14px;transition:outline .3s}
+.gnote{font-size:.7rem;color:var(--mute);line-height:1.8;margin-top:18px;text-align:center}
+.gnote b{color:var(--sub);font-weight:500}
+/* 유저칩 */
+.userchip{display:flex;align-items:center;gap:10px;font-size:.78rem;color:var(--sub)}
+.userchip #uinfo b{color:var(--ink);font-weight:700}
+.ubadge{font-size:.66rem;font-weight:700;color:var(--navy);background:var(--gold);border-radius:999px;padding:3px 10px;letter-spacing:.02em}
+/* 외부 연결 버튼 */
+.lext{display:flex;gap:8px;margin-top:9px;padding-top:9px;border-top:1px dashed rgba(255,255,255,.1)}
+.extbtn{
+  flex:1;text-align:center;font-size:.7rem;font-weight:500;color:var(--sub);text-decoration:none;
+  border:1px solid var(--line);border-radius:8px;padding:6px 8px;transition:.15s;cursor:pointer;background:none;font-family:'Noto Sans KR';
+}
+.extbtn:hover{border-color:var(--gold);color:var(--gold)}
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(8px);z-index:60;
+  background:var(--gold);color:var(--navy);font-size:.8rem;font-weight:700;border-radius:999px;
+  padding:11px 22px;opacity:0;pointer-events:none;transition:.3s;box-shadow:0 8px 30px rgba(0,0,0,.4);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* 관리자 */
+.gdivider{height:1px;background:rgba(255,255,255,.08);margin:20px 0 14px}
+.gadmin{text-align:center}
+.galink{background:none;border:none;color:var(--mute);font-size:.74rem;font-family:'Noto Sans KR';cursor:pointer;letter-spacing:.04em}
+.galink:hover{color:var(--gold)}
+#adminForm{margin-top:12px;text-align:left}
+.admin{position:fixed;inset:0;z-index:40;overflow-y:auto;display:none;
+  background:linear-gradient(160deg,#0a1830 0%,var(--navy2) 60%,#141f3d 100%);}
+.admin.open{display:block}
+.awrap{max-width:1180px;margin:0 auto;padding:0 20px 60px}
+.akpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:26px}
+.akpi{border:1px solid var(--line);border-radius:12px;padding:16px 14px;text-align:center;background:rgba(255,255,255,.03)}
+.akpi b{display:block;font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.7rem;color:var(--ink)}
+.akpi span{font-size:.68rem;color:var(--mute);letter-spacing:.08em}
+.akpi.warn2 b{color:var(--alert)}
+.akpi.alert2{border-color:rgba(232,106,90,.5)}
+.akpi.alert2 b{color:var(--alert)}
+.akpi.gold2 b{color:var(--gold)}
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px}
+@media(max-width:860px){.agrid{grid-template-columns:1fr}}
+.alertrow{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid rgba(255,255,255,.06);flex-wrap:wrap}
+.alertrow:first-of-type{border-top:none}
+.alname{font-size:.84rem;font-weight:500}
+.aldesc{font-size:.74rem;color:var(--sub);flex:1;min-width:150px}
+.atable{font-size:.8rem}
+.arow2{display:grid;grid-template-columns:1.1fr 1.2fr .8fr 1fr 1fr .9fr;gap:8px;padding:9px 4px;border-top:1px solid rgba(255,255,255,.06);align-items:center}
+.arow2.head{border-top:none;font-size:.68rem;color:var(--mute);letter-spacing:.08em;font-weight:500}
+.arow2 .nm2{font-weight:700}
+.arow2 .lk{font-size:.66rem;font-weight:700;color:var(--navy);background:var(--gold);border-radius:999px;padding:2px 8px;text-align:center}
+.arow2 .nolk{font-size:.66rem;color:var(--mute);text-align:center}
+.arow2.me{background:rgba(232,185,60,.08);border-radius:8px}
+@media(max-width:720px){.arow2{grid-template-columns:1fr 1fr 1fr;font-size:.72rem}.arow2 :nth-child(n+4){display:none}.arow2.head :nth-child(n+4){display:none}}
+.arow2.click{cursor:pointer;transition:.15s}
+.arow2.click:hover{background:rgba(232,185,60,.09);border-radius:8px}
+/* 학생 상세 모달 */
+.smodal{position:fixed;inset:0;z-index:55;background:rgba(5,12,26,.72);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 16px}
+.smodal.open{display:flex}
+.scard{
+  width:100%;max-width:860px;background:linear-gradient(160deg,#122241,#1a2a4a);
+  border:1px solid var(--line);border-radius:16px;padding:26px 28px;position:relative;
+  box-shadow:0 24px 70px rgba(0,0,0,.5);animation:fadein .25s;
+}
+.sclose{position:absolute;right:18px;top:16px;background:none;border:1px solid var(--line);color:var(--sub);
+  border-radius:999px;padding:5px 13px;font-size:.72rem;cursor:pointer;font-family:'Noto Sans KR'}
+.sclose:hover{border-color:var(--gold);color:var(--gold)}
+.shead h3{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.3rem}
+.smeta{font-size:.8rem;color:var(--sub);margin-top:6px}
+.smeta b{color:var(--ink);font-weight:700}
+.sfeed{font-size:.76rem;color:var(--gold);margin-top:5px}
+.sgrid{display:grid;grid-template-columns:1.1fr 1fr;gap:26px;margin-top:20px}
+@media(max-width:720px){.sgrid{grid-template-columns:1fr}}
+.stt{font-size:.7rem;letter-spacing:.16em;color:var(--mute);font-weight:700;margin-bottom:9px}
+.mrow{display:flex;align-items:center;gap:5px;margin:5px 0}
+.ml{width:52px;font-size:.76rem;font-weight:500;flex:none}
+.ml.weakl{color:var(--alert)}
+.ms{width:26px;height:13px;border-radius:4px;border:1px solid var(--line);flex:none}
+.ms-done{background:var(--done);border-color:var(--done)}
+.ms-now{background:var(--gold);border-color:var(--gold)}
+.mstage{font-size:.66rem;color:var(--mute);margin-left:6px}
+.slec{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:9px;background:rgba(0,0,0,.16)}
+.sacts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+/* 전체 진단 히트맵 */
+.heat{overflow-x:auto}
+.hrow{display:grid;grid-template-columns:110px repeat(7,minmax(46px,1fr)) 90px;gap:5px;align-items:center;padding:4px 0;cursor:pointer;border-radius:8px}
+.hrow:hover{background:rgba(232,185,60,.07)}
+.hrow.hh{cursor:default;font-size:.66rem;color:var(--mute);letter-spacing:.06em;font-weight:700}
+.hrow.hh:hover{background:none}
+.hname{font-size:.78rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hname small{color:var(--mute);font-weight:300;font-size:.66rem;margin-left:4px}
+.hcell{height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:rgba(255,255,255,.85)}
+.hs0{background:#3a4a6d}.hs1{background:#3d6cb8}.hs2{background:#c9a227;color:#0d1f3c}.hs3{background:#3e9c6d}
+.hcell.hw{box-shadow:inset 0 0 0 2px var(--alert)}
+.hstat{font-size:.64rem;font-weight:700;text-align:center;border-radius:999px;padding:3px 6px}
+.hstat.ok{color:var(--ok);border:1px solid rgba(94,201,143,.4)}
+.hstat.warn{color:var(--alert);border:1px solid rgba(232,106,90,.5)}
+.grow{display:grid;grid-template-columns:1.2fr .7fr 1fr 1fr .7fr;gap:8px;padding:8px 4px;border-top:1px solid rgba(255,255,255,.06);align-items:center;font-size:.78rem}
+.grow.head{border-top:none;font-size:.66rem;color:var(--mute);letter-spacing:.06em;font-weight:700}
+.grow .gn{font-weight:700}
+.grow .gwarn{color:var(--alert);font-weight:700}
+.grow .gok{color:var(--mute)}
+@media(max-width:720px){.hrow{grid-template-columns:80px repeat(7,minmax(30px,1fr)) 60px}.hcell{height:20px;font-size:.52rem}}
+/* AI 조교 */
+.fab{
+  position:fixed;right:22px;bottom:22px;z-index:58;display:flex;align-items:center;gap:8px;
+  background:var(--gold);color:var(--navy);border:none;border-radius:999px;padding:13px 20px;
+  font-size:1.05rem;cursor:pointer;font-family:'Noto Sans KR';box-shadow:0 10px 32px rgba(0,0,0,.45);transition:.2s;
+}
+.fab:hover{transform:translateY(-2px)}
+.fabl{font-size:.84rem;font-weight:700}
+.chat{
+  position:fixed;right:22px;bottom:88px;z-index:59;width:min(390px,calc(100vw - 32px));height:min(540px,72vh);
+  background:linear-gradient(165deg,#122241,#182849);border:1px solid var(--line);border-radius:16px;
+  display:none;flex-direction:column;box-shadow:0 24px 70px rgba(0,0,0,.55);overflow:hidden;
+}
+.chat.open{display:flex;animation:fadein .25s}
+.chead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.18)}
+.chead b{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1rem;color:var(--gold)}
+.chsub{display:block;font-size:.66rem;color:var(--sub);margin-top:2px}
+.cbody{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.cmsg{max-width:86%;padding:10px 13px;border-radius:13px;font-size:.84rem;line-height:1.7;white-space:pre-wrap}
+.cmsg.ai{background:rgba(255,255,255,.06);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.cmsg.me{background:var(--gold);color:var(--navy);font-weight:400;align-self:flex-end;border-bottom-right-radius:4px}
+.cmsg.typing{color:var(--sub);font-style:italic}
+.cinput{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);background:rgba(0,0,0,.18)}
+.cinput input{flex:1;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;color:var(--ink);
+  font-family:'Noto Sans KR';font-size:.84rem;padding:10px 12px;outline:none}
+.cinput input:focus{border-color:var(--gold)}
+.csend{background:var(--gold);color:var(--navy);border:none;border-radius:10px;padding:0 16px;font-weight:700;
+  font-family:'Noto Sans KR';font-size:.82rem;cursor:pointer}
+.csend:disabled{opacity:.4}
+@media(max-width:720px){
+  .grid{grid-template-columns:64px repeat(4,1fr)}
+  .gl{font-size:.76rem}
+  .cell{min-height:64px;padding:8px}
+  .cell .period{font-size:.62rem}
+  .cell .st{font-size:.68rem}
+  h2{font-size:1.35rem}
+}
+</style>
+</head>
+<body>
+
+<!-- 로그인 -->
+<div class="gate" id="gate">
+  <div class="gatecard">
+    <div class="gbrand">베리타스 PASS:ON</div>
+    <div class="gsub">변시 합격의 24h 동반자 · 수강생 로그인</div>
+    <label class="gl2">로스쿨</label>
+    <select id="fSchool">
+      <option value="">선택하세요</option>
+      <option>강원대</option><option>건국대</option><option>경북대</option><option>경희대</option>
+      <option>고려대</option><option>동아대</option><option>부산대</option><option>서강대</option>
+      <option>서울대</option><option>서울시립대</option><option>성균관대</option><option>아주대</option>
+      <option>연세대</option><option>영남대</option><option>원광대</option><option>이화여대</option>
+      <option>인하대</option><option>전남대</option><option>전북대</option><option>제주대</option>
+      <option>중앙대</option><option>충남대</option><option>충북대</option><option>한국외대</option><option>한양대</option>
+    </select>
+    <label class="gl2">학년</label>
+    <select id="fYear">
+      <option value="">선택하세요</option>
+      <option>1학년</option><option>2학년</option><option>3학년</option><option>졸업생</option>
+    </select>
+    <label class="gl2">성명</label>
+    <input id="fName" type="text" placeholder="이름을 입력하세요" maxlength="10" onkeydown="if(event.key==='Enter')login()">
+    <label class="gl2">수강 상품</label>
+    <div class="planrow">
+      <label class="planopt on" id="poFull" onclick="setPlan('full')">종합반 <small>순환 완전체</small></label>
+      <label class="planopt" id="poSingle" onclick="setPlan('single')">단과반 <small>과목 한정</small></label>
+    </div>
+    <select id="fSubj" style="display:none;margin-top:8px">
+      <option>행정법</option><option>헌법</option><option>민법</option><option>형법</option>
+      <option>민소법</option><option>형소법</option><option>상법</option>
+    </select>
+    <div class="gerr" id="gerr"></div>
+    <button class="btn gbtn" onclick="login()">입장하기 →</button>
+    <button class="quickbtn" onclick="quickLogin('full')">⚡ 종합반 시연 입장</button>
+    <button class="quickbtn" onclick="quickLogin('single')">🔓 단과반(행정법) 시연 입장 — 잠금 확인용</button>
+    <div class="gnote">교재 결제는 <b>북라인</b>, 강의 영상은 <b>고시닷컴</b>에서 — 이곳은 나의 로드맵과 누적을 관리하는 학습 관제탑입니다.<br>등록 정보로 오프라인 특강 연계 시 <b>5% 추가 할인</b>이 적용됩니다.</div>
+    <div class="gdivider"></div>
+    <div class="gadmin">
+      <button class="galink" onclick="toggleAdminForm()">관리자 입장 →</button>
+      <div id="adminForm" style="display:none">
+        <input id="fAdmin" type="password" placeholder="관리자 코드 (데모: veritas)" oninput="if(this.value.trim()==='veritas')adminLogin()" onkeydown="if(event.key==='Enter')adminLogin()">
+        <button class="btn gbtn" style="margin-top:10px" onclick="adminLogin()">관리자 대시보드 열기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 관리자 대시보드 -->
+<div class="admin" id="adminView">
+  <div class="awrap">
+    <div class="topbar">
+      <div class="brand">베리타스 PASS:ON <small>관리자 대시보드 · 운영 관제</small></div>
+      <div class="userchip" style="display:flex">
+        <span><b style="color:var(--ink)">관리자</b> · 베리타스 온라인운영팀</span>
+        <button class="mini" onclick="adminLogout()">나가기</button>
+      </div>
+    </div>
+
+    <div class="akpis">
+      <div class="akpi"><b id="akTotal">0</b><span>총 수강생</span></div>
+      <div class="akpi"><b>19</b><span>오늘 활동</span></div>
+      <div class="akpi warn2"><b>3</b><span>기한 주의</span></div>
+      <div class="akpi alert2"><b>2</b><span>상담 개입 대기</span></div>
+      <div class="akpi gold2"><b id="akLink">0</b><span>오프라인 연계(5%)</span></div>
+    </div>
+
+    <div class="agrid">
+      <div class="panel">
+        <h3>수요 지도 — 로스쿨별 가입 분포</h3>
+        <div class="sub">가입 데이터가 곧 지방 시장 정보입니다 · 수도권 외 로스쿨 비중 <b style="color:var(--gold)" id="akLocal">0%</b></div>
+        <div class="bars" id="schoolBars"></div>
+      </div>
+      <div class="panel">
+        <h3>이탈 신호 — 안전망 작동</h3>
+        <div class="sub">과업 정체를 데이터로 감지, 사람이 개입합니다</div>
+        <div class="alertrow"><span class="pc warn">주의</span><span class="alname">이OO · 전북대 3학년</span><span class="aldesc">민법 제12강 정체 3일 · 기한 8/8</span><button class="mini" onclick="toast('1:1 상담 슬롯 제안을 발송했습니다')">상담 제안</button></div>
+        <div class="alertrow"><span class="pc warn">주의</span><span class="alname">박OO · 제주대 졸업생</span><span class="aldesc">행정법 해소율 41% · 로드맵 이탈 위험</span><button class="mini" onclick="toast('1:1 상담 슬롯 제안을 발송했습니다')">상담 제안</button></div>
+        <div class="alertrow"><span class="pc ok">회복</span><span class="alname">김OO · 경북대 3학년</span><span class="aldesc">상담 후 5일 연속 과업 이행 — 정상 궤도</span><span class="mini" style="opacity:.4">완료</span></div>
+        <div class="empty-log" style="margin-top:14px">주간 재조정(매주 토 자동 실행) 시 위 신호가 로드맵 수정에 함께 반영됩니다.</div>
+      </div>
+    </div>
+
+    <div class="agrid" style="margin-top:22px">
+      <div class="panel">
+        <h3>전체 수준 종합 — 단계 분포</h3>
+        <div class="sub">전체 수강생 × 7법 = <span id="agTotalCells"></span>개 칸의 현재 단계 분포 · 학원 전체가 지금 어느 국면인지</div>
+        <div class="bars" id="stageDist"></div>
+      </div>
+      <div class="panel">
+        <h3>전체 수준 종합 — 과목별 평균 정답률</h3>
+        <div class="sub">최근 2주 선택형 집계 · 65% 미만은 전사적 보강 후보</div>
+        <div class="bars" id="avgRates"></div>
+      </div>
+    </div>
+
+    <div class="agrid" style="margin-top:22px">
+      <div class="panel">
+        <h3>학교별 분석</h3>
+        <div class="sub">로스쿨 단위의 인원·진도·성취 — 지방 거점별 관리의 기초 자료</div>
+        <div class="atable" id="bySchool"></div>
+      </div>
+      <div class="panel">
+        <h3>학년별 분석</h3>
+        <div class="sub">학년(초시·재시 성격) 단위의 진도·성취 비교</div>
+        <div class="atable" id="byYear"></div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:22px">
+      <h3>전체 진단 한눈판 — 수강생 × 7법 히트맵</h3>
+      <div class="sub">칸 색 = 현재 단계 (<span style="color:#7a8db0">기본</span> → <span style="color:#5aa8e8">문풀</span> → <span style="color:#e8b93c">심화</span> → <span style="color:#5ec98f">파이널</span>) · <span style="color:#e86a5a">붉은 테두리 = 취약 신호</span> · 행 클릭 시 학생 상세</div>
+      <div class="heat" id="heatmap"></div>
+    </div>
+
+    <div class="panel" style="margin-top:22px">
+      <h3>수강생 명부</h3>
+      <div class="sub">행을 클릭하면 그 학생의 학습 위치·해소 현황·정답률이 열립니다 — AS의 출발점</div>
+      <div class="atable" id="roster"></div>
+    </div>
+  </div>
+
+  <!-- 학생 상세 -->
+  <div class="smodal" id="studentModal" onclick="if(event.target===this)closeStudent()">
+    <div class="scard">
+      <button class="sclose" onclick="closeStudent()">✕ 닫기</button>
+      <div id="studentBody"></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">베리타스 PASS:ON <small>변시 합격의 24h 동반자 · 운영 데모</small></div>
+    <a class="mini portallink" href="변시_학습포털.html">🏠 학습포털(매대)로</a>
+    <div class="userchip" id="userchip" style="display:none">
+      <span id="uinfo"></span>
+      <span class="ubadge">오프라인 연계 5% 추가할인 대상</span>
+      <button class="mini" onclick="logout()">로그아웃</button>
+    </div>
+    <div class="top-stats">
+      <div class="tstat"><div class="v">D-<em id="dday">164</em></div><div class="l">2027 변시</div></div>
+      <div class="tstat"><div class="v"><em id="cellsDone">6</em>/28</div><div class="l">통과 칸</div></div>
+      <div class="tstat"><div class="v"><em id="pace">5.9</em>일</div><div class="l">남은 일수÷남은 칸</div></div>
+    </div>
+  </div>
+
+  <div class="cycle">
+    <span class="cnode" id="cn1">① 자가진단</span><span class="carr">→</span>
+    <span class="cnode" id="cn2">② 연간 로드맵</span><span class="carr">→</span>
+    <span class="cnode" id="cn3">③ 일일 과업</span><span class="carr">→</span>
+    <span class="cnode" id="cn4">④ 엔진 실행</span><span class="carr">→</span>
+    <span class="cnode" id="cn5">⑤ 데이터</span>
+    <span class="carr back">⟲</span>
+    <span class="cnode hot" id="cn6">⑥ 로드맵 재조정</span>
+    <button class="tourbtn" id="tourbtn" onclick="startTour()">▶ 순환 자동 시연</button>
+  </div>
+
+  <!-- ① -->
+  <section id="s1">
+    <div class="step-tag">STEP ① 자가진단</div>
+    <h2>수험생을 고르면, 로드맵이 바뀝니다</h2>
+    <p class="lede">같은 종합반이지만 두 사람의 28칸 지도는 다릅니다. 아래에서 수험생을 전환하며 매트릭스가 어떻게 재배열되는지 확인하세요.</p>
+    <div class="profiles">
+      <div class="pcard on" id="pA" onclick="setProfile('A')">
+        <h3>김수민 · 초시</h3>
+        <p>지방 로스쿨 3학년. 전 과목 기본부터 완주하는 표준 트랙.</p>
+        <div class="diag">진단 결과 — 28칸 전 칸 이수 · 기본 2~6월 배치</div>
+      </div>
+      <div class="pcard" id="pB" onclick="setProfile('B')">
+        <h3>박정호 · 재시</h3>
+        <p>직전 변시 근접 탈락. 진단 결과 행정법·상법 취약, 5개 과목은 문풀 직행.</p>
+        <div class="diag">진단 결과 — 기본 5칸 면제 · 취약 2과목만 기본 압축 재수강</div>
+      </div>
+    </div>
+    <a class="realbtn" href="변시_schedule.html">🧭 실제 자가진단 프로그램 열기 <small>· 5단계 기준으로 내 위치 진단</small></a>
+  </section>
+
+  <!-- ② -->
+  <section id="s2">
+    <div class="matrix-head">
+      <div>
+        <div class="step-tag">STEP ② 연간 로드맵 — 7법 × 4단계 × 3유형</div>
+        <h2>28칸 매트릭스</h2>
+        <p class="lede">칸을 누르면 그 칸의 3유형 훈련 레이어가 열립니다. 우측 상단 점: <span style="color:#5aa8e8">선택형</span> · <span style="color:#e8925a">사례형</span> · <span style="color:#5ec98f">기록형</span></p>
+      </div>
+      <div class="legend">
+        <span><span class="chip c-done"></span>통과</span>
+        <span><span class="chip c-now"></span>진행 중 (오늘 8/1)</span>
+        <span><span class="chip c-todo"></span>예정</span>
+        <span><span class="chip c-skip"></span>진단 면제</span>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="detail" id="detail"></div>
+    <a class="realbtn" href="변시_roadmap.html">🗺️ 실제 로드맵 계산기 열기 <small>· 하루 강의수로 완주 가능 판정</small></a>
+  </section>
+
+  <!-- ③ -->
+  <section id="s3">
+    <div class="step-tag">STEP ③④ 강의별 해소 · 자율 소화</div>
+    <h2>총량은 시스템이 지키고, 리듬은 학생이 쥡니다</h2>
+    <p class="lede">각 강의에는 해소해야 할 문제 총량(객관식+사례)이 배정되어 있습니다. 오프라인은 습득 정도와 무관하게 진도가 밀고 나가지만, 여기서는 오늘 몇 문을 소화할지 학생이 스스로 정합니다. 다만 해소 기한은 로드맵이 지키고 있습니다 — 자율은 학생에게, 감시는 시스템에게.</p>
+    <div class="today">
+      <div class="panel">
+        <h3 id="todayTitle">진행 중인 강의 — 김수민</h3>
+        <div class="sub">버튼으로 오늘의 소화량을 직접 정하세요 · 해소량은 즉시 누적탑에 쌓입니다</div>
+        <div id="lectures"></div>
+        <div class="mini-rate">오늘 소화 <b id="todayDigest">0문 · 답안 0</b><span class="mini-note">· 기한 대비 정체 시 신호 → 3일 지속 시 1:1 상담 자동 제안(안전망)</span></div>
+      </div>
+      <div class="panel">
+        <h3>과목별 누적탑</h3>
+        <div class="sub" id="accumSub">개강(2/2) 이후 누적 — 선택형 문항 · 사례형 답안 · 기록형 세트</div>
+        <div id="accum"></div>
+        <div class="accum-total">7법 합계 <b id="accumTotal">0</b>문 <span id="todayAdd"></span></div>
+      </div>
+    </div>
+    <div class="pairlabel">일일 과업을 실행하는 두 엔진 — 문풀과 사례는 한 세트</div>
+    <div class="pairrow">
+      <a class="realbtn" href="#" onclick="launchEngine('six');return false">⚙️ 선택형 — 6단계 자율학습시스템 <small>· 등록→승급·재학습→데이터</small></a>
+      <a class="realbtn" href="#" onclick="launchEngine('case');return false">📝 사례형 — 답안 학습엔진 <small>· 쟁점→현출→누적·스테이지</small></a>
+    </div>
+  </section>
+
+  <!-- ⑤⑥ -->
+  <section id="s4">
+    <div class="step-tag">STEP ⑤⑥ 데이터 → 로드맵 재조정</div>
+    <h2>시스템이 유기체가 되는 순간</h2>
+    <p class="lede">지난 1주간의 엔진 실행 데이터입니다. 버튼을 누르면 이 데이터가 위의 28칸 로드맵을 실제로 고칩니다 — 위로 스크롤해 행정법·형법 행이 바뀌는 것을 확인하세요.</p>
+    <div class="datazone">
+      <div class="panel">
+        <h3>주간 데이터 — 과목별 선택형 정답률</h3>
+        <div class="sub">7/25 ~ 7/31 · OX 6단계 + 5지택일 엔진 집계</div>
+        <div class="bars" id="bars"></div>
+      </div>
+      <div class="panel">
+        <h3>재조정 결정</h3>
+        <div class="sub">축적 데이터가 ②로드맵을 수정하는 되먹임(⑥→②)</div>
+        <button class="btn" id="rebtn" onclick="rebalance()">⟲ 주간 데이터 반영 — 로드맵 재조정</button>
+        <div class="log" id="log"></div>
+        <div class="empty-log" id="logEmpty">아직 이번 주 데이터가 반영되지 않았습니다. 버튼을 눌러 순환을 완성하세요.</div>
+      </div>
+    </div>
+    <a class="realbtn" href="변시_자율학습시스템.html">📊 실제 데이터는 6단계 시스템에 쌓입니다 <small>· 열어서 확인하기</small></a>
+  </section>
+
+  <footer>
+    본 화면은 시연용 데모이며 수험생·수치는 가상의 예시입니다. 엔진(OX 6단계·5지택일·선다박스·과업엔진·매칭첨삭스코어)은 실제 운영 중인 검증 자산의 축소 재현입니다.<br>
+    1행2필 행정법구조연구소 × 베리타스법학원 제안 자료 · 2026. 8.
+  </footer>
+</div>
+
+<script>
+const laws=["헌법","민법","형법","행정법","민소법","형소법","상법"];
+const stages=["기본","문풀","심화","파이널"];
+// 유형 레이어 배치: 단계 인덱스별 [선택형, 사례형, 기록형]
+const typeMap=[[1,1,0],[1,1,1],[1,1,1],[1,1,1]];
+const engines={
+  sel:["OX 6단계 (오답 자동 반복)","실전 5지택일","선다박스 혼합형","전범위 선택형 모의"],
+  cas:["목차·쟁점 구조 훈련","답안 현출 훈련 + 체크리스트","매칭첨삭스코어 정밀첨삭","실전 첨삭 모의"],
+  rec:["—","쟁점 추출 훈련 (기록 독해)","CBT 서면 작성 트레이너","CBT 실전 모의 (실전 동일 환경)"]
+};
+// 프로필별 로드맵: 각 칸 {p:기간, s:상태 done/now/todo/skip}
+const P={
+A:{name:"김수민 · 초시", done:6, pace:"5.9",
+  cells:laws.map((l,i)=>([
+    {p:"2/2–6/14",s:"done"},
+    {p:"7/6–9/27",s:"now"},
+    {p:"10/5–11/22",s:"todo"},
+    {p:"11/30–1/8",s:"todo"}
+  ]))},
+B:{name:"박정호 · 재시", done:9, pace:"4.4",
+  cells:laws.map((l,i)=>{
+    const weak=(l==="행정법"||l==="상법");
+    return weak?[
+      {p:"2/2–4/12 압축",s:"done"},
+      {p:"4/20–8/23",s:"now"},
+      {p:"8/31–11/1",s:"todo"},
+      {p:"11/9–1/8",s:"todo"}
+    ]:[
+      {p:"진단 통과",s:"skip"},
+      {p:"3/2–7/26",s:"done"},
+      {p:"8/3–10/25",s:"now"},
+      {p:"11/2–1/8",s:"todo"}
+    ];
+  })}
+};
+let cur="A", rebalanced=false;
+
+function grid(){
+  const g=document.getElementById("grid");
+  let h='<div class="gh"></div>'+stages.map(s=>`<div class="gh">${s}</div>`).join("");
+  P[cur].cells.forEach((row,li)=>{
+    h+=`<div class="gl">${laws[li]}</div>`;
+    row.forEach((c,si)=>{
+      const dots=typeMap[si].map((on,t)=>on?`<span class="dot ${["d-sel","d-case","d-rec"][t]}"></span>`:"").join("");
+      const stTxt={done:"통과",now:"진행 중",todo:"예정",skip:"면제"}[c.s];
+      h+=`<div class="cell ${c.s}" id="c-${li}-${si}" onclick="openCell(${li},${si})">
+        <div class="dots">${dots}</div>
+        <div class="period">${c.p}</div><div class="st">${stTxt}</div>
+        <div class="ext">▲ 재조정 반영</div></div>`;
+    });
+  });
+  g.innerHTML=h;
+}
+function openCell(li,si){
+  const d=document.getElementById("detail");
+  const c=P[cur].cells[li][si];
+  const [hasSel,hasCase,hasRec]=typeMap[si];
+  d.innerHTML=`
+   <h3>${laws[li]} <span>· ${stages[si]}</span></h3>
+   <div class="meta">${c.p} · 상태: ${{done:"통과",now:"진행 중",todo:"예정",skip:"진단 면제 (직행)"}[c.s]} · 이 칸의 일일 과업은 매일 아침 자동 발행됩니다</div>
+   <div class="layers">
+     <div class="layer sel ${hasSel?"":"off"}"><div class="tag">선택형</div><div class="eng">${engines.sel[si]}</div><p>정답률·오답 단계 분포가 ⑤데이터로 축적됩니다.</p></div>
+     <div class="layer case ${hasCase?"":"off"}"><div class="tag">사례형</div><div class="eng">${engines.cas[si]}</div><p>6단계 답안분석 프레임(배점→채점포인트→현출 체크리스트) 기반.</p></div>
+     <div class="layer rec ${hasRec?"":"off"}"><div class="tag">기록형 · CBT</div><div class="eng">${engines.rec[si]}</div><p>실전과 동일한 화면·타이핑 환경. 온라인만이 제공하는 실전성입니다.</p></div>
+   </div>`;
+  d.classList.add("open");
+  d.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function setProfile(k){
+  cur=k;
+  document.getElementById("pA").classList.toggle("on",k==="A");
+  document.getElementById("pB").classList.toggle("on",k==="B");
+  document.getElementById("cellsDone").textContent=P[k].done;
+  document.getElementById("pace").textContent=P[k].pace;
+  document.getElementById("todayTitle").textContent="진행 중인 강의 — "+P[k].name.split(" ·")[0];
+  document.getElementById("detail").classList.remove("open");
+  grid(); initBoard();
+}
+// 강의 = 해소 총량의 단위. obj/cas(/rec): [해소, 총량]. due: 로드맵상 해소 기한
+const lecData={
+A:[
+ {subj:"행정법",title:"제7강 · 거부처분과 취소소송",obj:[14,20],cas:[9,18],due:"8/10",pace:"ok"},
+ {subj:"민법",title:"제12강 · 물권변동",obj:[11,24],cas:[4,15],due:"8/8",pace:"warn"},
+ {subj:"형법",title:"제9강 · 공범론",obj:[18,18],cas:[10,12],due:"8/12",pace:"near"}
+],
+B:[
+ {subj:"행정법",title:"취약 제4강 · 처분성과 원고적격",obj:[20,30],cas:[8,20],due:"8/9",pace:"warn"},
+ {subj:"상법",title:"취약 제6강 · 이사의 책임",obj:[15,22],cas:[6,12],due:"8/14",pace:"ok"},
+ {subj:"형법",title:"심화 제3강 · 죄수론 종합",obj:[9,12],cas:[5,8],rec:[1,2],due:"8/16",pace:"ok"}
+]};
+let lec=[];
+function resetLec(){lec=JSON.parse(JSON.stringify(lecData[cur]));}
+let today={sel:0,cas:0,rec:0};
+function paceTag(p,doneAll){
+  if(doneAll)return `<span class="pc done">해소 완료 · 칸 진도 반영</span>`;
+  return {ok:`<span class="pc ok">기한 여유</span>`,
+          warn:`<span class="pc warn">주의 — 잔량 대비 기한 촉박</span>`,
+          near:`<span class="pc near">완료 임박</span>`}[p];
+}
+function lectures(){
+  const el=document.getElementById("lectures");
+  el.innerHTML=lec.map((L,i)=>{
+    const doneAll=L.obj[0]>=L.obj[1]&&L.cas[0]>=L.cas[1]&&(!L.rec||L.rec[0]>=L.rec[1]);
+    const recRow=L.rec?`
+      <div class="lrow"><span class="lt rec">기록형</span>
+        <div class="ltrack"><div class="lfill rec" style="width:${L.rec[0]/L.rec[1]*100}%"></div></div>
+        <span class="lnum">${L.rec[0]} / ${L.rec[1]}</span>
+        <button class="mini" onclick="consume(${i},'rec',1)" ${L.rec[0]>=L.rec[1]?"disabled":""}>+1 작성</button></div>`:"";
+    return `<div class="lcard ${doneAll?"lc-done":""}" id="lc${i}">
+      <div class="lhead"><b>${L.subj}</b> <span class="ltitle">${L.title}</span>
+        <span class="ldue">해소 기한 ${L.due}</span>${paceTag(L.pace,doneAll)}</div>
+      <div class="lrow"><span class="lt sel">객관식</span>
+        <div class="ltrack"><div class="lfill sel" style="width:${L.obj[0]/L.obj[1]*100}%"></div></div>
+        <span class="lnum">${L.obj[0]} / ${L.obj[1]}문</span>
+        <button class="mini" onclick="consume(${i},'obj',5)" ${L.obj[0]>=L.obj[1]?"disabled":""}>+5문</button>
+        <button class="mini" onclick="consume(${i},'obj',1)" ${L.obj[0]>=L.obj[1]?"disabled":""}>+1문</button>
+        <button class="mini engbtn" onclick="launchEngine('six')" title="선택형 전용 엔진">⚙️ 6단계</button></div>
+      <div class="lrow"><span class="lt case">사례</span>
+        <div class="ltrack"><div class="lfill case" style="width:${L.cas[0]/L.cas[1]*100}%"></div></div>
+        <span class="lnum">${L.cas[0]} / ${L.cas[1]}문</span>
+        <button class="mini" onclick="consume(${i},'cas',1)" ${L.cas[0]>=L.cas[1]?"disabled":""}>+1 현출</button>
+        <button class="mini engbtn" onclick="launchEngine('case')" title="사례형 전용 엔진">📝 사례엔진</button></div>
+      ${recRow}
+      <div class="lext">
+        <button class="extbtn" onclick="ext('고시닷컴','강의 영상')">▶ 강의 보기 · 고시닷컴</button>
+        <button class="extbtn" onclick="ext('북라인','교재 결제')">📕 교재 · 북라인</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+function consume(i,kind,n){
+  const L=lec[i],l=L.subj;
+  const slot=kind==="obj"?L.obj:(kind==="cas"?L.cas:L.rec);
+  const real=Math.min(n,slot[1]-slot[0]);
+  if(real<=0)return;
+  slot[0]+=real;
+  const before=accum[l][0],beforeTotal=laws.reduce((a,k)=>a+accum[k][0],0);
+  if(kind==="obj"){accum[l][0]+=real;today.sel+=real;}
+  else if(kind==="cas"){accum[l][1]+=real;today.cas+=real;}
+  else{accum[l][2]+=real;today.rec+=real;}
+  lectures();
+  // 누적탑 갱신
+  const max=Math.max(...laws.map(k=>accum[k][0]));
+  laws.forEach(k=>{document.getElementById("fill-"+k).style.width=(accum[k][0]/max*100).toFixed(1)+"%";});
+  countUp(document.getElementById("cnt-"+l),before,accum[l][0]);
+  document.getElementById("cc-"+l).textContent=accum[l][1];
+  document.getElementById("rc-"+l).textContent=accum[l][2];
+  const row=document.getElementById("ar-"+l),plus=document.getElementById("plus-"+l);
+  const g=todayGainStr(l);
+  plus.textContent=g?("오늘 "+g):""; row.classList.toggle("gain",!!g);
+  countUp(document.getElementById("accumTotal"),beforeTotal,laws.reduce((a,k)=>a+accum[k][0],0));
+  document.getElementById("todayDigest").textContent=today.sel+"문 · 답안 "+today.cas+(today.rec?(" · 기록 "+today.rec):"");
+  const parts=[];
+  if(today.sel)parts.push("+"+today.sel+"문");if(today.cas)parts.push("답안 +"+today.cas);if(today.rec)parts.push("기록 +"+today.rec);
+  document.getElementById("todayAdd").textContent=parts.length?("▲ 오늘 "+parts.join(" · ")+" 적립"):"";
+}
+const todayBySubj={};
+function todayGainStr(l){
+  // 오늘 소화분을 강의 데이터와 시드의 차로 계산
+  let sel=0,cas=0,rec=0;
+  lec.forEach((L,i)=>{
+    if(L.subj!==l)return;
+    const S=lecData[cur][i];
+    sel+=L.obj[0]-S.obj[0];cas+=L.cas[0]-S.cas[0];
+    if(L.rec)rec+=L.rec[0]-S.rec[0];
+  });
+  const parts=[];
+  if(sel)parts.push("+"+sel+"문");if(cas)parts.push("답안 +"+cas);if(rec)parts.push("기록 +"+rec);
+  return parts.join(" · ");
+}
+// 개강(2/2) 이후 과목별 누적 시드: [선택형 문항, 사례형 답안, 기록형 세트]
+const accumSeed={
+A:{헌법:[812,14,2],민법:[1046,18,3],형법:[934,16,3],행정법:[758,12,2],민소법:[689,10,2],형소법:[702,11,2],상법:[641,9,1]},
+B:{헌법:[1420,26,6],민법:[1655,31,8],형법:[1508,28,7],행정법:[1102,19,4],민소법:[1237,22,6],형소법:[1284,23,6],상법:[918,15,3]}
+};
+let accum={};
+function resetAccum(){accum=JSON.parse(JSON.stringify(accumSeed[cur]));}
+function fmt(n){return n.toLocaleString("ko-KR");}
+function countUp(el,from,to){
+  const dur=550,t0=performance.now();
+  function step(t){
+    const k=Math.min(1,(t-t0)/dur);
+    el.textContent=fmt(Math.round(from+(to-from)*(1-Math.pow(1-k,3))));
+    if(k<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+function renderAccum(anim){
+  const el=document.getElementById("accum");
+  const max=Math.max(...laws.map(l=>accum[l][0]));
+  let total=0;
+  el.innerHTML=laws.map(l=>{
+    const [s,c,r]=accum[l]; total+=s;
+    return `<div class="arow" id="ar-${l}">
+      <div class="top"><span class="nm">${l}</span>
+        <span class="cnt"><span id="cnt-${l}">${fmt(s)}</span><small>문</small></span>
+        <span class="plus" id="plus-${l}"></span></div>
+      <div class="track2"><div class="fill2" id="fill-${l}" style="width:${(s/max*100).toFixed(1)}%"></div></div>
+      <div class="subcnt">사례형 답안 <b id="cc-${l}">${c}</b> · 기록형 <b id="rc-${l}">${r}</b>세트</div>
+    </div>`;
+  }).join("");
+  document.getElementById("accumTotal").textContent=fmt(total);
+}
+function initBoard(){
+  resetAccum();resetLec();
+  today={sel:0,cas:0,rec:0};
+  lectures();renderAccum();
+  document.getElementById("todayDigest").textContent="0문 · 답안 0";
+  document.getElementById("todayAdd").textContent="";
+}
+const weekData=[["헌법",82],["민법",76],["형법",88],["행정법",54,1],["민소법",71],["형소법",79],["상법",61,1]];
+function bars(){
+  document.getElementById("bars").innerHTML=weekData.map(w=>`
+   <div class="bar ${w[2]?"weak":""}"><span class="bl">${w[0]}</span>
+   <div class="track"><div class="fill" style="width:0" data-w="${w[1]}"></div></div>
+   <span class="bv">${w[1]}%</span></div>`).join("");
+  setTimeout(()=>document.querySelectorAll(".fill").forEach(f=>f.style.width=f.dataset.w+"%"),150);
+}
+function rebalance(){
+  if(isSingle()){upsell("로드맵 자동 재조정");return;}
+  if(rebalanced)return;
+  rebalanced=true;
+  document.getElementById("rebtn").disabled=true;
+  document.getElementById("logEmpty").style.display="none";
+  const li=laws.indexOf("행정법"), fi=laws.indexOf("형법"), si2=laws.indexOf("상법");
+  // 행정법 문풀 연장, 심화 순연
+  const A=P[cur].cells;
+  if(cur==="A"){
+    A[li][1].p="7/6–10/11 (+2주)"; A[li][2].p="10/19–11/29";
+    A[fi][2].p="9/28 조기 진입"; 
+    A[si2][1].p="7/6–10/4 (+1주)";
+  }else{
+    A[li][1].p="4/20–9/6 (+2주)"; A[li][2].p="9/14–11/8";
+    A[fi][2].p="8/3–10/11 압축"; A[si2][1].p="4/20–9/6 (+2주)";
+  }
+  grid();
+  ["c-"+li+"-1","c-"+li+"-2","c-"+fi+"-2","c-"+si2+"-1"].forEach(id=>{
+    const el=document.getElementById(id); if(el){el.classList.add("pulse","extended");}
+  });
+  const logs=[
+    `<b>행정법</b> 정답률 54% → 문풀 칸 <b>+2주 연장</b>, 심화 진입 순연. 일일 과업에 5지택일 +10문 증량.`,
+    `<b>상법</b> 정답률 61% → 문풀 칸 +1주 연장, 사례형 첨삭 주기 2주→1주로 단축.`,
+    `<b>형법</b> 정답률 88% → 심화 <b>조기 진입</b>. 확보된 시간을 행정법에 재배정.`,
+    `안전망 점검 — 과업 이행률 정상 범위. <b>상담 개입 불필요</b>. 다음 재조정: 8/8(토) 자동 실행.`
+  ];
+  const lg=document.getElementById("log");
+  logs.forEach((t,i)=>{
+    const d=document.createElement("div");
+    d.className="li"+(i===3?" safety":""); d.innerHTML=t; lg.appendChild(d);
+    setTimeout(()=>d.classList.add("show"),300+i*450);
+  });
+  document.getElementById("grid").scrollIntoView({behavior:"smooth",block:"center"});
+}
+// ---------- 로그인 · 저장 · 외부 연결 ----------
+let user=null;
+async function saveUser(u){
+  try{ if(window.storage) await window.storage.set('hapgyeok_os_user', JSON.stringify(u)); }catch(e){}
+}
+async function loadUser(){
+  try{
+    if(window.storage){
+      const r=await window.storage.get('hapgyeok_os_user');
+      if(r&&r.value) return JSON.parse(r.value);
+    }
+  }catch(e){}
+  return null;
+}
+async function clearUser(){
+  try{ if(window.storage) await window.storage.delete('hapgyeok_os_user'); }catch(e){}
+}
+function applyUser(u){
+  user=u;
+  document.getElementById("gate").classList.add("hidden");
+  const chip=document.getElementById("userchip");
+  chip.style.display="flex";
+  document.getElementById("uinfo").innerHTML=`<b>${u.name}</b> · ${u.school} ${u.year}`;
+  const badge=chip.querySelector(".ubadge");
+  if(u.plan==="single"){badge.textContent="단과반 · "+u.subj+" 한정";badge.classList.add("single");}
+  else{badge.textContent="종합반 · 오프라인 연계 5% 할인 대상";badge.classList.remove("single");}
+  let ub=document.getElementById("upgTop");
+  if(u.plan==="single"){
+    if(!ub){ub=document.createElement("button");ub.id="upgTop";ub.className="upgbtn";ub.textContent="⭐ 종합반 신청";
+      ub.onclick=()=>openUpgrade();chip.insertBefore(ub,chip.querySelector(".mini"));}
+  }else if(ub){ub.remove();}
+  applyPlanLocks();
+}
+async function login(){
+  const school=document.getElementById("fSchool").value;
+  const year=document.getElementById("fYear").value;
+  const name=document.getElementById("fName").value.trim();
+  const err=document.getElementById("gerr");
+  if(!school||!year||!name){err.textContent="로스쿨·학년·성명을 모두 입력해 주세요. (또는 아래 \u2018시연용 바로 입장\u2019을 누르세요)";return;}
+  err.textContent="";
+  const u={school,year,name,plan:selPlan,subj:selPlan==="single"?document.getElementById("fSubj").value:null,joined:new Date().toISOString().slice(0,10)};
+  await saveUser(u);
+  applyUser(u);
+  toast(name+"님, 오늘의 해소를 시작하세요");
+}
+async function quickLogin(plan){
+  const u={school:"베리타스",year:"시연",name:"조홍주",plan:plan||"full",subj:plan==="single"?"행정법":null,joined:new Date().toISOString().slice(0,10)};
+  await saveUser(u);
+  applyUser(u);
+  toast(plan==="single"?"단과반(행정법) 시연 — 잠긴 기능을 눌러 보세요":"종합반 시연으로 입장했습니다");
+}
+let selPlan="full";
+function setPlan(p){
+  selPlan=p;
+  document.getElementById("poFull").classList.toggle("on",p==="full");
+  document.getElementById("poSingle").classList.toggle("on",p==="single");
+  document.getElementById("fSubj").style.display=p==="single"?"block":"none";
+}
+function isSingle(){return user&&user.plan==="single";}
+function upsell(feat){
+  openUpgrade(feat);
+}
+const UPG_PW="vos2027"; // 시연용 발급 비밀번호
+let upgApplied=false;
+function openUpgrade(feat){
+  const u=user||{};
+  const fmsg=feat?('🔒 <b class="upfeat">'+feat+'</b>은(는) 종합반 전용 기능입니다.<br>'):'';
+  document.getElementById("upBody").innerHTML=upgApplied?upgDoneView():`
+    <h3>종합반 신청</h3>
+    <div class="upsub">${fmsg}
+    신청서 제출 → 종합반 비용 입금 → 입금 확인 후 <b style="color:var(--gold)">비밀번호가 발급</b>되며, 이후 종합반으로 이용합니다.</div>
+    <label>로스쿨</label>
+    <select id="upSchool">
+      <option ${u.school==="강원대"?"selected":""}>강원대</option><option ${u.school==="건국대"?"selected":""}>건국대</option><option ${u.school==="경북대"?"selected":""}>경북대</option><option ${u.school==="경희대"?"selected":""}>경희대</option>
+      <option ${u.school==="고려대"?"selected":""}>고려대</option><option ${u.school==="동아대"?"selected":""}>동아대</option><option ${u.school==="부산대"?"selected":""}>부산대</option><option ${u.school==="서강대"?"selected":""}>서강대</option>
+      <option ${u.school==="서울대"?"selected":""}>서울대</option><option ${u.school==="서울시립대"?"selected":""}>서울시립대</option><option ${u.school==="성균관대"?"selected":""}>성균관대</option><option ${u.school==="아주대"?"selected":""}>아주대</option>
+      <option ${u.school==="연세대"?"selected":""}>연세대</option><option ${u.school==="영남대"?"selected":""}>영남대</option><option ${u.school==="원광대"?"selected":""}>원광대</option><option ${u.school==="이화여대"?"selected":""}>이화여대</option>
+      <option ${u.school==="인하대"?"selected":""}>인하대</option><option ${u.school==="전남대"?"selected":""}>전남대</option><option ${u.school==="전북대"?"selected":""}>전북대</option><option ${u.school==="제주대"?"selected":""}>제주대</option>
+      <option ${u.school==="중앙대"?"selected":""}>중앙대</option><option ${u.school==="충남대"?"selected":""}>충남대</option><option ${u.school==="충북대"?"selected":""}>충북대</option><option ${u.school==="한국외대"?"selected":""}>한국외대</option><option ${u.school==="한양대"?"selected":""}>한양대</option>
+    </select>
+    <label>학년</label>
+    <select id="upYear"><option ${u.year==="1학년"?"selected":""}>1학년</option><option ${u.year==="2학년"?"selected":""}>2학년</option><option ${u.year==="3학년"?"selected":""}>3학년</option><option ${u.year==="졸업생"?"selected":""}>졸업생</option></select>
+    <label>성명</label><input id="upName" type="text" maxlength="10" value="${u.name||""}">
+    <label>전화번호</label><input id="upPhone" type="tel" placeholder="010-0000-0000" maxlength="13">
+    <label>사용할 아이디</label><input id="upId" type="text" placeholder="영문·숫자 4~12자" maxlength="12">
+    <div class="uperr" id="uperr"></div>
+    <button class="btn gbtn" onclick="submitUpgrade()">종합반 신청하기 →</button>
+    <div class="upsub" style="margin:12px 0 0;text-align:center">종합반 비용은 <b class="upfeat">오프라인 종합반 대비 할인가</b>로 산정되며,<br>기수강 <b class="upfeat">단과 비용은 종합반 비용에 산입</b>됩니다 · 입금 확인 시 비밀번호가 발급됩니다</div>`;
+  document.getElementById("upmodal").classList.add("open");
+}
+function upgDoneView(){
+  return `
+    <h3>신청이 접수되었습니다</h3>
+    <div class="upsub">신청번호 <b style="color:var(--gold)">VOS-${String(Math.floor(1000+Math.random()*9000))}</b></div>
+    <div class="updone">
+      <b>다음 단계</b><br>
+      ① 관리자가 신청을 확인하고 <b>종합반 비용을 산정</b>하여 문자로 안내합니다<br>&nbsp;&nbsp;&nbsp;(오프라인 종합반 대비 할인가 · 기수강 단과 비용은 종합반 비용에 산입)<br>
+      ② 안내된 금액을 입금하면, 입금 확인 후 <b>비밀번호가 문자로 발송</b>됩니다<br>
+      ③ 아래 입력창에 비밀번호를 넣으면 즉시 종합반으로 전환됩니다<br>
+      <span style="color:var(--mute);font-size:.72rem">· 시연용 발급 비밀번호: <b>vos2027</b></span>
+    </div>
+    <div class="updiv"></div>
+    <input id="upPw" type="password" placeholder="발급받은 비밀번호 입력" onkeydown="if(event.key==='Enter')activateFull()">
+    <button class="btn gbtn" style="margin-top:10px" onclick="activateFull()">종합반으로 전환 →</button>`;
+}
+function submitUpgrade(){
+  const nm=document.getElementById("upName").value.trim();
+  const ph=document.getElementById("upPhone").value.trim();
+  const id=document.getElementById("upId").value.trim();
+  const err=document.getElementById("uperr");
+  if(!nm||!ph||!id){err.textContent="성명·전화번호·아이디를 모두 입력해 주세요.";return;}
+  upgApplied=true;
+  document.getElementById("upBody").innerHTML=upgDoneView();
+  toast("신청이 접수되었습니다 — 관리자 승인 대기");
+}
+async function activateFull(){
+  const pw=(document.getElementById("upPw")||{}).value||"";
+  if(pw.trim()!==UPG_PW){toast("비밀번호가 올바르지 않습니다 — 입금 확인 후 발송됩니다");return;}
+  const u={...user,plan:"full",subj:null};
+  await saveUser(u);applyUser(u);
+  closeUpgrade();
+  toast("🎉 "+u.name+"님, 종합반으로 전환되었습니다 — 모든 기능이 열렸습니다");
+}
+function closeUpgrade(){document.getElementById("upmodal").classList.remove("open");}
+function applyPlanLocks(){
+  const single=isSingle();
+  const rb=document.getElementById("rebtn");
+  if(rb&&!rebalanced){rb.innerHTML=single?"🔒 로드맵 재조정 — 종합반 전용":"⟲ 주간 데이터 반영 — 로드맵 재조정";}
+  const fab=document.getElementById("fab");
+  if(fab){fab.innerHTML=single?'🔒<span class="fabl">AI 조교 (종합반)</span>':'💬<span class="fabl">AI 조교</span>';}
+}
+async function logout(){
+  await clearUser();user=null;
+  document.getElementById("userchip").style.display="none";
+  document.getElementById("gate").classList.remove("hidden");
+}
+function ext(site,what){
+  toast("실서비스에서는 "+site+" "+what+" 페이지로 연결됩니다");
+}
+let toastTimer=null;
+function toast(msg){
+  let t=document.getElementById("toast");
+  if(!t){t=document.createElement("div");t.id="toast";t.className="toast";document.body.appendChild(t);}
+  t.textContent=msg;t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove("show"),2400);
+}
+(async()=>{
+  const u=await loadUser();
+  if(u) applyUser(u);
+})();
+// ---------- 관리자 ----------
+const rosterSeed=[
+ {n:"이O진",s:"전북대",y:"3학년",cells:"9/28",acc:"6,214",st:"warn",lk:1,
+  pos:[1,1,1,1,2,1,1],weak:["민법"],rates:[78,52,81,74,69,76,71],
+  lecs:[{t:"민법 제12강 · 물권변동",o:[6,24],c:[2,15],due:"8/8",p:"warn"},{t:"행정법 제8강 · 집행정지",o:[17,22],c:[11,16],due:"8/12",p:"ok"}],
+  last:"3일 전 (정체)",feed:"사례 답안 2건 첨삭 대기"},
+ {n:"박O호",s:"제주대",y:"졸업생",cells:"11/28",acc:"9,102",st:"warn",lk:0,
+  pos:[2,2,2,1,2,2,1],weak:["행정법","상법"],rates:[84,79,88,54,77,80,61],
+  lecs:[{t:"행정법 취약 제4강 · 처분성",o:[20,30],c:[8,20],due:"8/9",p:"warn"},{t:"형법 심화 제3강 · 죄수론",o:[9,12],c:[5,8],due:"8/16",p:"ok"}],
+  last:"오늘 09:12",feed:"CBT 서면 1건 첨삭 반환 완료"},
+ {n:"김O린",s:"경북대",y:"3학년",cells:"8/28",acc:"5,830",st:"ok",lk:1,
+  pos:[1,1,1,1,1,1,1],weak:[],rates:[80,76,79,72,74,78,70],
+  lecs:[{t:"헌법 제9강 · 기본권 경합",o:[15,20],c:[9,14],due:"8/13",p:"ok"},{t:"민소법 제7강 · 기판력",o:[12,18],c:[7,12],due:"8/15",p:"ok"}],
+  last:"오늘 07:41",feed:"상담 후 5일 연속 이행 — 정상 궤도"},
+ {n:"최O원",s:"전남대",y:"3학년",cells:"7/28",acc:"5,488",st:"ok",lk:1,
+  pos:[1,1,1,1,1,1,1],weak:["형소법"],rates:[75,73,77,70,72,58,69],
+  lecs:[{t:"형소법 제6강 · 위법수집증거",o:[10,20],c:[5,14],due:"8/14",p:"ok"},{t:"민법 제11강 · 채권자대위",o:[19,24],c:[12,15],due:"8/11",p:"ok"}],
+  last:"어제 22:30",feed:"사례 답안 1건 첨삭 대기"},
+ {n:"정O우",s:"강원대",y:"졸업생",cells:"10/28",acc:"8,455",st:"ok",lk:0,
+  pos:[2,1,2,1,1,2,1],weak:[],rates:[83,77,85,75,74,82,72],
+  lecs:[{t:"형법 심화 제2강 · 부작위범",o:[8,12],c:[4,8],due:"8/17",p:"ok"},{t:"헌법 심화 제1강 · 위헌심사",o:[6,14],c:[3,10],due:"8/19",p:"ok"}],
+  last:"오늘 10:05",feed:"첨삭 이력 12건 · 평균 스코어 상승 추세"},
+ {n:"한O서",s:"충남대",y:"3학년",cells:"6/28",acc:"5,102",st:"ok",lk:0,
+  pos:[1,1,1,1,1,1,0],weak:["상법"],rates:[74,71,76,69,70,73,55],
+  lecs:[{t:"상법 기본 보강 제3강 · 회사법 총론",o:[9,18],c:[4,12],due:"8/16",p:"ok"},{t:"민법 제12강 · 물권변동",o:[14,24],c:[8,15],due:"8/13",p:"ok"}],
+  last:"오늘 08:55",feed:"상법 기본 재배치 — 지난주 재조정 반영"},
+ {n:"오O민",s:"부산대",y:"2학년",cells:"4/28",acc:"3,247",st:"ok",lk:1,
+  pos:[1,0,1,0,0,1,0],weak:[],rates:[72,68,73,66,65,70,63],
+  lecs:[{t:"민법 기본 제18강 · 법률행위",o:[11,22],c:[5,12],due:"8/18",p:"ok"},{t:"헌법 문풀 제2강 · 통치구조",o:[8,20],c:[4,14],due:"8/20",p:"ok"}],
+  last:"어제 21:14",feed:"2학년 선행 트랙 — 기본 단계 중심"},
+ {n:"장O희",s:"원광대",y:"3학년",cells:"8/28",acc:"5,914",st:"ok",lk:0,
+  pos:[1,1,1,1,1,1,1],weak:["민소법"],rates:[77,74,78,72,59,75,70],
+  lecs:[{t:"민소법 제8강 · 소송요건",o:[13,20],c:[6,14],due:"8/12",p:"ok"},{t:"형법 제10강 · 재산죄",o:[16,18],c:[9,12],due:"8/13",p:"near"}],
+  last:"오늘 06:58",feed:"사례 답안 3건 첨삭 대기 (우선 배정 후보)"},
+ {n:"윤O성",s:"동아대",y:"졸업생",cells:"12/28",acc:"9,873",st:"ok",lk:1,
+  pos:[2,2,2,2,2,2,1],weak:[],rates:[86,82,87,80,79,84,74],
+  lecs:[{t:"행정법 심화 제4강 · 국가배상",o:[10,14],c:[6,10],due:"8/15",p:"ok"},{t:"상법 문풀 제9강 · 어음수표",o:[15,22],c:[8,12],due:"8/14",p:"ok"}],
+  last:"오늘 09:47",feed:"최상위 페이스 — 파이널 조기 진입 검토 대상"},
+ {n:"서O아",s:"충북대",y:"3학년",cells:"7/28",acc:"5,340",st:"ok",lk:0,
+  pos:[1,1,1,1,1,1,1],weak:["헌법"],rates:[57,73,76,71,70,74,68],
+  lecs:[{t:"헌법 제8강 · 기본권 총론 보강",o:[7,20],c:[3,12],due:"8/13",p:"ok"},{t:"민법 제12강 · 물권변동",o:[16,24],c:[9,15],due:"8/12",p:"ok"}],
+  last:"오늘 08:20",feed:"헌법 문풀 +1주 연장 — 지난주 재조정 반영"}
+];
+const metro=["서울대","고려대","연세대","성균관대","한양대","이화여대","중앙대","경희대","서강대","한국외대","서울시립대","건국대","인하대","아주대"];
+function toggleAdminForm(){
+  const f=document.getElementById("adminForm");
+  f.style.display=f.style.display==="none"?"block":"none";
+}
+function adminLogin(){
+  const code=document.getElementById("fAdmin").value.trim();
+  if(code!=="veritas"){toast("관리자 코드가 올바르지 않습니다");return;}
+  renderAdmin();
+  const av=document.getElementById("adminView");
+  av.classList.add("open");
+  av.scrollTop=0;
+}
+function adminLogout(){
+  document.getElementById("adminView").classList.remove("open");
+}
+function renderAdmin(){
+  const list=[...rosterSeed];
+  if(user)list.unshift({n:user.name,s:user.school,y:user.year,cells:"6/28",acc:"5,502",st:"ok",lk:1,me:1});
+  // KPI
+  document.getElementById("akTotal").textContent=list.length;
+  document.getElementById("akLink").textContent=list.filter(x=>x.lk).length;
+  const localN=list.filter(x=>!metro.includes(x.s)).length;
+  document.getElementById("akLocal").textContent=Math.round(localN/list.length*100)+"%";
+  // 로스쿨 분포
+  const cnt={};list.forEach(x=>cnt[x.s]=(cnt[x.s]||0)+1);
+  const entries=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
+  const mx=entries[0][1];
+  document.getElementById("schoolBars").innerHTML=entries.map(([s,c])=>`
+   <div class="bar"><span class="bl">${s}</span>
+   <div class="track"><div class="fill" style="width:${c/mx*100}%"></div></div>
+   <span class="bv">${c}명</span></div>`).join("");
+  // ===== 종합 분석 =====
+  const stName=["기본","문풀","심화","파이널"];
+  const posOfA=x=>x.me?[1,1,1,1,1,1,1]:x.pos;
+  const ratesOfA=x=>x.me?[82,76,88,54,71,79,61]:x.rates;
+  const cellsNum=x=>parseInt(x.cells);
+  // 단계 분포
+  const dist=[0,0,0,0];
+  list.forEach(x=>posOfA(x).forEach(p=>dist[Math.min(p,3)]++));
+  const totalCells=dist.reduce((a,b)=>a+b,0);
+  document.getElementById("agTotalCells").textContent=totalCells;
+  const stColor=["#3a4a6d","#3d6cb8","#c9a227","#3e9c6d"];
+  document.getElementById("stageDist").innerHTML=stName.map((n,i)=>`
+   <div class="bar"><span class="bl">${n}</span>
+   <div class="track"><div class="fill" style="width:${(dist[i]/totalCells*100).toFixed(1)}%;background:${stColor[i]}"></div></div>
+   <span class="bv">${Math.round(dist[i]/totalCells*100)}%</span></div>`).join("");
+  // 과목별 평균 정답률
+  const avg=laws.map((l,li)=>Math.round(list.reduce((a,x)=>a+ratesOfA(x)[li],0)/list.length));
+  document.getElementById("avgRates").innerHTML=laws.map((l,li)=>`
+   <div class="bar ${avg[li]<65?"weak":""}"><span class="bl">${l}</span>
+   <div class="track"><div class="fill" style="width:${avg[li]}%"></div></div>
+   <span class="bv">${avg[li]}%</span></div>`).join("");
+  // 학교별 / 학년별 집계
+  function groupTable(keyFn, elId){
+    const g={};
+    list.forEach(x=>{const k=keyFn(x);if(!g[k])g[k]={n:0,cells:0,rate:0,warn:0};
+      g[k].n++;g[k].cells+=cellsNum(x);
+      g[k].rate+=ratesOfA(x).reduce((a,b)=>a+b,0)/7;
+      if(x.st==="warn")g[k].warn++;});
+    const rows=Object.entries(g).sort((a,b)=>b[1].n-a[1].n);
+    document.getElementById(elId).innerHTML=
+     `<div class="grow head"><span>구분</span><span>인원</span><span>평균 통과 칸</span><span>평균 정답률</span><span>주의</span></div>`+
+     rows.map(([k,v])=>`<div class="grow"><span class="gn">${k}</span><span>${v.n}명</span>
+       <span>${(v.cells/v.n).toFixed(1)} / 28</span><span>${Math.round(v.rate/v.n)}%</span>
+       <span class="${v.warn?"gwarn":"gok"}">${v.warn?v.warn+"명":"—"}</span></div>`).join("");
+  }
+  groupTable(x=>x.s,"bySchool");
+  groupTable(x=>x.y,"byYear");
+  const posOf=posOfA;
+  const weakOf=x=>x.me?["행정법"]:x.weak;
+  document.getElementById("heatmap").innerHTML=
+   `<div class="hrow hh"><span></span>${laws.map(l=>`<span style="text-align:center">${l}</span>`).join("")}<span style="text-align:center">페이스</span></div>`+
+   list.map((x,i)=>{
+     const pos=posOf(x),wk=weakOf(x);
+     const cells=laws.map((l,li)=>{
+       const p=Math.min(pos[li],3);
+       return `<span class="hcell hs${p} ${wk.includes(l)?"hw":""}">${stName[p]}</span>`;
+     }).join("");
+     const st=x.st==="warn"?'<span class="hstat warn">주의</span>':'<span class="hstat ok">정상</span>';
+     return `<div class="hrow" onclick="openStudent(${i})"><span class="hname">${x.n}${x.me?" ★":""}<small>${x.s}</small></span>${cells}${st}</div>`;
+   }).join("");
+  // 명부
+  document.getElementById("roster").innerHTML=
+   `<div class="arow2 head"><span>성명</span><span>로스쿨</span><span>학년</span><span>통과 칸</span><span>누적 문항</span><span>연계할인</span></div>`+
+   list.map((x,i)=>`<div class="arow2 ${x.me?"me":""} click" onclick="openStudent(${i})">
+     <span class="nm2">${x.n}${x.me?" ★":""}</span><span>${x.s}</span><span>${x.y}</span>
+     <span>${x.cells}</span><span>${x.acc}문</span>
+     ${x.lk?'<span class="lk">5% 적용</span>':'<span class="nolk">미연계</span>'}
+   </div>`).join("");
+  adminList=list;
+}
+let adminList=[];
+function openStudent(i){
+  const x=adminList[i];
+  const d=x.me?{...x,pos:[1,1,1,1,1,1,1],weak:["행정법"],rates:[82,76,88,54,71,79,61],
+    lecs:[{t:"행정법 제7강 · 거부처분과 취소소송",o:[14,20],c:[9,18],due:"8/10",p:"ok"},{t:"민법 제12강 · 물권변동",o:[11,24],c:[4,15],due:"8/8",p:"warn"}],
+    last:"지금 접속 중",feed:"본인(관리자 시연 계정)"}:x;
+  const stName=["기본","문풀","심화","파이널"];
+  const mini=laws.map((l,li)=>{
+    const p=d.pos[li];
+    const cells=[0,1,2,3].map(si=>{
+      let cls="ms-todo";
+      if(si<p)cls="ms-done";else if(si===p)cls="ms-now";
+      return `<span class="ms ${cls}" title="${l} ${stName[si]}"></span>`;
+    }).join("");
+    return `<div class="mrow"><span class="ml ${d.weak.includes(l)?"weakl":""}">${l}</span>${cells}<span class="mstage">${stName[d.pos[li]]||"완료"}</span></div>`;
+  }).join("");
+  const rateBars=laws.map((l,li)=>`
+    <div class="bar ${d.rates[li]<65?"weak":""}"><span class="bl">${l}</span>
+    <div class="track"><div class="fill" style="width:${d.rates[li]}%"></div></div>
+    <span class="bv">${d.rates[li]}%</span></div>`).join("");
+  const lecRows=d.lecs.map(L=>`
+    <div class="slec">
+      <div class="lhead"><span class="ltitle" style="color:var(--ink)">${L.t}</span>
+        <span class="ldue">기한 ${L.due}</span>${L.p==="warn"?'<span class="pc warn">주의</span>':(L.p==="near"?'<span class="pc near">완료 임박</span>':'<span class="pc ok">여유</span>')}</div>
+      <div class="lrow"><span class="lt sel">객관식</span><div class="ltrack"><div class="lfill sel" style="width:${L.o[0]/L.o[1]*100}%"></div></div><span class="lnum">${L.o[0]}/${L.o[1]}문</span></div>
+      <div class="lrow"><span class="lt case">사례</span><div class="ltrack"><div class="lfill case" style="width:${L.c[0]/L.c[1]*100}%"></div></div><span class="lnum">${L.c[0]}/${L.c[1]}문</span></div>
+    </div>`).join("");
+  document.getElementById("studentBody").innerHTML=`
+    <div class="shead">
+      <h3>${d.n} <span style="color:var(--sub);font-weight:400;font-size:.85rem">· ${d.s} ${d.y} ${d.lk?'<span class="lk" style="margin-left:6px">5% 연계</span>':""}</span></h3>
+      <div class="smeta">통과 칸 <b>${d.cells}</b> · 누적 <b>${d.acc}문</b> · 최근 활동 <b>${d.last}</b></div>
+      <div class="sfeed">${d.feed}</div>
+    </div>
+    <div class="sgrid">
+      <div>
+        <div class="stt">28칸 학습 위치</div>
+        ${mini}
+        <div class="stt" style="margin-top:16px">진행 중 강의 해소</div>
+        ${lecRows}
+      </div>
+      <div>
+        <div class="stt">과목별 선택형 정답률 (최근 2주)</div>
+        ${rateBars}
+        <div class="stt" style="margin-top:16px">AS 액션</div>
+        <div class="sacts">
+          <button class="extbtn" onclick="toast('${d.n} 님에게 1:1 상담 슬롯을 제안했습니다')">1:1 상담 제안</button>
+          <button class="extbtn" onclick="toast('${d.n} 님 로드맵 수동 재조정 화면 (실서비스 연결 지점)')">로드맵 수동 조정</button>
+          <button class="extbtn" onclick="toast('${d.n} 님 첨삭을 우선 배정 대기열에 올렸습니다')">첨삭 우선 배정</button>
+          <button class="extbtn" onclick="toast('${d.n} 님에게 오프라인 특강 5% 연계 안내를 발송했습니다')">오프라인 연계 안내</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById("studentModal").classList.add("open");
+}
+function closeStudent(){document.getElementById("studentModal").classList.remove("open");}
+function launchEngine(k){
+  if(isSingle()&&(k==="six"||k==="case"))toast("단과반: "+user.subj+" 과목만 등록·이용 가능합니다");
+  if(typeof openEngine==="function"){openEngine(k);return;}
+  const files={six:"변시_자율학습시스템.html",case:"변시_사례형엔진.html",schedule:"변시_schedule.html",roadmap:"변시_roadmap.html",admin:"변시_관리자.html"};
+  if(files[k])location.href=files[k];
+}
+grid();initBoard();bars();
+// ---------- 순환 자동 시연 ----------
+let tourOn=false,tourTimers=[];
+function narr(step,text){
+  let n=document.getElementById("narrBox");
+  if(!n){n=document.createElement("div");n.id="narrBox";n.className="narr";
+    n.innerHTML='<div class="nstep" id="nstep"></div><div class="ntext" id="ntext"></div>';
+    document.body.appendChild(n);}
+  n.classList.add("show");
+  document.getElementById("nstep").textContent=step;
+  document.getElementById("ntext").innerHTML=text;
+}
+function narrHide(){const n=document.getElementById("narrBox");if(n)n.classList.remove("show");}
+function nodeOn(i){
+  for(let k=1;k<=6;k++)document.getElementById("cn"+k).classList.remove("active");
+  if(i)document.getElementById("cn"+i).classList.add("active");
+}
+function go(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:"smooth",block:"center"});}
+function hlOn(id){const el=document.getElementById(id);if(el)el.classList.add("hl");}
+function hlOff(id){const el=document.getElementById(id);if(el)el.classList.remove("hl");}
+function after(ms,fn){tourTimers.push(setTimeout(fn,ms));}
+function stopTour(){
+  tourOn=false;tourTimers.forEach(clearTimeout);tourTimers=[];
+  narrHide();nodeOn(0);
+  ["pB","s2","s3","s4"].forEach(hlOff);
+  const b=document.getElementById("tourbtn");b.textContent="▶ 순환 자동 시연";b.classList.remove("stop");
+}
+function startTour(){
+  if(tourOn){stopTour();return;}
+  tourOn=true;rebalanced=false;
+  const b=document.getElementById("tourbtn");b.textContent="■ 시연 중지";b.classList.add("stop");
+  let t=0;
+  // ① 자가진단
+  after(t+=200,()=>{nodeOn(1);go("s1");hlOn("pB");
+    narr("STEP ① 자가진단","재시생 <b>박정호</b>를 선택합니다. 진단 결과: 5개 과목 기본 면제, <b>행정법·상법 취약</b> — 이 진단이 다음 단계의 로드맵을 결정합니다.");});
+  after(t+=2800,()=>{setProfile('B');});
+  // ② 로드맵
+  after(t+=1400,()=>{hlOff("pB");nodeOn(2);go("grid");hlOn("s2");
+    narr("STEP ② 연간 로드맵","진단이 <b>28칸 지도를 재배열</b>했습니다. 면제 칸(빗금)과 취약 과목의 압축 재수강 칸이 생기고, 모든 칸에 날짜가 박힙니다. 로드맵은 이제 매일 아침 \u2018오늘\u2019을 낳습니다.");});
+  // ③ 일일 과업
+  after(t+=3600,()=>{hlOff("s2");nodeOn(3);go("s3");hlOn("s3");
+    narr("STEP ③ 강의별 해소","로드맵의 현재 칸이 <b>해소 총량</b>(객관식+사례)으로 내려왔습니다. 총량과 기한은 시스템이 지키고, 오늘 몇 문을 소화할지는 학생이 정합니다.");});
+  // ④ 엔진 실행 — 실제 소화 동작
+  after(t+=3200,()=>{nodeOn(4);
+    narr("STEP ④ 엔진 실행","이제 학생이 소화를 시작합니다 — <b>행정법 +5문씩</b>, 사례 <b>+1문 현출</b>. 오른쪽 <b>누적탑</b>이 실시간으로 자라는 것을 보세요.");});
+  after(t+=1200,()=>{consume(0,'obj',5);});
+  after(t+=900,()=>{consume(0,'obj',5);});
+  after(t+=900,()=>{consume(0,'cas',1);});
+  after(t+=900,()=>{consume(1,'obj',5);});
+  after(t+=900,()=>{consume(1,'cas',1);});
+  // ⑤ 데이터
+  after(t+=1600,()=>{hlOff("s3");nodeOn(5);go("s4");hlOn("s4");
+    narr("STEP ⑤ 데이터 축적","실행이 데이터가 됩니다. 주간 집계에서 <b>행정법 54%</b>·<b>상법 61%</b>가 빨간 신호 — 이 숫자가 다음 단계의 입력값입니다.");});
+  // ⑥ 재조정
+  after(t+=3600,()=>{nodeOn(6);
+    narr("STEP ⑥ 로드맵 재조정","데이터가 로드맵을 고칩니다 — 재조정을 실행합니다.");});
+  after(t+=1400,()=>{rebalance();});
+  after(t+=1200,()=>{
+    narr("⑥ → ② 되먹임 완성","위 매트릭스에서 <b>행정법 문풀 +2주</b>, <b>형법 심화 압축</b> 칸이 금색으로 바뀌었습니다. 수정된 로드맵이 내일 아침 다시 \u2018오늘의 과업\u2019을 낳습니다 — <b>순환이 닫혔습니다. 이것이 유기체입니다.</b>");});
+  after(t+=5200,()=>{hlOff("s4");stopTour();toast("순환 한 바퀴 완료 — 각 단계를 직접 눌러보세요");});
+}
+// ---------- AI 조교 (실제 API 호출) ----------
+let chatHist=[];
+function toggleChat(){
+  if(isSingle()){upsell("24시간 AI 조교");return;}
+  document.getElementById("chat").classList.toggle("open");
+  if(document.getElementById("chat").classList.contains("open"))document.getElementById("cq").focus();
+}
+function addMsg(role,text){
+  const b=document.getElementById("cbody");
+  const d=document.createElement("div");
+  d.className="cmsg "+role; d.textContent=text;
+  b.appendChild(d); b.scrollTop=b.scrollHeight;
+  return d;
+}
+async function askAI(){
+  const inp=document.getElementById("cq");
+  const q=inp.value.trim();
+  if(!q)return;
+  inp.value=""; addMsg("me",q);
+  chatHist.push({role:"user",content:q});
+  const btn=document.getElementById("csend");btn.disabled=true;
+  const t=addMsg("ai typing","답변을 작성하고 있습니다…");
+  const who=user?`${user.name}(${user.school} ${user.year})`:"수험생";
+  const prof=cur==="A"?"초시생, 현재 문풀 단계":"재시생, 행정법·상법 취약, 심화 단계";
+  const sys=`당신은 대한민국 변호사시험 온라인 종합반 '합격 OS'의 AI 학습 조교입니다. 상대는 ${who}, ${prof}입니다. 헌법·민법·형법·행정법·민사소송법·형사소송법·상법 7법의 개념·판례·답안 현출 방법을 정확하고 간결하게(400자 이내) 한국어로 답하세요. 사례형 질문에는 목차 잡는 법과 채점포인트 관점으로 답합니다. 학습 조언 요청 시 오늘의 해소 과업과 연결해 구체적으로 조언하세요. 확실하지 않은 판례 번호는 만들어내지 말고 쟁점 중심으로 설명하세요.`;
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,system:sys,
+        messages:chatHist.slice(-10)})
+    });
+    const data=await res.json();
+    const ans=(data.content||[]).filter(x=>x.type==="text").map(x=>x.text).join("\n").trim();
+    if(!ans)throw new Error("empty");
+    t.className="cmsg ai";t.textContent=ans;
+    chatHist.push({role:"assistant",content:ans});
+  }catch(e){
+    t.className="cmsg ai";
+    t.textContent="연결이 원활하지 않습니다. 잠시 후 다시 시도해 주세요. (실서비스에서는 전용 회선으로 안정 제공됩니다)";
+  }
+  btn.disabled=false;
+  const b=document.getElementById("cbody");b.scrollTop=b.scrollHeight;
+}
+</script>
+<!-- 종합반 신청 -->
+<div class="upmodal" id="upmodal" onclick="if(event.target===this)closeUpgrade()">
+  <div class="upcard">
+    <button class="upclose" onclick="closeUpgrade()">✕</button>
+    <div id="upBody"></div>
+  </div>
+</div>
+
+<!-- AI 조교 -->
+<button class="fab" id="fab" onclick="toggleChat()">💬<span class="fabl">AI 조교</span></button>
+<div class="chat" id="chat">
+  <div class="chead">
+    <div><b>AI 조교</b><span class="chsub">24시간 즉문즉답 · 새벽에도 답합니다</span></div>
+    <button class="mini" onclick="toggleChat()">닫기</button>
+  </div>
+  <div class="cbody" id="cbody">
+    <div class="cmsg ai">안녕하세요! 변시 학습 중 막히는 것을 무엇이든 물어보세요. 개념 질문, 판례, 답안 현출 방법, 오늘 과업에 대한 조언까지 — 지금 바로 답해드립니다.</div>
+  </div>
+  <div class="cinput">
+    <input id="cq" type="text" placeholder="예: 거부처분의 처분성 요건이 헷갈려요" onkeydown="if(event.key==='Enter')askAI()">
+    <button class="csend" id="csend" onclick="askAI()">전송</button>
+  </div>
+</div>
+
+</body>
+</html>

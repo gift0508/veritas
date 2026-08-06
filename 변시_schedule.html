@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>변호사시험 학습 스케줄 — 자가진단 · 5단계 로드맵</title>
+<style>
+  :root{
+    --ink:#16203A; --muted:#6B7488; --line:#E3E7EF; --paper:#F4F6FA; --card:#fff;
+    --accent:#3B5BDB; --accent-soft:#E8EDFB;
+    --s1:#5b8def; --s2:#3a4fd0; --s3:#5847d4; --s4:#e08a2e; --s5:#1f9d6b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","맑은 고딕",sans-serif;
+    background:var(--paper); color:var(--ink); line-height:1.6;
+    -webkit-font-smoothing:antialiased; padding:26px 14px 80px;
+  }
+  .wrap{max-width:720px;margin:0 auto}
+
+  .head{text-align:center;margin-bottom:20px}
+  .head .kicker{
+    display:inline-block;font-size:12px;font-weight:700;letter-spacing:1.5px;color:#fff;
+    background:linear-gradient(100deg,#3a4fd0,#5847d4);padding:6px 16px;border-radius:30px;margin-bottom:12px;
+  }
+  .head h1{font-size:24px;font-weight:800;letter-spacing:-0.6px}
+  .head p{margin-top:9px;font-size:14px;color:var(--muted)}
+
+  /* 안내 배너 */
+  .intro{
+    background:linear-gradient(135deg,#eef2ff,#e8edfb);border:1px solid #d4dcf5;border-radius:14px;
+    padding:16px 20px;margin-bottom:24px;font-size:13.5px;color:var(--ink);line-height:1.65;
+  }
+  .intro b{color:var(--accent)}
+  .intro .flow{
+    display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:12px;
+    font-size:12px;font-weight:700;
+  }
+  .intro .fstep{background:#fff;border:1px solid var(--line);border-radius:20px;padding:4px 12px;color:var(--muted)}
+  .intro .farrow{color:#b7c0dd}
+
+  /* 타임라인 */
+  .timeline{position:relative;padding-left:8px}
+  .stage{position:relative;padding-left:52px;padding-bottom:22px}
+  .stage:last-child{padding-bottom:0}
+  /* 세로선 */
+  .stage::before{
+    content:"";position:absolute;left:19px;top:6px;bottom:-6px;width:2px;background:var(--line);
+  }
+  .stage:last-child::before{display:none}
+  /* 단계 번호 원 */
+  .snum{
+    position:absolute;left:0;top:0;width:40px;height:40px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;font-weight:800;
+    z-index:1;box-shadow:0 3px 10px rgba(22,32,58,.15);
+  }
+  .stage.st1 .snum{background:var(--s1)}
+  .stage.st2 .snum{background:var(--s2)}
+  .stage.st3 .snum{background:var(--s3)}
+  .stage.st4 .snum{background:var(--s4)}
+  .stage.st5 .snum{background:var(--s5)}
+
+  .scard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:0 3px 12px rgba(22,32,58,.05)}
+  .sname{display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap}
+  .sname .nm{font-size:19px;font-weight:800;letter-spacing:-0.4px}
+  .sname .hanja{font-size:12px;font-weight:700;color:#fff;border-radius:20px;padding:3px 10px}
+  .stage.st4 .hanja{background:var(--s4)}
+  .stage.st5 .hanja{background:var(--s5)}
+  .sdesc{font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+
+  .srow{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13.5px}
+  .srow .rk{flex:0 0 92px;font-weight:700;color:var(--muted);font-size:12.5px}
+  .srow .rv{flex:1;font-weight:600}
+  .srow .rv b{color:var(--accent)}
+  .srow .rv .lec{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:800;padding:1px 9px;border-radius:6px;margin:2px 3px 2px 0}
+
+  .shoplinks{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .shoplinks a{
+    flex:1;min-width:150px;display:flex;align-items:center;justify-content:center;gap:6px;
+    font-size:12px;font-weight:800;text-decoration:none;border-radius:9px;padding:9px 10px;
+    border:1.5px solid var(--line);color:var(--ink);background:var(--card);transition:.15s;white-space:nowrap;
+  }
+  .shoplinks a:hover{border-color:var(--accent);color:var(--accent)}
+  .shoplinks a.buy{border-color:#e8d9b0;background:#fffaf0;color:#8a6d1f}
+  .shoplinks a.buy:hover{border-color:#c9a14a;color:#c9a14a}
+  .calc-link{
+    margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--paper);border-radius:10px;padding:10px 14px;font-size:12.5px;color:var(--muted);font-weight:600;
+  }
+  .calc-link a{
+    font-size:12.5px;font-weight:800;color:#fff;background:var(--accent);
+    text-decoration:none;padding:7px 14px;border-radius:20px;white-space:nowrap;
+  }
+
+  .foot{text-align:center;font-size:12px;color:var(--muted);margin-top:26px;line-height:1.7}
+  .foot b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <span class="kicker">변호사시험 · 1행2필 합격 OS</span>
+    <h1>자가진단 — 나는 지금 어느 단계인가</h1>
+    <p>각 단계의 목표 기준으로 지금 내 위치를 진단하고, 순서대로 밟아 올라가면 됩니다.</p>
+  </div>
+
+  <div class="intro">
+    이 로드맵은 <b>‘무엇을, 어떤 순서로’</b> 하는지를 보여줍니다. <b>‘며칠 걸리는지’</b>는 당신의 하루 학습량에 따라 다르니,
+    <b>합격 로드맵 계산기</b>에서 직접 계산하세요. 지금 내가 어느 단계인지 모르겠다면 <b>자가진단</b>부터 시작하면 됩니다.
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #d4dcf5;font-size:12.5px;color:var(--muted);font-weight:600">
+      <b style="color:var(--ink)">변시 7법</b> &nbsp;헌법 · 민법 · 형법 · 행정법 · 민소법 · 형소법 · 상법
+      <span style="display:block;margin-top:5px">과목마다 진도가 다릅니다 — <b>과목별로</b> 지금 단계를 확인하세요.</span>
+    </div>
+    <div class="flow">
+      <span class="fstep">진입</span><span class="farrow">→</span>
+      <span class="fstep">습득</span><span class="farrow">→</span>
+      <span class="fstep">풀이</span><span class="farrow">→</span>
+      <span class="fstep">1행</span><span class="farrow">→</span>
+      <span class="fstep">2필</span>
+    </div>
+  </div>
+
+  <div class="timeline">
+
+    <!-- 진입 -->
+    <div class="stage st1">
+      <div class="snum">1</div>
+      <div class="scard">
+        <div class="sname"><span class="nm">진입</span></div>
+        <div class="sdesc">개념을 처음 접하는 단계. 기본 내용을 눈에 익히고 외웁니다.</div>
+        <div class="srow"><div class="rk">🎧 듣는 강의</div><div class="rv"><span class="lec">입문이론</span><span class="lec">기본이론</span></div></div>
+        <div class="srow"><div class="rk">📋 하는 곳</div><div class="rv">6단계 자율학습시스템 (OX 등록·1단계)</div></div>
+        <div class="srow"><div class="rk">🎯 목표</div><div class="rv">10문제 중 <b>8개 이상 암기</b></div></div>
+        <div class="shoplinks">
+          <a href="#" onclick="alert('실서비스에서 고시닷컴 입문·기본이론 강의실로 연결됩니다');return false">▶ 고시닷컴 강의</a>
+          <a href="#" class="buy" onclick="alert('실서비스에서 북라인 교재 구매로 연결됩니다');return false">📕 북라인 교재</a>
+          <a href="#" class="buy" onclick="alert('실서비스에서 북라인 PDF 낱개구매로 연결됩니다');return false">📄 PDF 낱개구매</a>
+        </div>
+        <div class="calc-link"><span>이 단계 며칠 걸릴까?</span><a href="변시_roadmap.html">입문·기본이론 계산하기 →</a></div>
+      </div>
+    </div>
+
+    <!-- 습득 -->
+    <div class="stage st2">
+      <div class="snum">2</div>
+      <div class="scard">
+        <div class="sname"><span class="nm">습득</span></div>
+        <div class="sdesc">진입은 순조로웠지만 이해가 완전하지 않은 단계. 강의를 통해 왜 그런지 해소합니다.</div>
+        <div class="srow"><div class="rk">🎧 듣는 강의</div><div class="rv"><span class="lec">기본이론</span><span class="lec">문제풀이</span> <span style="color:var(--muted);font-weight:600">막힌 부분만</span></div></div>
+        <div class="srow"><div class="rk">📋 하는 곳</div><div class="rv">기본이론 재청취 + 6단계 보드 오답 반복</div></div>
+        <div class="srow"><div class="rk">🎯 목표</div><div class="rv">막힌 부분을 <b>강의로 해소</b>하고 이해하기</div></div>
+        <div class="shoplinks">
+          <a href="#" onclick="alert('실서비스에서 고시닷컴 기본이론·문제풀이 강의실로 연결됩니다');return false">▶ 고시닷컴 강의</a>
+          <a href="#" class="buy" onclick="alert('실서비스에서 북라인 교재 구매로 연결됩니다');return false">📕 북라인 교재</a>
+          <a href="#" class="buy" onclick="alert('실서비스에서 북라인 PDF 낱개구매로 연결됩니다');return false">📄 PDF 낱개구매</a>
+        </div>
+        <div class="calc-link"><span>이 단계는 약점만 골라 듣는 시기</span><a href="변시_roadmap.html">문제풀이 계산하기 →</a></div>
+      </div>
+    </div>
+
+    <!-- 풀이 -->
+    <div class="stage st3">
+      <div class="snum">3</div>
+      <div class="scard">
+        <div class="sname"><span class="nm">풀이</span></div>
+        <div class="sdesc">설명은 되는데 문제로는 정답을 못 고르는 단계. 문제 형식별 정답 선택을 훈련합니다.</div>
+        <div class="srow"><div class="rk">🎧 듣는 강의</div><div class="rv"><span class="lec">문제풀이</span><span class="lec">사례형 답안훈련</span></div></div>
+        <div class="srow"><div class="rk">📋 하는 곳</div><div class="rv">실전 5지택일 + 사례형 답안훈련 (문풀·사례 연동)</div></div>
+        <div class="srow"><div class="rk">🎯 목표</div><div class="rv">5문제 중 <b>3개 이상 정답</b></div></div>
+        <div class="shoplinks">
+          <a href="#" onclick="alert('실서비스에서 고시닷컴 문제풀이·사례형 강의실로 연결됩니다');return false">▶ 고시닷컴 강의</a>
+          <a href="#" class="buy" onclick="alert('실서비스에서 북라인 교재 구매로 연결됩니다');return false">📕 북라인 교재</a>
+          <a href="#" class="buy" onclick="alert('실서비스에서 북라인 PDF 낱개구매로 연결됩니다');return false">📄 PDF 낱개구매</a>
+        </div>
+        <div class="calc-link"><span>이 단계 며칠 걸릴까?</span><a href="변시_roadmap.html">문제풀이 계산하기 →</a></div>
+      </div>
+    </div>
+
+    <!-- 1행 -->
+    <div class="stage st4">
+      <div class="snum">4</div>
+      <div class="scard">
+        <div class="sname"><span class="nm">1행 단계</span><span class="hanja">一幸 · 운칠기삼 합격</span></div>
+        <div class="sdesc">합격선에 거의 왔습니다. 다만 지금 실력으로는 운이 좋아야 붙는 자리. 약점을 메워 ‘운’을 ‘필연’으로 바꿉니다.</div>
+        <div class="srow"><div class="rk">🎧 듣는 강의</div><div class="rv"><span class="lec">심화이론</span><span class="lec">파이널</span> <span style="color:var(--muted);font-weight:600">촘촘하게</span></div></div>
+        <div class="srow"><div class="rk">📋 하는 곳</div><div class="rv">선다박스 혼합형 + 기록형 CBT 훈련</div></div>
+        <div class="srow"><div class="rk">🎯 목표</div><div class="rv">10문제 중 <b>6개 이상</b>으로 끌어올리기</div></div>
+        <div class="shoplinks">
+          <a href="#" onclick="alert('실서비스에서 고시닷컴 심화·파이널 강의실로 연결됩니다');return false">▶ 고시닷컴 강의</a>
+          <a href="#" class="buy" onclick="alert('실서비스에서 북라인 교재 구매로 연결됩니다');return false">📕 북라인 교재</a>
+          <a href="#" class="buy" onclick="alert('실서비스에서 북라인 PDF 낱개구매로 연결됩니다');return false">📄 PDF 낱개구매</a>
+        </div>
+        <div class="calc-link"><span>약점 위주로 더 촘촘하게 반복</span><a href="변시_roadmap.html">심화·파이널 계산하기 →</a></div>
+      </div>
+    </div>
+
+    <!-- 2필 -->
+    <div class="stage st5">
+      <div class="snum">5</div>
+      <div class="scard">
+        <div class="sname"><span class="nm">2필 단계</span><span class="hanja">二必 · 기칠운삼 합격</span></div>
+        <div class="sdesc">실력으로 반드시 붙는 자리에 도달. 새로운 것을 늘리기보다 이 감각을 시험날까지 유지하는 것이 관건입니다.</div>
+        <div class="srow"><div class="rk">🎧 듣는 강의</div><div class="rv"><span class="lec">파이널</span><span class="lec">전범위 모의</span> <span style="color:var(--muted);font-weight:600">가볍게</span></div></div>
+        <div class="srow"><div class="rk">📋 하는 곳</div><div class="rv">사례·기록 CBT 실전 모의 (감각 유지)</div></div>
+        <div class="srow"><div class="rk">🎯 목표</div><div class="rv">10문제 중 <b>6개 이상</b> 안정적으로 유지</div></div>
+        <div class="shoplinks">
+          <a href="#" onclick="alert('실서비스에서 고시닷컴 파이널·모의 강의실로 연결됩니다');return false">▶ 고시닷컴 강의</a>
+          <a href="#" class="buy" onclick="alert('실서비스에서 북라인 교재 구매로 연결됩니다');return false">📕 북라인 교재</a>
+          <a href="#" class="buy" onclick="alert('실서비스에서 북라인 PDF 낱개구매로 연결됩니다');return false">📄 PDF 낱개구매</a>
+        </div>
+        <div class="calc-link"><span>1행과 같은 강의를 가볍게 반복하며 감각 유지</span><a href="변시_roadmap.html">계산기로 확인하기 →</a></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <b>진입 · 습득 · 풀이 단계는 다른 강의를 듣는 국면</b>이고, <b>1행 · 2필 단계는 마무리 강의를 밀도만 다르게</b> 듣는 두 지점입니다.<br>과목마다 단계가 다르니 <b>7법 각각</b>에 대해 진단하세요.<br>
+    각 단계가 며칠 걸릴지는 <b>합격 로드맵 계산기</b>에서, 지금 내 단계는 <b>자가진단</b>에서 확인하세요.
+  </div>
+
+</div>
+</body>
+</html>

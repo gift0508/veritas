@@ -1,0 +1,2934 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>/* storage-safe shim: 차단 환경에서 메모리 저장으로 대체 */
+try{window.localStorage.getItem("__t__");}catch(e){
+  (function(){var m={};var fake={getItem:function(k){return Object.prototype.hasOwnProperty.call(m,k)?m[k]:null;},
+  setItem:function(k,v){m[k]=String(v);},removeItem:function(k){delete m[k];},
+  clear:function(){m={};},key:function(i){return Object.keys(m)[i]||null;}};
+  Object.defineProperty(fake,"length",{get:function(){return Object.keys(m).length;}});
+  try{Object.defineProperty(window,"localStorage",{value:fake,configurable:true});}catch(e2){}
+  try{Object.defineProperty(window,"sessionStorage",{value:fake,configurable:true});}catch(e3){}})();
+}
+</script>
+<meta charset="UTF-8">
+<!-- Google Analytics (GA4) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S2B3ZWCHXN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-S2B3ZWCHXN');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<title>1행2필 | 변시 사례형 답안 학습엔진</title>
+<style>
+:root{
+  --navy:#0f1b3d;
+  --navy-soft:#16204a;
+  --gold:#c9a14a;
+  --paper:#f7f5f0;
+  --ink:#1c2333;
+  --line:#e3e0d8;
+  --blue:#2f5fb3;
+  --green:#2f7d4f;
+  --orange:#d97b29;
+  --purple:#7048a8;
+  --red:#c4453f;
+  --muted:#8a8578;
+  font-family:"Pretendard","Noto Sans KR",-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-size:14px;
+  line-height:1.6;
+}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:#d8d4c8;border-radius:4px;}
+
+/* ===== HEADER ===== */
+header{
+  background:var(--navy);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 24px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 12px rgba(0,0,0,.15);
+}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand .mark{
+  width:34px;height:34px;border-radius:8px;
+  background:linear-gradient(135deg,var(--gold),#a87f2e);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;color:var(--navy);font-size:15px;
+}
+.brand .title{font-weight:700;font-size:16px;letter-spacing:.3px;display:flex;align-items:center;gap:8px;}
+.domain-badge{
+  background:var(--gold);color:var(--navy);font-size:11px;font-weight:800;
+  padding:3px 10px;border-radius:20px;letter-spacing:.3px;
+}
+.brand .title .step-admin-gear{font-size:13px;cursor:pointer;color:#9aa3c4;}
+.brand .title .step-admin-gear:hover{color:#fff;}
+.brand .sub{font-size:11px;color:#9aa3c4;font-weight:400;letter-spacing:.5px;}
+.header-actions{display:flex;gap:10px;align-items:center;}
+.hbtn{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.15);
+  color:#fff;padding:8px 14px;border-radius:8px;
+  font-size:12.5px;cursor:pointer;font-weight:600;
+  display:flex;align-items:center;gap:6px;
+  transition:.15s;
+}
+.hbtn:hover{background:rgba(255,255,255,.16);}
+.hbtn.danger{background:rgba(196,69,63,.2);border-color:rgba(196,69,63,.4);}
+.hbtn.danger:hover{background:rgba(196,69,63,.35);}
+
+/* ===== LAYOUT ===== */
+.layout{
+  display:grid;
+  grid-template-columns:280px 1fr 320px;
+  gap:14px;
+  padding:14px;
+  align-items:start;
+}
+/* 태블릿(갤탭): 2단 레이아웃 — 좌측패널 + 중앙답안영역 (우측패널은 아래로) */
+@media (max-width:1200px) and (min-width:768px){
+  .layout{grid-template-columns:260px 1fr;}
+}
+/* 모바일: 1단 */
+@media (max-width:767px){
+  .layout{grid-template-columns:1fr;}
+}
+
+.panel{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:16px;
+}
+.panel h3{
+  font-size:13px;font-weight:700;color:var(--navy);
+  margin-bottom:10px;display:flex;align-items:center;gap:6px;
+}
+
+/* ===== LEFT: PROBLEM INFO ===== */
+.problem-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+.problem-nav .num{
+  font-size:20px;font-weight:800;color:var(--navy);
+  letter-spacing:1px;
+}
+.navbtn{
+  width:30px;height:30px;border-radius:8px;border:1px solid var(--line);
+  background:#fff;cursor:pointer;font-size:14px;color:var(--navy);
+  display:flex;align-items:center;justify-content:center;
+}
+.navbtn:hover{background:var(--paper);}
+
+.pool-badge{
+  font-size:11px;color:var(--muted);margin-bottom:14px;
+  display:flex;justify-content:space-between;
+}
+.field{margin-bottom:10px;}
+.field-label{
+  font-size:11.5px;font-weight:700;color:#5a5648;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:4px;
+}
+.lock-icon{font-size:11px;color:var(--muted);}
+.field-box{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:10px 12px;
+  font-size:12.5px;
+  min-height:36px;
+  color:#7c7669;
+  position:relative;
+  overflow:hidden;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+.field-box.blurred{
+  filter:blur(4px);
+  user-select:none;
+}
+.field-box.revealed{
+  filter:none;color:var(--ink);
+  background:#fbfaf7;
+}
+.score-row{display:flex;gap:10px;}
+.score-row .field{flex:1;}
+.score-display{
+  text-align:center;font-weight:800;font-size:22px;color:var(--navy);
+  padding:8px 0;
+}
+.score-display .unit{font-size:12px;font-weight:600;color:var(--muted);margin-left:2px;}
+
+.btn-primary{
+  width:100%;background:var(--navy);color:#fff;border:none;
+  padding:12px;border-radius:9px;font-size:13.5px;font-weight:700;
+  cursor:pointer;margin-top:6px;transition:.15s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn-primary:hover{background:#1c2a5e;}
+.btn-primary:disabled{background:#c9c5b8;cursor:not-allowed;}
+
+/* ===== CENTER: MAIN WORK AREA ===== */
+.center-col{display:flex;flex-direction:column;gap:14px;}
+.top-bar-panel{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:10px;
+}
+.mode-switch{
+  display:flex;background:var(--paper);border-radius:9px;padding:3px;border:1px solid var(--line);
+}
+.mode-switch button{
+  border:none;background:transparent;padding:8px 18px;border-radius:7px;
+  font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;
+}
+.mode-switch button.active{background:var(--navy);color:#fff;}
+.accum-count{font-size:12px;color:var(--muted);}
+.accum-count b{color:var(--navy);font-size:15px;}
+.mode-hint{
+  font-size:11.5px;color:var(--muted);background:#fbf6e8;
+  border:1px solid #efe2bd;border-radius:7px;padding:5px 10px;
+}
+
+.steps-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:12px;
+}
+@media (max-width:1200px) and (min-width:768px){
+  .steps-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));}
+}
+.step-card{
+  border:1px solid var(--line);border-radius:10px;padding:14px;
+  display:flex;flex-direction:column;background:#fff;
+}
+.step-head{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;
+}
+.step-title{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;}
+.step-badge{
+  width:22px;height:22px;border-radius:6px;background:var(--navy);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;
+}
+.step-admin-gear{
+  cursor:pointer;color:var(--muted);font-size:14px;padding:2px 4px;border-radius:5px;
+  margin-left:auto;
+}
+.step-admin-gear:hover{color:var(--blue);background:var(--paper);}
+.step-prompt{
+  font-size:12px;color:#7c7669;margin-bottom:8px;line-height:1.55;
+  height:62px;overflow-y:auto;
+}
+
+.tab-len-badge{
+  display:inline-block;
+  background:rgba(255,255,255,0.25);
+  color:inherit;
+  font-size:10px;
+  font-weight:700;
+  border-radius:8px;
+  padding:0px 5px;
+  margin-left:4px;
+  vertical-align:middle;
+  line-height:1.6;
+}
+.step-tab.active .tab-len-badge{
+  background:rgba(255,255,255,0.3);
+  color:#fff;
+}
+.step-tabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
+.step-tab{
+  border:1px solid var(--line);background:var(--paper);border-radius:6px;
+  padding:5px 10px;font-size:11.5px;font-weight:600;color:#7c7669;cursor:pointer;
+}
+.step-tab.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+.step-tab-header{
+  width:100%;padding:4px 2px 2px;font-size:11px;font-weight:800;
+  color:var(--gold);letter-spacing:.3px;pointer-events:none;
+  border-bottom:1px solid var(--line);margin-bottom:2px;
+}
+.step-textarea{
+  flex:1;width:100%;min-height:160px;border:1px solid var(--line);
+  border-radius:8px;padding:10px;font-size:12.5px;font-family:inherit;
+  resize:vertical;background:#fdfcfa;
+}
+.step-textarea:focus{outline:2px solid var(--blue);outline-offset:-1px;border-color:var(--blue);}
+.char-count{
+  text-align:right;font-size:11.5px;color:var(--muted);margin-top:5px;transition:color 0.2s;
+}
+.char-count.near-target{color:#f6c90e;font-weight:600;}
+.char-count.at-target{color:#20bf6b;font-weight:700;}
+.char-count.over{color:var(--red);font-weight:700;}
+
+.actions-row{display:flex;gap:10px;flex-wrap:wrap;}
+.btn-secondary{
+  background:#fff;border:1px solid var(--line);color:var(--ink);
+  padding:11px 18px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;
+}
+.btn-secondary:hover{background:var(--paper);}
+.btn-submit{
+  flex:1;background:var(--navy);color:#fff;border:none;
+  padding:11px 18px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;
+}
+.btn-submit:hover{background:#1c2a5e;}
+.btn-reset{
+  background:#fff;border:1px solid #e9c3c1;color:var(--red);
+  padding:11px 18px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;
+}
+
+/* rule strip */
+.rule-strip{
+  display:flex;align-items:center;gap:16px;
+  background:var(--paper);border:1px solid var(--line);border-radius:10px;
+  padding:12px 16px;flex-wrap:wrap;font-size:12px;color:#6f6a5d;
+}
+.rule-strip .flow{display:flex;align-items:center;gap:8px;font-weight:700;}
+.flow .stage-chip{
+  background:#fff;border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:11.5px;
+}
+.flow .arrow{color:var(--muted);}
+
+/* ===== RIGHT: STAGE STATUS + AI ===== */
+.stage-alert{
+  background:#fdf3e3;border:1px solid #f1ddb0;border-radius:9px;
+  padding:10px 12px;margin-bottom:12px;font-size:12px;color:#8a6a1f;
+  display:flex;gap:8px;align-items:flex-start;
+}
+.stage-block{
+  border:1px solid var(--line);border-radius:9px;padding:12px;margin-bottom:10px;
+}
+.stage-block-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.stage-name{display:flex;align-items:center;gap:6px;font-weight:700;font-size:12.5px;}
+.flag{width:16px;height:16px;border-radius:3px;display:inline-block;}
+.flag.pool{background:#bfae8a;}
+.flag.s1{background:var(--green);}
+.flag.s2{background:var(--orange);}
+.flag.s3{background:var(--purple);}
+.flag.clear{background:var(--gold);}
+.stage-count{font-size:17px;font-weight:800;color:var(--navy);}
+.stage-count .cap{font-size:11px;color:var(--muted);font-weight:600;}
+.full-tag{
+  background:var(--red);color:#fff;font-size:10px;font-weight:800;
+  padding:2px 7px;border-radius:5px;
+}
+.progress-bar{
+  height:6px;border-radius:4px;background:#eee;overflow:hidden;margin-top:6px;
+}
+.progress-bar > div{height:100%;border-radius:4px;}
+.progress-bar.green > div{background:var(--green);}
+.progress-bar.orange > div{background:var(--orange);}
+.progress-bar.purple > div{background:var(--purple);}
+.full-note{font-size:11px;color:var(--red);margin-top:6px;}
+
+.score-rules{
+  display:flex;gap:8px;margin-top:12px;
+}
+.score-rule{
+  flex:1;border-radius:8px;padding:8px 10px;font-size:11px;font-weight:700;text-align:center;
+}
+.score-rule.up{background:#eaf5ee;color:var(--green);}
+.score-rule.down{background:#fbeceb;color:var(--red);}
+.score-rule small{display:block;font-weight:500;color:#999;margin-top:2px;}
+
+/* ── 키워드 자가체크 ── */
+.kw-check-section{
+  background:#fff;border:1px solid var(--line);border-radius:12px;
+  padding:16px 18px;margin-top:14px;
+}
+.kw-check-section .kw-title{
+  font-size:13px;font-weight:800;color:var(--navy);margin-bottom:4px;
+  display:flex;align-items:center;gap:6px;
+}
+.kw-check-section .kw-hint{
+  font-size:11.5px;color:var(--muted);margin-bottom:12px;
+}
+.kw-list{display:flex;flex-wrap:wrap;gap:8px;}
+.kw-item{
+  display:flex;align-items:center;gap:6px;
+  background:var(--paper);border:1px solid var(--line);border-radius:8px;
+  padding:6px 12px;font-size:12.5px;cursor:pointer;user-select:none;
+  transition:.15s;
+}
+.kw-item:hover{border-color:var(--gold);}
+.kw-item.checked{background:var(--navy);color:#fff;border-color:var(--navy);}
+.kw-item.locked{pointer-events:none;opacity:.5;}
+.kw-item .kw-cb{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--muted);flex-shrink:0;}
+.kw-item.checked .kw-cb{background:var(--gold);border-color:var(--gold);}
+.kw-result{margin-top:12px;font-size:12.5px;font-weight:700;color:var(--navy);}
+
+/* AI chat */
+.chat-panel{display:flex;flex-direction:column;height:520px;}
+.chat-head{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;
+}
+.chat-messages{
+  flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;
+  padding-right:4px;margin-bottom:10px;
+}
+.msg{
+  max-width:88%;padding:9px 12px;border-radius:10px;font-size:12.5px;line-height:1.55;
+  white-space:pre-wrap;
+}
+.msg.bot{background:var(--paper);align-self:flex-start;border:1px solid var(--line);}
+.msg.user{background:var(--navy);color:#fff;align-self:flex-end;}
+.msg.loading{color:var(--muted);font-style:italic;}
+.chat-suggest{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.chat-suggest button{
+  text-align:left;border:1px solid var(--line);background:#fff;border-radius:8px;
+  padding:8px 10px;font-size:12px;color:#5a5648;cursor:pointer;
+}
+.chat-suggest button:hover{background:var(--paper);border-color:var(--blue);color:var(--blue);}
+.chat-input-row{display:flex;gap:6px;}
+.chat-input-row textarea{flex:1;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12.5px;font-family:inherit;resize:none;min-height:42px;max-height:100px;line-height:1.45;}
+.chat-input-row textarea:focus{outline:2px solid var(--blue);outline-offset:-1px;}
+.chat-send{
+  background:var(--navy);color:#fff;border:none;border-radius:8px;width:42px;cursor:pointer;font-size:15px;
+}
+
+/* ===== ADMIN CONSOLE ===== */
+.admin-toggle{
+  position:fixed;bottom:20px;right:20px;z-index:100;
+  background:var(--navy);color:#fff;border:none;border-radius:50px;
+  padding:13px 20px;font-size:13px;font-weight:700;cursor:pointer;
+  box-shadow:0 6px 20px rgba(15,27,61,.35);
+  display:flex;align-items:center;gap:8px;
+}
+.admin-toggle:hover{background:#1c2a5e;}
+.admin-console{
+  background:var(--navy);color:#fff;border-radius:14px;margin:0 14px 14px;
+  padding:18px;display:none;
+}
+.admin-console.open{display:block;}
+.admin-head{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;
+  padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1);
+}
+.admin-head .title{font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px;}
+.admin-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.admin-tab{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  color:#c5cae5;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;
+}
+.admin-tab.active{background:var(--gold);color:var(--navy);border-color:var(--gold);}
+.admin-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;
+}
+.admin-card{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;padding:14px;
+}
+.admin-card h4{font-size:12.5px;font-weight:700;margin-bottom:10px;color:var(--gold);}
+.admin-card .stat-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;color:#c5cae5;border-bottom:1px solid rgba(255,255,255,.05);}
+.admin-card .stat-row b{color:#fff;}
+.admin-input{
+  width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  color:#fff;border-radius:7px;padding:8px 10px;font-size:12px;font-family:inherit;margin-bottom:8px;
+}
+.admin-input::placeholder{color:#7e87ac;}
+.admin-btn{
+  background:var(--gold);color:var(--navy);border:none;border-radius:7px;
+  padding:9px 14px;font-size:12px;font-weight:800;cursor:pointer;width:100%;
+}
+.admin-btn.secondary{background:rgba(255,255,255,.1);color:#fff;}
+.admin-btn.danger{background:var(--red);color:#fff;}
+table.admin-table{width:100%;font-size:11.5px;border-collapse:collapse;color:#c5cae5;}
+table.admin-table th{text-align:left;padding:6px 8px;color:#8e98c2;font-weight:700;border-bottom:1px solid rgba(255,255,255,.1);}
+table.admin-table td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.05);}
+.tag{padding:2px 8px;border-radius:5px;font-size:10.5px;font-weight:800;}
+.tag.pool{background:#bfae8a;color:#33291a;}
+.tag.s1{background:var(--green);color:#fff;}
+.tag.s2{background:var(--orange);color:#fff;}
+.tag.s3{background:var(--purple);color:#fff;}
+.tag.clear{background:var(--gold);color:var(--navy);}
+.toggle-pill{
+  width:36px;height:20px;border-radius:10px;background:rgba(255,255,255,.15);
+  position:relative;cursor:pointer;display:inline-block;
+}
+.toggle-pill.on{background:var(--green);}
+.toggle-pill .dot{
+  position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;
+  transition:.15s;
+}
+.toggle-pill.on .dot{left:18px;}
+.toast{
+  position:fixed;bottom:80px;right:20px;background:var(--navy);color:#fff;
+  padding:11px 18px;border-radius:9px;font-size:12.5px;font-weight:600;
+  box-shadow:0 6px 20px rgba(0,0,0,.2);z-index:200;
+  opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* config dropdown small */
+.cfg-link{font-size:11px;color:var(--blue);cursor:pointer;font-weight:600;}
+.api-key-row{
+  display:flex;gap:6px;align-items:center;margin-bottom:10px;
+}
+.api-key-row input{flex:1;}
+.api-key-note{font-size:10.5px;color:#8e98c2;margin-top:-4px;margin-bottom:8px;}
+
+@media(max-width:700px){
+  .layout{padding:8px;gap:8px;}
+  header{padding:10px 14px;}
+}
+
+/* prompt editor modal */
+.prompt-editor-overlay{
+  position:fixed;inset:0;background:rgba(15,27,61,.5);
+  display:flex;align-items:center;justify-content:center;z-index:300;
+  padding:20px;
+}
+.prompt-editor-box{
+  background:#fff;border-radius:12px;padding:20px;max-width:520px;width:100%;
+  box-shadow:0 12px 40px rgba(0,0,0,.25);
+}
+.prompt-editor-box h4{font-size:13.5px;color:var(--navy);margin-bottom:12px;}
+.prompt-editor-box textarea{
+  width:100%;min-height:120px;border:1px solid var(--line);border-radius:8px;
+  padding:10px;font-size:13px;font-family:inherit;resize:vertical;margin-bottom:12px;
+}
+.prompt-editor-box textarea:focus{outline:2px solid var(--blue);outline-offset:-1px;}
+.prompt-editor-actions{display:flex;gap:8px;align-items:center;}
+
+/* Light-theme override for admin-input/select/button used inside the (white) structure editor box,
+   since .admin-input is styled for the dark sidebar by default (white text on white bg = invisible) */
+.prompt-editor-box .admin-input{
+  background:#fff;color:var(--navy);border:1px solid var(--line);
+}
+.prompt-editor-box .admin-input::placeholder{color:#9aa3bd;}
+.prompt-editor-box .admin-input:focus{outline:2px solid var(--blue);outline-offset:-1px;border-color:var(--blue);}
+.prompt-editor-box select.admin-input{cursor:pointer;}
+.prompt-editor-box .admin-btn{width:auto;}
+.prompt-editor-box .admin-btn.secondary{background:#eef0f6;color:var(--navy);}
+.prompt-editor-box .admin-btn.danger{background:#e25555;color:#fff;}
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+
+
+<header>
+  <div class="brand">
+    <div class="mark">行</div>
+    <div>
+      <div class="title">1행2필 <span style="font-weight:400;color:#9aa3c4;">| 변시 사례형 답안 학습엔진</span>
+        <span class="domain-badge" id="domainBadge">변시</span>
+        <span class="step-admin-gear" id="domainEditBtn" title="학습영역 설정">⚙</span>
+      </div>
+      <div class="sub">1행2필 · 변시 사례형 답안 학습엔진 · <b style="color:#c9a14a">build r4</b></div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <input id="userNameInput" type="text" placeholder="이름 입력" style="
+      background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);
+      color:#fff;border-radius:8px;padding:7px 12px;font-size:13px;font-family:inherit;
+      width:120px;outline:none;
+    " maxlength="20">
+    <button class="hbtn" id="apiKeyBtn">🔑 API 키 설정</button>
+    <button class="hbtn" id="adminBtnTop">⚙ 관리자</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- LEFT: PROBLEM INFO -->
+  <div class="panel">
+    <div class="problem-nav">
+      <button class="navbtn" id="prevProblem">‹</button>
+      <div class="num">0001</div>
+      <button class="navbtn" id="nextProblem">›</button>
+    </div>
+    <div class="pool-badge">
+      <span>현재 스테이지</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span id="currentStageBadge" style="color:#bfae8a;font-weight:800;">POOL</span>
+        <span id="attemptBadge" style="font-size:11px;color:var(--muted);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:2px 7px;">첫 도전</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">학습자 이름</div>
+      <input class="field-box" id="learnerName" style="width:100%;border:1px solid var(--line);font-family:inherit;font-size:12.5px;color:var(--ink);" placeholder="이름을 입력하세요">
+    </div>
+
+    <div class="field">
+      <div class="field-label">단원 <span class="step-admin-gear" data-leftfield="chapter" title="내용 수정">⚙</span></div>
+      <div class="field-box revealed" data-leftcontent="chapter"></div>
+    </div>
+    <div class="field">
+      <div class="field-label">주제 <span class="step-admin-gear" data-leftfield="topic" title="내용 수정">⚙</span></div>
+      <div class="field-box revealed" data-leftcontent="topic"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">문제영 <span class="step-admin-gear" data-leftfield="title" title="내용 수정">⚙</span></div>
+      <div class="field-box revealed" data-leftcontent="title"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">사례문제 <span class="lock-icon" data-lock="case"></span><span class="step-admin-gear" data-leftfield="case" title="내용 수정">⚙</span></div>
+      <div class="field-box revealed" data-field="case" data-leftcontent="case">A시 소속 공무원 甲은 자신의 직무권한을 행사함에 있어 고의로 乙에게 손해를 가하였다. 이 경우 乙이 A시를 상대로 국가배상을 청구할 수 있는지 그 요건을 중심으로 논하라.</div>
+    </div>
+    <div class="field">
+      <div class="field-label">정답 <span class="lock-icon" data-lock="answer">🔒</span><span class="step-admin-gear" data-leftfield="answer" title="내용 수정">⚙</span></div>
+      <div class="field-box blurred" data-field="answer" data-leftcontent="answer">국가배상법 제2조의 요건(공무원, 직무집행관련성, 고의·과실, 위법성, 손해의 발생 및 인과관계)을 모두 충족하므로 A시는 乙에 대하여 국가배상책임을 진다.</div>
+    </div>
+    <div class="field">
+      <div class="field-label">핵심키워드 <span class="lock-icon" data-lock="keyword">🔒</span><span class="step-admin-gear" data-leftfield="keyword" title="내용 수정">⚙</span></div>
+      <div class="field-box blurred" data-field="keyword" data-leftcontent="keyword">국가배상법 제2조 / 직무관련성 / 고의·과실 / 위법성 / 인과관계 / 외형설</div>
+    </div>
+    <div class="field">
+      <div class="field-label">키워드 일치율 <span class="lock-icon" data-lock="rate">🔒</span></div>
+      <div class="field-box blurred" data-field="rate">—%</div>
+    </div>
+
+    <div class="score-row">
+      <div class="field">
+        <div class="field-label">예상점수 <span class="lock-icon" data-lock="score">🔒</span></div>
+        <div class="field-box blurred" data-field="score" style="text-align:center;">
+          <span class="score-display" id="scoreDisplay" style="font-size:22px;">--<span class="unit">점</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">답안 개선 방향 <span class="lock-icon" data-lock="advice">🔒</span><span class="step-admin-gear" data-leftfield="advice" title="내용 수정">⚙</span></div>
+      <div class="field-box blurred" data-field="advice" data-leftcontent="advice">사인의 적용 단계에서 "외형설"에 따른 직무관련성 판단 기준을 명시하면 배점이 상승합니다. 인과관계 서술을 더 구체화하세요.</div>
+    </div>
+
+    <button class="btn-primary" id="revealBtn">👁 완료 후 결과 확인</button>
+    <div style="margin-top:10px;">
+      <div class="field-label" style="margin-bottom:4px;">💬 교수님께 드리는 말씀</div>
+      <textarea id="studentMessage" placeholder="어드바이스 요청, 궁금한 점, 어려웠던 부분 등을 자유롭게 적어주세요." style="width:100%;min-height:70px;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12.5px;font-family:inherit;resize:vertical;background:#fdfcfa;color:var(--ink);"></textarea>
+    </div>
+    <button class="btn-secondary" id="exportBtn" style="width:100%;margin-top:8px;">⬇ 학습결과 내보내기</button>
+  </div>
+
+  <!-- CENTER -->
+  <div class="center-col">
+    <div class="panel top-bar-panel">
+      <div class="mode-switch">
+        <button class="active" data-mode="beginner">초보자 모드</button>
+        <button data-mode="advanced">상급자 모드</button>
+      </div>
+      <div class="accum-count">누적 사례 개수 <b id="accumCount">0</b></div>
+      <span class="step-admin-gear" id="structureEditBtn" title="목차(가운데 카드) 구조 설정" style="font-size:16px;margin-left:auto;">⚙ 목차 설정</span>
+      <div class="mode-hint" id="modeHint">※ 상급자 모드에서는 보다 심화된 논리 구성과 완성도 높은 답안을 작성합니다.</div>
+    </div>
+
+    <div class="panel">
+      <div class="steps-grid" id="stepsGrid"><!-- injected --></div>
+
+      <div class="actions-row" style="margin-top:14px;">
+        <button class="btn-secondary" id="saveTemp">임시저장</button>
+        <button class="btn-submit" id="submitBtn">완료 및 채점하기 ✓</button>
+        <button class="btn-reset" id="resetBtn">초기화</button>
+      </div>
+
+      <!-- 키워드 자가체크 섹션 (채점 후 활성화) -->
+      <div class="kw-check-section" id="kwCheckSection" style="display:none;">
+        <div class="kw-title">📋 핵심키워드 자가체크</div>
+        <div class="kw-hint">답안에 포함한 키워드를 직접 체크하세요. 체크한 수 기준으로 예상점수가 산출됩니다.</div>
+        <div class="kw-list" id="kwList"></div>
+        <div class="kw-result" id="kwResult"></div>
+        <button class="btn-submit" id="kwSubmitBtn" style="margin-top:14px;width:100%;">✓ 체크 완료 — 점수 반영하기</button>
+      </div>
+    </div>
+
+    <div class="rule-strip">
+      <span>📌 예상점수 규칙 안내</span>
+      <span>예상점수 <b>71점 이상</b> → 다음 스테이지로 즉시 이동 · <b>70점 이하</b> → STAGE 1 잔류</span>
+      <div class="flow" style="margin-left:auto;">
+        <span class="stage-chip">POOL</span><span class="arrow">→</span>
+        <span class="stage-chip">STAGE 1</span><span class="arrow">→</span>
+        <span class="stage-chip">STAGE 2</span><span class="arrow">→</span>
+        <span class="stage-chip">STAGE 3</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <div class="panel">
+      <h3>📊 나의 학습 현황</h3>
+      <div class="api-key-note" style="margin-bottom:10px;">전체 등록 문제 <b id="totalProblemCount">5</b>개 중, 내가 학습을 완료한 문제는 스테이지별로 아래와 같이 표시됩니다.</div>
+      <div class="stage-alert" id="stageAlert" style="display:none;">
+        ⚠️ <div><b>STAGE 2 집중 모드</b><br>STAGE 2가 가득 찼습니다. 먼저 STAGE 2 문제를 풀이하세요.</div>
+      </div>
+
+      <div class="stage-block">
+        <div class="stage-block-head">
+          <div class="stage-name"><span class="flag pool"></span>POOL (무제한)</div>
+          <div class="stage-count" id="countPool">0</div>
+        </div>
+      </div>
+
+      <div class="stage-block">
+        <div class="stage-block-head">
+          <div class="stage-name"><span class="flag s1"></span>STAGE 1 (무제한)</div>
+          <div class="stage-count" id="countS1">0</div>
+        </div>
+        <div class="progress-bar green"><div id="barS1" style="width:0%"></div></div>
+      </div>
+
+      <div class="stage-block">
+        <div class="stage-block-head">
+          <div class="stage-name"><span class="flag s2"></span>STAGE 2 (최대 3개)</div>
+          <div class="stage-count" id="countS2">0/3</div>
+        </div>
+        <div class="progress-bar orange"><div id="barS2" style="width:0%"></div></div>
+        <div class="full-note" id="noteS2" style="display:none;">⚠ 가득 참</div>
+      </div>
+
+      <div class="stage-block">
+        <div class="stage-block-head">
+          <div class="stage-name"><span class="flag s3"></span>STAGE 3 (최대 5개)</div>
+          <div class="stage-count" id="countS3">0/5</div>
+        </div>
+        <div class="progress-bar purple"><div id="barS3" style="width:0%"></div></div>
+        <div class="full-note" id="noteS3" style="display:none;">⚠ 가득 참</div>
+      </div>
+
+      <div class="stage-block" style="border-color:var(--gold);background:#fcf8ee;">
+        <div class="stage-block-head">
+          <div class="stage-name"><span class="flag clear"></span>CLEAR STACK (졸업)</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="stage-count" id="countClear">0</div>
+            <button id="clearStackToggle" onclick="toggleClearStackList()" style="
+              background:var(--gold);color:var(--navy);border:none;border-radius:6px;
+              padding:3px 8px;font-size:11px;font-weight:800;cursor:pointer;
+            ">목록 ▾</button>
+          </div>
+        </div>
+        <div id="clearStackList" style="display:none;margin-top:10px;"></div>
+      </div>
+
+      <div class="score-rules">
+        <div class="score-rule up">↑ 71점 이상<small>다음 스테이지로 이동</small></div>
+        <div class="score-rule down">↓ 70점 이하<small>STAGE 1로 강등</small></div>
+        <div class="score-rule" style="background:rgba(255,255,255,0.1);color:#9aa3c4;"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>🔍 문제 검색</h3>
+      <input class="admin-input" id="learnerSearchInput" placeholder="단원, 주제, 키워드로 검색...">
+      <div id="learnerSearchResults" style="margin-top:10px;display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;"></div>
+    </div>
+
+    <div class="panel chat-panel">
+      <div class="chat-head">
+        <h3 style="margin:0;">💬 AI 대화창</h3>
+        <span class="cfg-link" id="clearChat">대화 지우기</span>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg bot" style="background:#fdf3e3;border:1px solid #f1ddb0;color:#8a6a1f;">📢 <b>AI 대화창 준비 중</b><br>현재 AI 대화 기능은 준비 중입니다. 곧 활성화될 예정이니 조금만 기다려 주세요. 😊</div>
+      </div>
+      <div class="chat-suggest" id="chatSuggest" style="display:none!important">
+        <button data-q="현재 사례의 핵심 쟁점을 논리 구조에 맞게 정리해 주세요.">📌 쟁점 파악</button>
+        <button data-q="현재 사례 주제와 관련된 핵심 판례와 법령 조문을 알려주세요.">⚖️ 관련 판례</button>
+        <button data-q="현재 사례에 적용할 학설들을 비교 설명해 주세요.">📚 학설 비교</button>
+        <button data-q="제가 작성 중인 답안의 실로기스무스 논리 구조가 적절한지 점검해 주세요.">✏️ 답안 구조 점검</button>
+      </div>
+      <div class="chat-input-row">
+        <textarea id="chatInput" rows="1" placeholder="현재 AI 대화 기능 준비 중입니다." disabled style="opacity:0.45;cursor:not-allowed;"></textarea>
+        <button class="chat-send" id="chatSend" disabled style="opacity:0.35;cursor:not-allowed;">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN CONSOLE -->
+<div class="admin-console" id="adminConsole">
+  <div class="admin-head">
+    <div class="title">🔒 관리자 전용 마스터 관리 콘솔</div>
+    <button class="hbtn danger" id="adminClose">모드 종료 ✕</button>
+  </div>
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-tab="dash">대시보드</button>
+    <button class="admin-tab" data-tab="problems">문제 관리</button>
+    <button class="admin-tab" data-tab="clearstack">CLEAR STACK 관리</button>
+    <button class="admin-tab" data-tab="settings">시스템 설정</button>
+  </div>
+
+  <!-- DASH -->
+  <div class="admin-tab-content" data-content="dash">
+    <div class="admin-grid">
+      <div class="admin-card">
+        <h4>전체 학습 현황</h4>
+        <div class="stat-row"><span>전체 문제 수</span><b>1,248</b></div>
+        <div class="stat-row"><span>전체 학습 횟수</span><b>12,480</b></div>
+        <div class="stat-row"><span>평균 예상점수</span><b>82.3점</b></div>
+        <div class="stat-row"><span>CLEAR STACK 수</span><b>128 (10.3%)</b></div>
+      </div>
+      <div class="admin-card">
+        <h4>스테이지별 현황</h4>
+        <div class="stat-row"><span><span class="tag pool">POOL</span></span><b>1,074</b></div>
+        <div class="stat-row"><span><span class="tag s1">STAGE1</span></span><b>37</b></div>
+        <div class="stat-row"><span><span class="tag s2">STAGE2</span></span><b>4/4 FULL</b></div>
+        <div class="stat-row"><span><span class="tag s3">STAGE3</span></span><b>7/7 FULL</b></div>
+        <div class="stat-row"><span><span class="tag clear">CLEAR</span></span><b>128</b></div>
+      </div>
+      <div class="admin-card">
+        <h4>최근 활동</h4>
+        <table class="admin-table">
+          <tr><th>번호</th><th>스테이지</th><th>사례제목</th><th>일자</th></tr>
+          <tr><td>0001</td><td><span class="tag pool">POOL</span></td><td>직무상 불법행위 국가배상</td><td>05-20</td></tr>
+          <tr><td>0002</td><td><span class="tag s2">STAGE2</span></td><td>개발행위허가 취소</td><td>05-21</td></tr>
+          <tr><td>0003</td><td><span class="tag clear">CLEAR</span></td><td>징계처분 취소소송</td><td>05-22</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROBLEMS -->
+  <div class="admin-tab-content" data-content="problems" style="display:none;">
+    <div class="admin-grid">
+      <div class="admin-card">
+        <h4>일괄 등록 (txt 파일 업로드)</h4>
+        <div class="api-key-note">
+          한 문제당 아래 형식으로 작성 후, 문제와 문제 사이는 <b>빈 줄 2개</b> 또는 구분선 <b>"==="</b>로 구분하세요.<br><br>
+          단원: (예: 제2편 행정작용법 > 제3장 행정행위)<br>
+          주제: (예: 국가배상)<br>
+          사례지문: ...<br>
+          정답: ...<br>
+          핵심키워드: ... (/ 또는 , 로 구분. 예: 처분성 / 재량행위 / 비례원칙)<br>
+          핵심논리: ...<br><br>
+          <b>※ 단원·주제·사례지문·정답·핵심키워드·핵심논리 6개 항목이 모두 있어야 등록됩니다.</b> 누락 시 건너뛰고 사유를 안내합니다. 등록된 문제는 기본적으로 "초안" 상태로 표시됩니다.
+        </div>
+        <input type="file" id="bulkFileInput" accept=".txt" class="admin-input" style="padding:8px;">
+        <button class="admin-btn" onclick="handleBulkUpload()">파일 업로드 및 일괄 등록</button>
+        <button class="admin-btn secondary" style="margin-top:8px;" onclick="downloadTemplate()">양식 파일 다운로드</button>
+        <div id="bulkUploadResult" style="margin-top:10px;font-size:11.5px;color:#c5cae5;"></div>
+      </div>
+      <div class="admin-card">
+        <h4>단일 사례 직접 투입</h4>
+        <input class="admin-input" id="singleChapter" placeholder="단원">
+        <input class="admin-input" id="singleTopic" placeholder="주제">
+        <textarea class="admin-input" id="singleCase" style="min-height:70px;" placeholder="사례지문 *필수"></textarea>
+        <textarea class="admin-input" id="singleAnswer" style="min-height:60px;" placeholder="정답 *필수"></textarea>
+        <input class="admin-input" id="singleKeyword" placeholder="핵심키워드 *필수 (/ 구분)">
+        <textarea class="admin-input" id="singleLogic" style="min-height:50px;" placeholder="핵심논리 *필수"></textarea>
+        <input class="admin-input" id="singleAdvice" placeholder="답안 개선 방향 (선택)">
+        <button class="admin-btn" onclick="submitSingleProblem()">단일 사례 등록</button>
+      </div>
+      <div class="admin-card">
+        <h4>전체 문제 일괄 내보내기 (도서 편집용)</h4>
+        <div class="api-key-note">등록된 전체 문제를 단원·주제별로 정리하여 내보냅니다. 검수 상태(초안/확정)도 함께 포함됩니다.</div>
+        <button class="admin-btn" onclick="exportAllProblemsJSON()">JSON으로 내보내기</button>
+        <button class="admin-btn secondary" style="margin-top:8px;" onclick="exportAllProblemsDocx()">원고용 텍스트(docx 초안)로 내보내기</button>
+      </div>
+      <div class="admin-card" style="border:1px solid var(--gold);background:rgba(201,161,74,.08);">
+        <h4>🌐 학습자 배포용 내보내기 (problems_bs.json)</h4>
+        <div class="api-key-note">
+          현재 등록된 문제 전체를 <b>problems_bs.json</b> 파일로 내보냅니다. 이 파일을 학습엔진 HTML과 <b>같은 GitHub Pages 폴더</b>에 업로드하면, 모든 학습자가 다음 접속 때 자동으로 최신 문제를 받습니다.<br>
+          <b>※ 학습자 진도(스테이지)는 보존</b>되며, 새 문제만 POOL로 추가됩니다.<br>
+          순서: ① 문제 등록·수정 → ② 이 버튼 클릭 → ③ problems_bs.json을 GitHub에 업로드.
+        </div>
+        <button class="admin-btn" onclick="exportRemoteJSON()">problems_bs.json 생성 (배포용)</button>
+      </div>
+      <div class="admin-card" style="max-width:none;">
+        <h4>등록된 문제 목록</h4>
+        <input class="admin-input" id="problemListSearch" placeholder="🔍 문제 검색 (번호·단원·주제·제목)">
+        <table class="admin-table" id="problemListTable">
+          <tr><th>번호</th><th>스테이지</th><th>단원</th><th>주제</th><th>사례제목</th><th>검수상태</th><th>작업</th></tr>
+          <tr><td>0001</td><td><span class="tag pool">POOL</span></td><td>-</td><td>-</td><td>국가배상 (직무상 불법행위)</td><td>-</td><td>-</td></tr>
+          <tr><td>0002</td><td><span class="tag s1">STAGE1</span></td><td>-</td><td>-</td><td>행정처분 위법성 판단 기준</td><td>-</td><td>-</td></tr>
+          <tr><td>0003</td><td><span class="tag s1">STAGE1</span></td><td>-</td><td>-</td><td>공법상 계약의 해제</td><td>-</td><td>-</td></tr>
+          <tr><td>0004</td><td><span class="tag s2">STAGE2</span></td><td>-</td><td>-</td><td>개발행위허가 취소</td><td>-</td><td>-</td></tr>
+          <tr><td>0005</td><td><span class="tag s3">STAGE3</span></td><td>-</td><td>-</td><td>공무원 징계처분 취소소송</td><td>-</td><td>-</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLEAR STACK -->
+  <div class="admin-tab-content" data-content="clearstack" style="display:none;">
+    <div class="admin-grid">
+      <div class="admin-card">
+        <h4>CLEAR STACK 복습/실전 설정</h4>
+        <div class="stat-row"><span>복습 모드에서 CLEAR STACK 문제 포함</span><span class="toggle-pill on" onclick="this.classList.toggle('on')"><span class="dot"></span></span></div>
+        <div class="stat-row"><span>실전 모드에서 CLEAR STACK 문제 포함</span><span class="toggle-pill" onclick="this.classList.toggle('on')"><span class="dot"></span></span></div>
+        <div style="margin-top:12px;">
+          <button class="admin-btn secondary" onclick="toast('선택한 문제가 제출함으로 복귀되었습니다')">제출함(복귀)</button>
+        </div>
+      </div>
+      <div class="admin-card">
+        <h4>졸업(졸업한) 문제 목록</h4>
+        <table class="admin-table">
+          <tr><th>번호</th><th>사례제목</th><th>졸업일</th><th>최종점수</th></tr>
+          <tr><td>C001</td><td>공무원의 직무상 불법행위에 대한 국가배상</td><td>05-21</td><td>92점</td></tr>
+          <tr><td>C002</td><td>개발행위허가의 취소</td><td>05-21</td><td>88점</td></tr>
+          <tr><td>C003</td><td>영업정지처분의 취소</td><td>05-22</td><td>93점</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- USERS -->
+  <!-- SETTINGS -->
+  <div class="admin-tab-content" data-content="settings" style="display:none;">
+    <div class="admin-grid">
+      <div class="admin-card">
+        <h4>스테이지 용량 설정</h4>
+        <div class="stat-row"><span>STAGE 1 용량</span><b>무제한</b></div>
+        <div class="stat-row"><span>STAGE 2 용량</span><b>4개</b></div>
+        <div class="stat-row"><span>STAGE 3 용량</span><b>7개</b></div>
+        <div class="stat-row"><span>승급 기준점수</span><b>71점 이상</b></div>
+        <div class="stat-row"><span>강등 기준점수</span><b>79점 이하</b></div>
+      </div>
+      <div class="admin-card">
+        <h4>AI 대화창 (Claude API) 설정</h4>
+        <div class="api-key-row">
+          <input class="admin-input" id="adminApiKeyInput" placeholder="sk-ant-...">
+          <button class="admin-btn" style="width:auto;flex-shrink:0;" onclick="saveApiKey()">저장</button>
+        </div>
+        <div class="api-key-note">API 키는 이 브라우저에만 저장되며 서버로 전송되지 않습니다.</div>
+      </div>
+      <div class="admin-card">
+        <h4>전체 초기화</h4>
+        <div class="api-key-note">학습 데이터(답안, 점수, 스테이지 현황)와 안내문구 설정을 모두 초기 상태로 되돌립니다. API 키는 유지됩니다.</div>
+        <button class="admin-btn danger" onclick="fullReset()">전체 초기화 실행</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button class="admin-toggle" id="adminFloatBtn">⚙ 관리자 콘솔</button>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= STATE ================= */
+// Fixed first/last steps (always present)
+const FIXED_FIRST = {
+  beginner:  {label:'문제의 소재', roman:'Ⅰ', prompt:'마지막 묻는 문제를 자극으로 삼아 그 문제를 해결하기 위한 대전제를 설정하고, 대전제로부터 풀어야 할 소전제를 문제로 서술하세요.', maxLen:1000, targetLen:0},
+  advanced:  {label:'문제의 소재', roman:'Ⅰ', prompt:'마지막 묻는 문제를 자극으로 삼아 그 문제를 해결하기 위한 대전제를 설정하고, 대전제로부터 풀어야 할 소전제를 문제로 서술하세요.', maxLen:1000, targetLen:0}
+};
+const FIXED_LAST = {
+  beginner:  {label:'설문의 해결', prompt:'묻는 문제에 대한 반응으로 답을 서술하세요.', maxLen:500, targetLen:0},
+  advanced:  {label:'설문의 해결', prompt:'묻는 문제에 대한 반응으로 답을 서술하세요.', maxLen:1000, targetLen:0}
+};
+// Default middle cards (admin-editable, 1~5 cards per mode)
+const DEFAULT_MIDDLE = {
+  beginner: [
+    {label:'쟁점 검토', prompt:'적용법조와 판례를 기준으로 세워서 문제로 서술된 소전제를 해결하세요.', maxLen:1500, targetLen:0, tabs:['#1. 취소소송의 대상이 되는 처분인지 여부','(1) 판례','(2) 사안의 경우','#2. 기속행위인지 재량행위인지 여부','(1) 판례','(2) 사안의 경우']}
+  ],
+  advanced: [
+    {label:'쟁점 검토', prompt:'적용법조와 판례를 기준으로 세워서 문제로 서술된 소전제를 해결하세요.', maxLen:1500, targetLen:0, tabs:['#1. 취소소송의 대상이 되는 처분인지 여부','(1) 판례','(2) 사안의 경우','#2. 기속행위인지 재량행위인지 여부','(1) 판례','(2) 사안의 경우']}
+  ]
+};
+
+const MIDDLE_KEY = '1h2p_bs_middle_config'; // 전역 기본값 키 (사례별 오버라이드가 없을 때 폴백)
+const MIDDLE_VER_KEY = '1h2p_bs_middle_ver';
+const MIDDLE_VER = 'v20250617'; // 기본 목차 구조가 바뀔 때마다 이 값을 변경
+
+function checkMiddleVersion(){
+  const saved = localStorage.getItem(MIDDLE_VER_KEY);
+  if(saved !== MIDDLE_VER){
+    // 전역 기본값 + 사례별 저장값 모두 폐기
+    localStorage.removeItem(MIDDLE_KEY);
+    Object.keys(localStorage).filter(k=>k.startsWith('1h2p_bs_middle_')).forEach(k=>localStorage.removeItem(k));
+    localStorage.setItem(MIDDLE_VER_KEY, MIDDLE_VER);
+  }
+}
+
+// 사례별 목차 키 — 사례번호별로 독립 저장
+function getProblemMiddleKey(number){ return '1h2p_bs_middle_'+number; }
+
+// 답안(정답)에서 쟁점 목차를 자동 도출 — 로마숫자=쟁점, 1.학설/2.판례/3.검토/4.사안의 경우=탭
+function deriveMiddleFromAnswer(answer){
+  if(!answer) return null;
+  var ROM='ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ';
+  var secs=[], cur=null;
+  answer.split('\n').forEach(function(raw){
+    var ln=raw.trim();
+    var mR=ln.match(new RegExp('^(['+ROM+'])\\.\\s*(.+)$'));
+    var mS=ln.match(/^\d+\.\s*(문제의 소재|학설|판례|검토|사안의 경우)(?=\s|$)/);
+    if(mR){
+      var title=mR[2];
+      var mm=title.match(/^(.*?(?:여부|인지|되는지|가능한지|해당하는지))/);
+      title=(mm?mm[1]:title.split(/[.。]/)[0]).trim();
+      cur={r:mR[1],t:title,subs:[]}; secs.push(cur);
+    } else if(mS && cur){
+      if(cur.subs.indexOf(mS[1])<0) cur.subs.push(mS[1]);
+    }
+  });
+  var jaeng=secs.filter(function(s){ return s.r!=='Ⅰ' && s.t.indexOf('설문의 해결')<0 && s.t.indexOf('결론')<0; });
+  if(!jaeng.length) return null;
+  function tabsFor(subs){
+    var k=subs.join('|');
+    if(k==='판례|사안의 경우') return ['(1) 판례','(2) 사안의 경우'];
+    if(k==='학설|판례|검토|사안의 경우') return ['(1) 학설','(2) 판례','(3) 검토','(4) 사안의 경우'];
+    if(k==='학설|판례|검토') return ['(1) 학설','(2) 판례','(3) 검토'];
+    if(subs.length) return subs.map(function(x,j){ return '('+(j+1)+') '+x; });
+    return ['(1) 판례','(2) 사안의 경우'];
+  }
+  var tabs=[];
+  jaeng.forEach(function(s,i){ tabs.push('#'+(i+1)+'. '+s.t); tabsFor(s.subs).forEach(function(x){tabs.push(x);}); });
+  var card={label:'쟁점 검토', prompt:DEFAULT_MIDDLE.beginner[0].prompt, maxLen:1500, targetLen:0};
+  return {beginner:[Object.assign({},card,{tabs:tabs.slice()})], advanced:[Object.assign({},card,{tabs:tabs.slice()})]};
+}
+
+function getMiddleConfig(number){
+  // 저장값을 불러온 뒤 prompt는 항상 DEFAULT_MIDDLE 값으로 덮어씀
+  // (label, maxLen, targetLen, tabs는 저장값 유지 — 관리자 수정 보존)
+  function applyDefaultPrompts(cfg){
+    ['beginner','advanced'].forEach(function(mode){
+      if(!cfg[mode]) return;
+      cfg[mode].forEach(function(card, i){
+        const def = DEFAULT_MIDDLE[mode] && DEFAULT_MIDDLE[mode][i];
+        if(def) card.prompt = def.prompt;
+      });
+    });
+    return cfg;
+  }
+
+  const _num = number || currentProblemNumber;
+  const _prob = (typeof getProblems==='function') ? getProblems().find(function(p){return String(p.number)===String(_num);}) : null;
+  // 1순위: 문제에 저장된(관리자 수정) 목차 — problems_bs.json으로 함께 배포됨
+  if(_prob && _prob.middle && _prob.middle.beginner && _prob.middle.advanced) return applyDefaultPrompts(JSON.parse(JSON.stringify(_prob.middle)));
+  // 2순위: 답안에서 자동 도출 (수정 없으면 이것)
+  if(_prob && _prob.answer){ var _d=deriveMiddleFromAnswer(_prob.answer); if(_d) return applyDefaultPrompts(_d); }
+  // 3순위: 사례별 저장값(레거시)
+  const probKey = getProblemMiddleKey(number || currentProblemNumber);
+  try{
+    const saved = JSON.parse(localStorage.getItem(probKey));
+    if(saved && saved.beginner && saved.advanced) return applyDefaultPrompts(saved);
+  }catch(e){}
+  // 2순위: 전역 기본값
+  try{
+    const saved = JSON.parse(localStorage.getItem(MIDDLE_KEY));
+    if(saved && saved.beginner && saved.advanced) return applyDefaultPrompts(saved);
+  }catch(e){}
+  // 3순위: 하드코딩 DEFAULT
+  return JSON.parse(JSON.stringify(DEFAULT_MIDDLE));
+}
+function saveMiddleConfig(cfg, number){
+  // 수정본은 문제 객체에 저장 → problems_bs.json 내보낼 때 함께 배포됨
+  const num = number || currentProblemNumber;
+  if(typeof getProblems==='function'){
+    const list=getProblems();
+    const prob=list.find(function(p){return String(p.number)===String(num);});
+    if(prob){ prob.middle=cfg; saveProblems(list); return; }
+  }
+  localStorage.setItem(getProblemMiddleKey(num), JSON.stringify(cfg));
+}
+
+// Roman numerals: I is fixed for first step, last roman depends on middle count + 1
+const ROMANS = ['Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'];
+
+// Build the full step list: fixed first ("문제의 소재") + dynamic middles + fixed last ("설문의 해결").
+// "문제의 소재"와 "설문의 해결"은 라벨·안내문구·위치 모두 고정이며 편집 불가.
+// 가운데 카드(라벨, 안내문구, 최대글자수, 하위탭 라벨)는 모드별로 자유롭게 편집 가능.
+
+/* ── 글자수 표시 헬퍼 ── */
+function charCountText(cur, tgt, max){
+  if(tgt>0){
+    return '✍ '+cur+'자(공백포함) / 목표 '+tgt+'자 (최대 '+max+'자)';
+  }
+  return '✍ '+cur+'자(공백포함) (최대 '+max+'자)';
+}
+function buildStepsConfig(mode, number){
+  const middle = getMiddleConfig(number || currentProblemNumber)[mode] || [];
+  const steps = [];
+  steps.push(Object.assign({}, FIXED_FIRST[mode], {roman: ROMANS[0]}));
+  middle.forEach((m,i)=>{
+    steps.push(Object.assign({}, m, {roman: ROMANS[i+1]}));
+  });
+  steps.push(Object.assign({}, FIXED_LAST[mode], {roman: ROMANS[middle.length+1]}));
+  return steps;
+}
+
+let currentMode = 'beginner';
+let answers = {}; // {problemNumber: {mode: {stepIndex: text}}}
+let activeTabs = {}; // {stepIndex: tabLabel}
+
+function getAnswerStore(){
+  if(!answers[currentProblemNumber]) answers[currentProblemNumber]={};
+  if(!answers[currentProblemNumber][currentMode]) answers[currentProblemNumber][currentMode]={};
+  return answers[currentProblemNumber][currentMode];
+}
+function getStepText(i){
+  const val = getAnswerStore()[i];
+  if(!val) return '';
+  if(typeof val === 'string') return val;
+  return Object.values(val).filter(Boolean).join('\n');
+}
+
+/* ================= RENDER STEPS ================= */
+function renderSteps(){
+  const grid = document.getElementById('stepsGrid');
+  grid.innerHTML='';
+  const cfg = buildStepsConfig(currentMode);
+  const store = getAnswerStore();
+  cfg.forEach((step,i)=>{
+    const card = document.createElement('div');
+    card.className='step-card';
+
+    const hasTabs = step.tabs && step.tabs.length;
+    const clickableTabs = hasTabs ? step.tabs.map((t,ti)=>({t,ti})).filter(x=>!x.t.startsWith('#')) : [];
+    const hasClickable = clickableTabs.length > 0;
+
+    if(hasTabs){
+      if(activeTabs[i]===undefined) activeTabs[i] = hasClickable ? clickableTabs[0].ti : 0;
+      if(step.tabs[activeTabs[i]] && step.tabs[activeTabs[i]].startsWith('#'))
+        activeTabs[i] = hasClickable ? clickableTabs[0].ti : 0;
+    }
+
+    let tabsHtml='';
+    if(hasTabs){
+      tabsHtml = `<div class="step-tabs">` + step.tabs.map((t,ti)=>{
+        if(t.startsWith('#')) return `<span class="step-tab-header">${t.substring(1).trim()}</span>`;
+        // 해당 탭의 글자수 계산
+        let tabLen = 0;
+        if(hasClickable){
+          const s2 = getAnswerStore();
+          if(typeof s2[i]==='object' && s2[i]!==null){
+            tabLen = (s2[i][ti]||'').length;
+          }
+        }
+        const lenBadge = tabLen>0 ? ` <span class="tab-len-badge">${tabLen}</span>` : '';
+        return `<button class="step-tab ${ti===activeTabs[i]?'active':''}" data-step="${i}" data-tab="${ti}">${t}${lenBadge}</button>`;
+      }).join('') + `</div>`;
+    }
+
+    const maxLen = step.maxLen||1000;
+    let val = '';
+    if(hasClickable){
+      if(typeof store[i] !== 'object' || store[i]===null) store[i]={};
+      val = store[i][activeTabs[i]] || '';
+    } else {
+      val = (typeof store[i]==='string' ? store[i] : '') || '';
+    }
+
+    card.innerHTML = `
+      <div class="step-head">
+        <div class="step-title"><span class="step-badge">${step.roman}</span>${step.label}</div>
+        <span class="step-admin-gear" data-step="${i}" title="이 항목 안내문구 설정">⚙</span>
+      </div>
+      <div class="step-prompt" data-prompt="${i}">${getPrompt(i,step.prompt)}</div>
+      ${tabsHtml}
+      <textarea class="step-textarea" data-step="${i}" maxlength="${maxLen}" placeholder="이 부분에 내용을 입력하세요...">${val}</textarea>
+      <div class="char-count" data-step="${i}">${charCountText(val.length, step.targetLen||0, maxLen)}</div>
+    `;
+    grid.appendChild(card);
+  });
+
+  grid.querySelectorAll('.step-admin-gear').forEach(g=>{
+    g.addEventListener('click',()=> openPromptEditor(parseInt(g.dataset.step)));
+  });
+  grid.querySelectorAll('.step-textarea').forEach(ta=>{
+    ta.addEventListener('input',()=>{
+      const i = parseInt(ta.dataset.step);
+      const step = buildStepsConfig(currentMode)[i];
+      const hasTabs = step && step.tabs && step.tabs.length;
+      const hasClickable = hasTabs && step.tabs.some(t=>!t.startsWith('#'));
+      const s = getAnswerStore();
+      if(hasClickable){
+        if(typeof s[i] !== 'object' || s[i]===null) s[i]={};
+        s[i][activeTabs[i]] = ta.value;
+      } else {
+        s[i] = ta.value;
+      }
+      const max = ta.maxLength;
+      const step2 = buildStepsConfig(currentMode)[i];
+      const tgt = (step2 && step2.targetLen)||0;
+      const cc = grid.querySelector(`.char-count[data-step="${i}"]`);
+      cc.textContent = charCountText(ta.value.length, tgt, max);
+      cc.classList.toggle('over', ta.value.length>=max);
+      cc.classList.toggle('near-target', tgt>0 && ta.value.length>=Math.floor(tgt*0.9) && ta.value.length<tgt);
+      cc.classList.toggle('at-target', tgt>0 && ta.value.length>=tgt && ta.value.length<max);
+      // 탭 버튼 글자수 뱃지 실시간 갱신
+      const tabBtns = grid.querySelectorAll(`.step-tab[data-step="${i}"]`);
+      if(tabBtns.length){
+        tabBtns.forEach(btn=>{
+          const ti = parseInt(btn.dataset.tab);
+          const s3 = getAnswerStore();
+          const tabVal = (typeof s3[i]==='object' && s3[i]!==null) ? (s3[i][ti]||'') : '';
+          const tabLen = tabVal.length;
+          // 뱃지 업데이트
+          let badge = btn.querySelector('.tab-len-badge');
+          if(tabLen>0){
+            if(!badge){ badge=document.createElement('span'); badge.className='tab-len-badge'; btn.appendChild(badge); }
+            badge.textContent=tabLen;
+          } else {
+            if(badge) badge.remove();
+          }
+        });
+      }
+    });
+  });
+  grid.querySelectorAll('.step-tab').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const i=btn.dataset.step, t=parseInt(btn.dataset.tab);
+      activeTabs[i]=t;
+      renderSteps();
+    });
+  });
+}
+
+/* ================= MIDDLE STEP STRUCTURE EDITOR (admin) ================= */
+// Lets admin add/remove/edit the 1~5 dynamic middle cards (between 문제의 소재 and 설문의 해결),
+// independently per mode (beginner/advanced). Each card: label, prompt, maxLen, tabs(comma-separated or empty).
+/* ================= TAB PRESETS (shared) ================= */
+const TAB_PRESETS = {
+  none:    {label:'탭 없음', tabs:[]},
+  arabic4: {label:'1. 학설 / 2. 판례 / 3. 검토 / 4. 사안의 경우', tabs:['1. 학설','2. 판례','3. 검토','4. 사안의 경우']},
+  arabic2: {label:'1. 판례 / 2. 사안의 경우', tabs:['1. 판례','2. 사안의 경우']},
+  paren4:  {label:'(1) 학설 / (2) 판례 / (3) 검토 / (4) 사안의 경우', tabs:['(1) 학설','(2) 판례','(3) 검토','(4) 사안의 경우']},
+  paren2:  {label:'(1) 판례 / (2) 사안의 경우', tabs:['(1) 판례','(2) 사안의 경우']},
+  sojae3:  {label:'(1) 문제의 소재 / (2) 판례 / (3) 사안의 경우', tabs:['(1) 문제의 소재','(2) 판례','(3) 사안의 경우']},
+  sojae5:  {label:'(1) 문제의 소재 / (2) 학설 / (3) 판례 / (4) 검토 / (5) 사안의 경우', tabs:['(1) 문제의 소재','(2) 학설','(3) 판례','(4) 검토','(5) 사안의 경우']},
+  custom:  {label:'직접 입력', tabs:null}
+};
+function matchPreset(tabs){
+  if(!tabs || tabs.length===0) return 'none';
+  for(const key of ['arabic4','arabic2','paren4','paren2']){
+    const preset=TAB_PRESETS[key].tabs;
+    if(preset.length===tabs.length && preset.every((t,i)=>t===tabs[i])) return key;
+  }
+  return 'custom';
+}
+function presetOptionsHtml(selected){
+  return Object.keys(TAB_PRESETS).map(key=>
+    `<option value="${key}" ${key===selected?'selected':''}>${TAB_PRESETS[key].label}</option>`
+  ).join('');
+}
+
+function openStructureEditor(){
+  if(!adminAuthed){ askAdminPassword(()=>openStructureEditor()); return; }
+
+  const cfg = getMiddleConfig(currentProblemNumber);
+  const overlay = document.createElement('div');
+  overlay.className='prompt-editor-overlay';
+
+  function rowHtml(mode, m, idx){
+    const tabsStr = (m.tabs||[]).join(', ');
+    const presetKey = matchPreset(m.tabs);
+    const customStyle = presetKey==='custom' ? '' : 'display:none;';
+    return `
+      <div class="mid-card-row" data-mode="${mode}" data-idx="${idx}" style="border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px;">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+          <b style="color:var(--navy);font-size:12.5px;">${ROMANS[idx+1]}</b>
+          <input class="admin-input mid-label" style="flex:1;margin:0;" value="${m.label.replace(/"/g,'&quot;')}" placeholder="카드 제목 (예: 인지 여부)">
+          <input class="admin-input mid-targetLen" type="number" style="width:80px;margin:0;" value="${m.targetLen||0}" placeholder="목표" title="목표 글자수 (0=미설정)">
+          <input class="admin-input mid-maxlen" type="number" style="width:80px;margin:0;" value="${m.maxLen||1000}" placeholder="최대" title="최대 글자수">
+          <button class="admin-btn danger mid-remove" style="width:auto;padding:6px 10px;margin:0;">삭제</button>
+        </div>
+        <textarea class="admin-input mid-prompt" style="min-height:50px;margin-bottom:6px;" placeholder="안내 문구">${m.prompt||''}</textarea>
+        <select class="admin-input mid-tab-preset" style="margin-bottom:6px;">${presetOptionsHtml(presetKey)}</select>
+        <input class="admin-input mid-tabs" style="margin:0;${customStyle}" value="${tabsStr.replace(/"/g,'&quot;')}" placeholder="탭 (쉼표로 구분). # 접두사는 목차 헤더(클릭 불가). 예: #1. 취소소송의 대상이 되는 처분인지 여부, (1) 판례, (2) 사안의 경우, #2. 기속행위인지 재량행위인지 여부, (1) 판례, (2) 사안의 경우">
+      </div>`;
+  }
+
+  function modeBlock(mode){
+    const label = mode==='beginner'?'초보자 모드':'상급자 모드';
+    const cards = cfg[mode]||[];
+    return `
+      <div class="mid-mode-block" data-mode="${mode}" style="margin-bottom:16px;">
+        <h4 style="margin-bottom:8px;">${label} — 가운데 카드 구성 (1~5개)</h4>
+        <div class="mid-cards-container">${cards.map((m,i)=>rowHtml(mode,m,i)).join('')}</div>
+        <button class="admin-btn secondary mid-add" data-mode="${mode}" style="width:auto;">+ 카드 추가</button>
+      </div>`;
+  }
+
+  overlay.innerHTML = `
+    <div class="prompt-editor-box" style="max-width:640px;max-height:85vh;overflow-y:auto;">
+      <h4>목차(가운데 카드) 구조 설정</h4>
+      <div class="api-key-note" style="margin-bottom:12px;">
+        "문제의 소재"(Ⅰ)와 "설문의 해결"(마지막)은 항상 고정되며, 그 사이에 들어갈 카드를 모드별로 1~5개까지 자유롭게 설정할 수 있습니다. 각 카드의 제목, 안내문구, <b>목표 글자수</b>(✍ 카운터 가이드 · 0=미설정), <b>최대 글자수</b>(하드 제한), 하위탭 이름을 자유롭게 수정할 수 있습니다. 로마숫자는 순서에 따라 자동 부여됩니다.
+      </div>
+
+      <div style="background:#f0f4ff;border:1px solid #c5d0f0;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;line-height:1.9;color:#2a3a6e;">
+        <b style="font-size:12.5px;display:block;margin-bottom:6px;">📋 직접 입력란 지시어 가이드</b>
+        <b>#</b> (앞에 붙임) → 골드색 목차 헤더 (클릭 불가, 박스 없음)<br>
+        <b>,</b> (쉼표) → 탭 구분자<br>
+        <br>
+        <b>유형 A</b> — 단순 4탭:<br>
+        <span style="color:#555;">1. 학설, 2. 판례, 3. 검토, 4. 사안의 경우</span><br>
+        <br>
+        <b>유형 B</b> — 2쟁점 구조 (헤더+탭):<br>
+        <span style="color:#555;">#1. 취소소송의 대상이 되는 처분인지 여부, (1) 판례, (2) 사안의 경우, #2. 기속행위인지 재량행위인지 여부, (1) 판례, (2) 사안의 경우</span><br>
+        <br>
+        <b>유형 C</b> — 3쟁점 구조:<br>
+        <span style="color:#555;">#1. 처분성 여부, (1) 판례, (2) 사안의 경우, #2. 원고적격 여부, (1) 판례, (2) 사안의 경우, #3. 협의의 소익 여부, (1) 판례, (2) 사안의 경우</span>
+      </div>
+      ${modeBlock('beginner')}
+      ${modeBlock('advanced')}
+      <div class="prompt-editor-actions">
+        <button class="admin-btn secondary" id="midDefault" style="width:auto;">기본값으로 복원</button>
+        <div style="flex:1;"></div>
+        <button class="btn-secondary" id="midCancel">취소</button>
+        <button class="btn-submit" id="midSave" style="flex:none;">저장</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  function bindRowEvents(){
+    overlay.querySelectorAll('.mid-remove').forEach(btn=>{
+      btn.onclick=()=>{
+        const row=btn.closest('.mid-card-row');
+        const block=row.closest('.mid-mode-block');
+        const container=block.querySelector('.mid-cards-container');
+        if(container.querySelectorAll('.mid-card-row').length<=1){ toast('최소 1개의 카드가 필요합니다'); return; }
+        row.remove();
+        reindex(block);
+      };
+    });
+    overlay.querySelectorAll('.mid-tab-preset').forEach(sel=>{
+      sel.onchange=()=>{
+        const row=sel.closest('.mid-card-row');
+        const tabsInput=row.querySelector('.mid-tabs');
+        const key=sel.value;
+        if(key==='custom'){
+          tabsInput.style.display='';
+        } else {
+          tabsInput.value = TAB_PRESETS[key].tabs.join(', ');
+          tabsInput.style.display='none';
+        }
+      };
+    });
+  }
+  function reindex(block){
+    block.querySelectorAll('.mid-card-row').forEach((row,i)=>{
+      row.dataset.idx=i;
+      row.querySelector('b').textContent=ROMANS[i+1];
+    });
+  }
+  overlay.querySelectorAll('.mid-add').forEach(btn=>{
+    btn.onclick=()=>{
+      const mode=btn.dataset.mode;
+      const block=overlay.querySelector(`.mid-mode-block[data-mode="${mode}"]`);
+      const container=block.querySelector('.mid-cards-container');
+      if(container.querySelectorAll('.mid-card-row').length>=5){ toast('카드는 최대 5개까지 추가할 수 있습니다'); return; }
+      const idx=container.querySelectorAll('.mid-card-row').length;
+      container.insertAdjacentHTML('beforeend', rowHtml(mode,{label:'새 항목',prompt:'',maxLen:1000,tabs:[]},idx));
+      bindRowEvents();
+    };
+  });
+  bindRowEvents();
+
+  document.getElementById('midCancel').onclick=()=>overlay.remove();
+  document.getElementById('midDefault').onclick=()=>{
+    saveMiddleConfig(JSON.parse(JSON.stringify(DEFAULT_MIDDLE)), currentProblemNumber);
+    overlay.remove();
+    activeTabs={};
+    renderSteps();
+    toast('기본 목차 구조로 복원되었습니다');
+  };
+  document.getElementById('midSave').onclick=()=>{
+    const newCfg={beginner:[],advanced:[]};
+    overlay.querySelectorAll('.mid-mode-block').forEach(block=>{
+      const mode=block.dataset.mode;
+      block.querySelectorAll('.mid-card-row').forEach(row=>{
+        const label=row.querySelector('.mid-label').value.trim()||'항목';
+        const promptVal=row.querySelector('.mid-prompt').value;
+        const maxLen=parseInt(row.querySelector('.mid-maxlen').value)||1000;
+        const targetLenEl=row.querySelector('.mid-targetLen');
+        const targetLen=targetLenEl?parseInt(targetLenEl.value)||0:0;
+        const tabsStr=row.querySelector('.mid-tabs').value.trim();
+        const tabs=tabsStr?tabsStr.split(',').map(t=>t.trim()).filter(t=>t):null;
+        newCfg[mode].push({label,prompt:promptVal,maxLen,targetLen,tabs});
+      });
+      if(newCfg[mode].length===0){ newCfg[mode]=JSON.parse(JSON.stringify(DEFAULT_MIDDLE[mode])); }
+    });
+    saveMiddleConfig(newCfg, currentProblemNumber);
+    overlay.remove();
+    activeTabs={};
+    renderSteps();
+    toast(`[${currentProblemNumber}] 목차 구조가 저장되었습니다`);
+  };
+}
+
+/* ================= CUSTOM STEP PROMPTS (admin-editable) ================= */
+const PROMPT_KEY='1h2p_bs_step_prompts'; // {beginner:{0:'...'}, advanced:{...}}
+const PROMPT_VER_KEY='1h2p_bs_prompt_ver';
+const PROMPT_VER='v20250617'; // 기본 안내문구가 바뀔 때마다 이 값을 변경
+
+// 버전이 달라지면 저장된 prompt를 폐기 (새 기본값 적용)
+function checkPromptVersion(){
+  const saved = localStorage.getItem(PROMPT_VER_KEY);
+  if(saved !== PROMPT_VER){
+    localStorage.removeItem(PROMPT_KEY);
+    localStorage.setItem(PROMPT_VER_KEY, PROMPT_VER);
+  }
+}
+function getAllPrompts(){
+  try{ return JSON.parse(localStorage.getItem(PROMPT_KEY))||{}; }catch(e){ return {}; }
+}
+function getPrompt(i, fallback){
+  // 문제의 소재(0번)와 설문의 해결(마지막)은 항상 하드코딩 값 사용
+  const cfg = buildStepsConfig(currentMode);
+  const isFixed = (i === 0) || (i === cfg.length - 1);
+  if(isFixed) return fallback;
+  const all = getAllPrompts();
+  return (all[currentMode] && all[currentMode][i]!==undefined) ? all[currentMode][i] : fallback;
+}
+function setPrompt(i, text){
+  const all = getAllPrompts();
+  if(!all[currentMode]) all[currentMode]={};
+  all[currentMode][i]=text;
+  localStorage.setItem(PROMPT_KEY, JSON.stringify(all));
+}
+
+function openPromptEditor(i){
+  if(!adminAuthed){ askAdminPassword(()=>openPromptEditor(i)); return; }
+
+  const cfg = buildStepsConfig(currentMode);
+  const step = cfg[i];
+  const isMiddle = (i>0 && i<cfg.length-1); // first(0) and last are fixed position cards
+  const overlay = document.createElement('div');
+  overlay.className='prompt-editor-overlay';
+
+  if(!isMiddle){
+    // 문제의 소재 / 설문의 해결 : 안내 문구만 수정 가능 (위치·제목 고정)
+    const cur = getPrompt(i, step.prompt);
+    overlay.innerHTML=`
+      <div class="prompt-editor-box">
+        <h4>${step.roman}. ${step.label} — 안내 문구 설정 (${currentMode==='advanced'?'상급자':'초보자'} 모드)</h4>
+        <textarea id="promptEditTextarea">${cur}</textarea>
+        <div class="prompt-editor-actions">
+          <button class="admin-btn secondary" id="promptEditDefault" style="width:auto;">기본값으로 복원</button>
+          <div style="flex:1;"></div>
+          <button class="btn-secondary" id="promptEditCancel">취소</button>
+          <button class="btn-submit" id="promptEditSave" style="flex:none;">저장</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    document.getElementById('promptEditCancel').onclick=()=>overlay.remove();
+    document.getElementById('promptEditDefault').onclick=()=>{
+      document.getElementById('promptEditTextarea').value = step.prompt;
+    };
+    document.getElementById('promptEditSave').onclick=()=>{
+      const val = document.getElementById('promptEditTextarea').value;
+      setPrompt(i,val);
+      overlay.remove();
+      renderSteps();
+      toast('안내 문구가 저장되었습니다');
+    };
+    return;
+  }
+
+  // 가운데 카드 : 제목 / 안내 문구 / 최대글자수 / 하위탭을 한 번에 수정
+  const midIdx = i-1; // index within getMiddleConfig()[mode]
+  const m = step; // {label, prompt, maxLen, tabs, roman}
+  const tabsStr = (m.tabs||[]).join(', ');
+  const presetKey = matchPreset(m.tabs);
+  const customStyle = presetKey==='custom' ? '' : 'display:none;';
+
+  overlay.innerHTML=`
+    <div class="prompt-editor-box">
+      <h4>${m.roman}. ${m.label} — 항목 설정 (${currentMode==='advanced'?'상급자':'초보자'} 모드)</h4>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+        <input class="admin-input" id="peLabel" style="flex:1;margin:0;" value="${(m.label||'').replace(/"/g,'&quot;')}" placeholder="카드 제목 (예: 인지 여부)">
+        <input class="admin-input" id="peMaxLen" type="number" style="width:100px;margin:0;" value="${m.maxLen||1000}" placeholder="최대글자수">
+      </div>
+      <textarea id="promptEditTextarea" placeholder="안내 문구">${m.prompt||''}</textarea>
+      <div style="font-size:12px;color:#7a8aa0;margin-bottom:4px;">하위 탭 구성</div>
+      <select class="admin-input" id="peTabPreset" style="margin-bottom:6px;">${presetOptionsHtml(presetKey)}</select>
+      <input class="admin-input" id="peTabs" style="margin:0 0 8px;${customStyle}" value="${tabsStr.replace(/"/g,'&quot;')}" placeholder="탭 (쉼표로 구분). # 접두사는 목차 헤더(클릭 불가). 예: #1. 취소소송의 대상이 되는 처분인지 여부, (1) 판례, (2) 사안의 경우, #2. 기속행위인지 재량행위인지 여부, (1) 판례, (2) 사안의 경우">
+      <div class="prompt-editor-actions">
+        <button class="admin-btn secondary" id="promptEditDefault" style="width:auto;">기본값으로 복원</button>
+        <div style="flex:1;"></div>
+        <button class="btn-secondary" id="promptEditCancel">취소</button>
+        <button class="btn-submit" id="promptEditSave" style="flex:none;">저장</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  document.getElementById('peTabPreset').onchange=(e)=>{
+    const tabsInput=document.getElementById('peTabs');
+    const key=e.target.value;
+    if(key==='custom'){
+      tabsInput.style.display='';
+    } else {
+      tabsInput.value = TAB_PRESETS[key].tabs.join(', ');
+      tabsInput.style.display='none';
+    }
+  };
+
+  document.getElementById('promptEditCancel').onclick=()=>overlay.remove();
+  document.getElementById('promptEditDefault').onclick=()=>{
+    const def = (DEFAULT_MIDDLE[currentMode]||[])[midIdx];
+    if(def){
+      document.getElementById('peLabel').value = def.label;
+      document.getElementById('peMaxLen').value = def.maxLen||1000;
+      document.getElementById('promptEditTextarea').value = def.prompt||'';
+      const dk = matchPreset(def.tabs);
+      document.getElementById('peTabPreset').value = dk;
+      const tabsInput=document.getElementById('peTabs');
+      if(dk==='custom'){ tabsInput.style.display=''; tabsInput.value=(def.tabs||[]).join(', '); }
+      else { tabsInput.style.display='none'; tabsInput.value=TAB_PRESETS[dk].tabs.join(', '); }
+    } else {
+      document.getElementById('promptEditTextarea').value = m.prompt;
+    }
+  };
+  document.getElementById('promptEditSave').onclick=()=>{
+    const label = document.getElementById('peLabel').value.trim()||'항목';
+    const maxLen = parseInt(document.getElementById('peMaxLen').value)||1000;
+    const promptVal = document.getElementById('promptEditTextarea').value;
+    const tabsStr2 = document.getElementById('peTabs').value.trim();
+    const tabs = tabsStr2 ? tabsStr2.split(',').map(t=>t.trim()).filter(t=>t) : null;
+
+    const allMid = getMiddleConfig(currentProblemNumber);
+    if(!allMid[currentMode][midIdx]) allMid[currentMode][midIdx]={};
+    allMid[currentMode][midIdx] = {label, prompt:promptVal, maxLen, tabs};
+    saveMiddleConfig(allMid, currentProblemNumber);
+
+    overlay.remove();
+    activeTabs={};
+    renderSteps();
+    toast('항목 설정이 저장되었습니다');
+  };
+}
+
+function fullReset(){
+  if(!confirm('모든 학습 데이터(답안, 점수, 스테이지 현황, 안내문구 설정)를 초기화합니다.\n계속하시겠습니까?')) return;
+
+  // clear stored prompts and answers
+  localStorage.removeItem(PROMPT_KEY);
+  localStorage.removeItem(MIDDLE_KEY);
+  // 사례별 목차 키도 모두 삭제
+  Object.keys(localStorage).filter(k=>k.startsWith('1h2p_bs_middle_')).forEach(k=>localStorage.removeItem(k));
+  localStorage.removeItem(PROBLEMS_KEY);
+  localStorage.removeItem(REMOTE_VER_KEY);   // 원격 버전 마커 제거 → 재접속 시 problems_bs.json 재반영
+  localStorage.removeItem('1h2p_bs_learner_progress');
+  localStorage.removeItem('1h2p_bs_0001_attempted');
+  // 문제별 시도 키 모두 삭제
+  Object.keys(localStorage).filter(k=>k.startsWith('1h2p_bs_attempted_')||k.startsWith('1h2p_bs_attempts_')).forEach(k=>localStorage.removeItem(k));
+  renderProblemTable();
+  renderStagePanel();
+  answers = {};
+  activeTabs = {};
+
+  // reset mode to beginner
+  currentMode='beginner';
+  document.querySelectorAll('.mode-switch button').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.mode-switch button[data-mode="beginner"]').classList.add('active');
+  document.getElementById('modeHint').textContent='※ 초보자 모드에서는 4단계 구조로 차근차근 답안을 작성합니다.';
+  renderSteps();
+
+  // reset left panel fields (blur again, lock icons, score) - keep case prompt open
+  document.querySelectorAll('.field-box.revealed').forEach(el=>{
+    if(el.dataset.field && el.dataset.field!=='case'){
+      el.classList.remove('revealed');
+      el.classList.add('blurred');
+    }
+  });
+  document.querySelectorAll('.lock-icon').forEach(el=>{
+    el.textContent = (el.dataset.lock==='case') ? '' : '🔒';
+  });
+  document.getElementById('scoreDisplay').innerHTML='--<span class="unit">점</span>';
+
+  // reset chat
+  chatMessages.innerHTML='<div class="msg bot" style="background:#fdf3e3;border:1px solid #f1ddb0;color:#8a6a1f;">📢 <b>AI 대화창 준비 중</b><br>현재 AI 대화 기능은 준비 중입니다. 곧 활성화될 예정이니 조금만 기다려 주세요. 😊</div>';
+  chatHistory=[];
+  clearChatHistory();
+  document.getElementById('chatSuggest').style.display='flex';
+
+  toast('전체 초기화가 완료되었습니다');
+  setTimeout(()=>location.reload(), 800);
+}
+
+/* ================= LEFT PANEL CONTENT EDITING (admin) ================= */
+// Left panel content is linked to problem #0001's record in the problem list (PROBLEMS_KEY),
+// so admin edits here stay in sync with the registered problem data.
+const leftFieldLabels={
+  chapter:'단원',
+  topic:'주제',
+  title:'문제영',
+  case:'사례문제',
+  answer:'정답',
+  keyword:'핵심키워드',
+  advice:'답안 개선 방향'
+};
+const DEFAULT_0001={
+  number:'0001',
+  chapter:'',
+  topic:'',
+  title:'',
+  case:'',
+  answer:'',
+  keyword:'',
+  advice:'',
+  stage:'POOL',
+  status:'초안'
+};
+
+// currentProblemNumber: which registered problem is currently loaded in the workspace.
+let currentProblemNumber='0001';
+
+function getCurrentProblem(){
+  const list=getProblems();
+  let rec=list.find(p=>p.number===currentProblemNumber);
+  if(!rec){
+    rec = (currentProblemNumber==='0001') ? {...DEFAULT_0001} : {number:currentProblemNumber, stage:'POOL', status:'초안'};
+    list.unshift(rec);
+    saveProblems(list);
+  }
+  return rec;
+}
+function updateCurrentProblem(key,val){
+  const list=getProblems();
+  let rec=list.find(p=>p.number===currentProblemNumber);
+  if(!rec){
+    rec = (currentProblemNumber==='0001') ? {...DEFAULT_0001} : {number:currentProblemNumber, stage:'POOL', status:'초안'};
+    list.unshift(rec);
+  }
+  rec[key]=val;
+  saveProblems(list);
+  renderProblemTable();
+  renderStagePanel();
+}
+// Backwards-compatible aliases
+function getProblem0001(){ return getCurrentProblem(); }
+function updateProblem0001(key,val){ return updateCurrentProblem(key,val); }
+
+function applyLeftContent(){
+  const rec=getCurrentProblem();
+  document.querySelectorAll('[data-leftcontent]').forEach(el=>{
+    const key=el.dataset.leftcontent;
+    el.textContent = rec[key]!==undefined ? rec[key] : '';
+  });
+  updateCurrentStageBadge(rec.stage||'POOL');
+  renderAttemptBadge();
+  document.querySelector('.problem-nav .num').textContent = currentProblemNumber;
+
+  // reset answer fields display state (re-lock until graded), but keep the case prompt open
+  document.querySelectorAll('.field-box[data-field]').forEach(el=>{
+    if(el.dataset.field==='case'){
+      el.classList.remove('blurred');
+      el.classList.add('revealed');
+    } else {
+      el.classList.remove('revealed');
+      el.classList.add('blurred');
+    }
+  });
+  document.querySelectorAll('.lock-icon').forEach(el=>{
+    el.textContent = (el.dataset.lock==='case') ? '' : '🔒';
+  });
+  document.getElementById('scoreDisplay').innerHTML='--<span class="unit">점</span>';
+}
+
+function switchToProblem(number){
+  currentProblemNumber=number;
+  activeTabs={};
+  renderSteps();
+  applyLeftContent();
+  renderLearnerSearch(document.getElementById('learnerSearchInput').value);
+  toast(number+'번 문제로 전환했습니다');
+}
+
+const STAGE_BADGE_COLOR={POOL:'#bfae8a',STAGE1:'var(--green)',STAGE2:'var(--orange)',STAGE3:'var(--purple)',CLEAR:'var(--gold)'};
+const STAGE_BADGE_LABEL={POOL:'POOL',STAGE1:'STAGE 1',STAGE2:'STAGE 2',STAGE3:'STAGE 3',CLEAR:'CLEAR STACK'};
+function updateCurrentStageBadge(stage){
+  const el=document.getElementById('currentStageBadge');
+  if(!el) return;
+  el.textContent = STAGE_BADGE_LABEL[stage]||stage;
+  el.style.color = STAGE_BADGE_COLOR[stage]||'var(--orange)';
+}
+
+function openLeftFieldEditor(key){
+  if(!adminAuthed){ askAdminPassword(()=>openLeftFieldEditor(key)); return; }
+
+  const el = document.querySelector(`[data-leftcontent="${key}"]`);
+  const cur = el.textContent.trim();
+  const overlay = document.createElement('div');
+  overlay.className='prompt-editor-overlay';
+  overlay.innerHTML=`
+    <div class="prompt-editor-box">
+      <h4>"${leftFieldLabels[key]||key}" 내용 수정 (문제번호 ${currentProblemNumber})</h4>
+      <textarea id="leftFieldTextarea" style="min-height:160px;">${cur}</textarea>
+      <div class="prompt-editor-actions">
+        <div style="flex:1;"></div>
+        <button class="btn-secondary" id="leftFieldCancel">취소</button>
+        <button class="btn-submit" id="leftFieldSave" style="flex:none;">저장</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  document.getElementById('leftFieldCancel').onclick=()=>overlay.remove();
+  document.getElementById('leftFieldSave').onclick=()=>{
+    const val=document.getElementById('leftFieldTextarea').value;
+    updateProblem0001(key,val);
+    el.textContent=val;
+    overlay.remove();
+    toast('내용이 저장되었습니다 (문제 목록에도 반영됨)');
+  };
+}
+
+document.querySelectorAll('.step-admin-gear[data-leftfield]').forEach(g=>{
+  g.addEventListener('click',()=> openLeftFieldEditor(g.dataset.leftfield));
+});
+
+window.addEventListener('DOMContentLoaded', applyLeftContent);
+
+/* ================= BULK PROBLEM UPLOAD ================= */
+const PROBLEMS_KEY='1h2p_bs_problems';
+
+function getProblems(){
+  try{ return JSON.parse(localStorage.getItem(PROBLEMS_KEY))||[]; }catch(e){ return []; }
+}
+function saveProblems(list){ localStorage.setItem(PROBLEMS_KEY, JSON.stringify(list)); }
+
+/* ================= REMOTE problems_bs.json (자가 배포용) =================
+   같은 폴더에 올려둔 problems_bs.json을 로드 시 읽어와 문제 내용을 채운다.
+   - {version, problems:[...]} 형식이면 version이 바뀔 때만 반영(불필요한 덮어쓰기 방지)
+   - 순수 배열이면 매 로드마다 반영
+   - 학습자 진도(각 문제의 stage)는 번호 기준으로 보존, 신규 문제는 POOL
+   - 오프라인/파일없음이면 조용히 로컬 데이터 유지 (오프라인 안전) */
+const REMOTE_URL='problems_bs.json';
+const REMOTE_VER_KEY='1h2p_bs_remote_ver';
+
+async function loadRemoteProblems(){
+  try{
+    const res=await fetch(REMOTE_URL+'?t='+Date.now(), {cache:'no-store'});
+    if(!res.ok) return;
+    const data=await res.json();
+    const remoteList=Array.isArray(data)?data:(data.problems||[]);
+    const remoteVer=Array.isArray(data)?null:(data.version!==undefined?String(data.version):null);
+    if(!remoteList.length) return;
+
+    // 버전 게이트: version이 있으면 직전 반영분과 다를 때만 적용
+    if(remoteVer!==null && localStorage.getItem(REMOTE_VER_KEY)===remoteVer) return;
+
+    // 학습자 진도(stage) 스냅샷 — 번호 기준 보존
+    const stageByNum={};
+    getProblems().forEach(p=>{ if(p.number) stageByNum[p.number]=p.stage||'POOL'; });
+
+    const merged=remoteList.map((rp,i)=>{
+      const num=(rp.number && /^\d{4}$/.test(String(rp.number)))?String(rp.number):String(i+1).padStart(4,'0');
+      const case_=rp.case||'';
+      return {
+        number:num,
+        chapter:rp.chapter||'',
+        topic:rp.topic||'',
+        case:case_,
+        answer:rp.answer||'',
+        keyword:rp.keyword||'',
+        logic:rp.logic||'',
+        advice:rp.advice||'',
+        title:rp.title||(case_.slice(0,30)+(case_.length>30?'...':'')),
+        status:rp.status||'초안',
+        stage:stageByNum[num]||'POOL',   // 학습자 진도 보존, 신규는 POOL
+        middle:rp.middle||null           // 관리자가 수정한 목차(있으면) 반영
+      };
+    });
+    saveProblems(merged);
+    if(remoteVer!==null) localStorage.setItem(REMOTE_VER_KEY, remoteVer);
+
+    if(typeof renderProblemTable==='function') renderProblemTable();
+    if(typeof renderStagePanel==='function') renderStagePanel();
+    const lsi=document.getElementById('learnerSearchInput');
+    if(typeof renderLearnerSearch==='function') renderLearnerSearch(lsi?lsi.value:'');
+    if(typeof applyLeftContent==='function') applyLeftContent();
+    toast('최신 문제 '+merged.length+'개를 불러왔습니다');
+  }catch(e){ /* 오프라인/파일없음: 로컬 유지 */ }
+}
+window.addEventListener('DOMContentLoaded', loadRemoteProblems);
+
+function parseBulkText(text){
+  // split blocks by "===" line or 2+ blank lines
+  const blocks = text.split(/\n\s*={3,}\s*\n|\n{3,}/).map(b=>b.trim()).filter(b=>b.length>0);
+  const problems=[];
+  const errors=[];
+
+  blocks.forEach((block,idx)=>{
+    const get=(label)=>{
+      const re=new RegExp(label+'\\s*[:：]\\s*([\\s\\S]*?)(?=\\n(?:단원|주제|사례지문|정답|핵심키워드|핵심논리)\\s*[:：]|$)');
+      const m=block.match(re);
+      return m ? m[1].trim() : '';
+    };
+    const chapter = get('단원');
+    const topic = get('주제');
+    const case_ = get('사례지문');
+    const answer = get('정답');
+    const keyword = get('핵심키워드');
+    const logic = get('핵심논리');
+
+    const missing=[];
+    if(!chapter) missing.push('단원');
+    if(!topic) missing.push('주제');
+    if(!case_) missing.push('사례지문');
+    if(!answer) missing.push('정답');
+    if(!keyword) missing.push('핵심키워드');
+    if(!logic) missing.push('핵심논리');
+
+    if(missing.length){
+      errors.push(`#${idx+1}번째 블록: ${missing.join(', ')} 항목이 누락되어 건너뜁니다.`);
+      return;
+    }
+    problems.push({
+      chapter: chapter,
+      topic: topic,
+      case: case_,
+      answer: answer,
+      keyword: keyword,
+      logic: logic,
+      stage: 'POOL',
+      status: '초안',
+      title: case_.slice(0,30)+(case_.length>30?'...':'')
+    });
+  });
+
+  return {problems, errors};
+}
+
+function handleBulkUpload(){
+  const fileInput=document.getElementById('bulkFileInput');
+  const resultEl=document.getElementById('bulkUploadResult');
+  if(!fileInput.files.length){
+    resultEl.textContent='먼저 txt 파일을 선택하세요.';
+    return;
+  }
+  const file=fileInput.files[0];
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    const text=e.target.result;
+    const {problems, errors} = parseBulkText(text);
+    if(problems.length===0){
+      resultEl.innerHTML='⚠ 등록 가능한 문제를 찾지 못했습니다. 양식을 확인해주세요.';
+      return;
+    }
+    const existing=getProblems();
+    let nextNum=existing.length+1;
+    problems.forEach(p=>{
+      p.number=String(nextNum).padStart(4,'0');
+      nextNum++;
+    });
+    saveProblems(existing.concat(problems));
+    renderProblemTable();
+    renderStagePanel();
+
+    let html=`✅ ${problems.length}개 문제가 POOL에 등록되었습니다.`;
+    if(errors.length){
+      html+=`<br>⚠ ${errors.length}개 블록은 형식 오류로 제외되었습니다:<br>`+errors.join('<br>');
+    }
+    resultEl.innerHTML=html;
+    toast(problems.length+'개 문제가 일괄 등록되었습니다');
+  };
+  reader.readAsText(file,'UTF-8');
+}
+
+function downloadTemplate(){
+  const sample=
+`단원: 제2편 행정작용법 > 제3장 행정행위
+주제: 국가배상
+사례지문: A시 소속 공무원 甲은 자신의 직무권한을 행사함에 있어 고의로 乙에게 손해를 가하였다. 이 경우 乙이 A시를 상대로 국가배상을 청구할 수 있는지 그 요건을 중심으로 논하라.
+정답: 국가배상법 제2조의 요건(공무원, 직무관련성, 고의·과실, 위법성, 손해 및 인과관계)을 모두 충족하므로 A시는 乙에 대하여 국가배상책임을 진다.
+핵심키워드: 국가배상법 제2조 / 직무관련성 / 고의·과실 / 위법성 / 인과관계 / 외형설
+핵심논리: 공무원의 행위가 직무관련성을 가지는지는 외형설에 따라 판단하며, 고의·과실로 위법하게 손해를 가한 경우 인과관계가 인정되면 국가배상책임이 성립한다.
+
+===
+
+단원: 제2편 행정작용법 > 제4장 행정계획·개발행위
+주제: 개발행위허가
+사례지문: B군수는 개발행위허가를 신청한 丙에게 인근 주민의 반대를 이유로 허가를 거부하였다. 丙은 이 거부처분의 취소를 구할 수 있는가?
+정답: 개발행위허가는 기속행위로서 법령상 거부사유에 해당하지 않는 한 거부할 수 없으므로, 위 거부처분은 위법하여 취소될 수 있다.
+핵심키워드: 개발행위허가 / 기속행위 / 거부처분 / 재량의 일탈남용
+핵심논리: 인근 주민의 반대는 법령상 거부사유에 해당하지 않으므로 재량권의 일탈·남용에 해당하여 거부처분은 위법하다.`;
+
+  const blob=new Blob([sample],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='문제_일괄등록_양식.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function reorderAndRenumber(list){
+  // 순서 변경 후 번호를 0001부터 순서대로 재부여
+  return list.map((p,i)=>({...p, number:String(i+1).padStart(4,'0')}));
+}
+
+function moveProblem(number, direction){
+  let list=getProblems();
+  const idx=list.findIndex(p=>p.number===number);
+  if(idx<0) return;
+  const newIdx = direction==='up' ? idx-1 : idx+1;
+  if(newIdx<0 || newIdx>=list.length) return;
+  // swap
+  [list[idx], list[newIdx]] = [list[newIdx], list[idx]];
+  list = reorderAndRenumber(list);
+  saveProblems(list);
+  // 현재 문제 번호도 갱신
+  const movedNum = list[newIdx].number;
+  if(currentProblemNumber===number) currentProblemNumber=movedNum;
+  renderProblemTable();
+  applyLeftContent();
+  toast('순서가 변경되었습니다');
+}
+
+function renderProblemTable(){
+  // 누적 사례 개수 갱신
+  const accumEl = document.getElementById('accumCount');
+  if(accumEl) accumEl.textContent = getProblems().length;
+  const tbl=document.getElementById('problemListTable');
+  const searchInput=document.getElementById('problemListSearch');
+  const q=(searchInput && searchInput.value || '').trim().toLowerCase();
+
+  function matches(...fields){
+    if(!q) return true;
+    return fields.some(f=> (f||'').toLowerCase().includes(q));
+  }
+
+  const problems = getProblems();
+  let html='<tr><th>번호</th><th>스테이지</th><th>단원</th><th>주제</th><th>사례제목</th><th>검수상태</th><th>순서</th><th>작업</th></tr>';
+  const stageTagMap={POOL:'pool',STAGE1:'s1',STAGE2:'s2',STAGE3:'s3',CLEAR:'clear'};
+  problems.forEach((p,idx)=>{
+    const stage=p.stage||'POOL';
+    const tagClass=stageTagMap[stage]||'pool';
+    const title=p.title || (p.case ? p.case.slice(0,30)+(p.case.length>30?'...':'') : '');
+    const status=p.status||'초안';
+    const statusClass = status==='확정' ? 'clear' : 's2';
+    if(!matches(p.number, p.chapter, p.topic, title)) return;
+    const isFirst = idx===0;
+    const isLast = idx===problems.length-1;
+    html+=`<tr><td>${p.number}</td><td><span class="tag ${tagClass}">${stage}</span></td><td>${p.chapter||'-'}</td><td>${p.topic||'-'}</td><td>${title}</td>`+
+      `<td><span class="tag ${statusClass}" style="cursor:pointer;" onclick="toggleProblemStatus('${p.number}')" title="클릭하여 초안/확정 전환">${status}</span></td>`+
+      `<td style="white-space:nowrap;">`+
+      `<button class="admin-btn secondary" style="width:auto;padding:3px 8px;font-size:12px;margin:0 2px 0 0;" onclick="moveProblem('${p.number}','up')" ${isFirst?'disabled':''}>↑</button>`+
+      `<button class="admin-btn secondary" style="width:auto;padding:3px 8px;font-size:12px;margin:0;" onclick="moveProblem('${p.number}','down')" ${isLast?'disabled':''}>↓</button>`+
+      `</td>`+
+      `<td style="white-space:nowrap;">`+
+      `<button class="admin-btn secondary" style="width:auto;padding:4px 10px;font-size:11px;margin:0 4px 0 0;" onclick="openEditProblemModal('${p.number}')">수정</button>`+
+      `<button class="admin-btn danger" style="width:auto;padding:4px 10px;font-size:11px;margin:0;" onclick="deleteProblem('${p.number}')">삭제</button>`+
+      `</td></tr>`;
+  });
+  tbl.innerHTML=html;
+}
+
+/* ================= EDIT / DELETE REGISTERED PROBLEMS ================= */
+function deleteProblem(number){
+  if(!adminAuthed){ askAdminPassword(()=>deleteProblem(number)); return; }
+  if(!confirm(number+'번 문제를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+
+  let list=getProblems();
+  list=list.filter(p=>p.number!==number);
+  list=reorderAndRenumber(list);  // 삭제 후 번호 재정렬
+  saveProblems(list);
+
+  // clean up any saved answers/progress tied to this problem number
+  delete answers[number];
+
+  // 현재 문제 번호 초기화
+  if(currentProblemNumber===number){
+    currentProblemNumber = list.length>0 ? list[0].number : '0001';
+    applyLeftContent();
+  }
+
+  renderProblemTable();
+  renderStagePanel();
+  toast(number+'번 문제가 삭제되고 번호가 재정렬되었습니다');
+}
+
+function openEditProblemModal(number){
+  if(!adminAuthed){ askAdminPassword(()=>openEditProblemModal(number)); return; }
+
+  const list=getProblems();
+  const rec=list.find(p=>p.number===number);
+  if(!rec){ toast('해당 문제를 찾을 수 없습니다'); return; }
+
+  const overlay=document.createElement('div');
+  overlay.className='prompt-editor-overlay';
+  overlay.innerHTML=`
+    <div class="prompt-editor-box" style="max-width:640px;max-height:85vh;overflow-y:auto;">
+      <h4>${number}번 문제 수정</h4>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+        <input class="admin-input" id="epChapter" style="flex:1;margin:0;" value="${(rec.chapter||'').replace(/"/g,'&quot;')}" placeholder="단원">
+        <input class="admin-input" id="epTopic" style="flex:1;margin:0;" value="${(rec.topic||'').replace(/"/g,'&quot;')}" placeholder="주제">
+      </div>
+      <div style="font-size:12px;color:#7a8aa0;margin-bottom:4px;">사례지문</div>
+      <textarea class="admin-input" id="epCase" style="min-height:90px;margin-bottom:8px;">${rec.case||''}</textarea>
+      <div style="font-size:12px;color:#7a8aa0;margin-bottom:4px;">정답</div>
+      <textarea class="admin-input" id="epAnswer" style="min-height:60px;margin-bottom:8px;">${rec.answer||''}</textarea>
+      <div style="font-size:12px;color:#7a8aa0;margin-bottom:4px;">핵심키워드</div>
+      <textarea class="admin-input" id="epKeyword" style="min-height:50px;margin-bottom:8px;" placeholder="/ 또는 , 로 구분 입력. 예: 국가배상법 제2조 / 직무관련성 / 고의·과실 / 위법성 / 인과관계 / 외형설">${rec.keyword||''}</textarea>
+      <div style="font-size:12px;color:#7a8aa0;margin-bottom:4px;">핵심논리</div>
+      <textarea class="admin-input" id="epLogic" style="min-height:90px;margin-bottom:8px;">${rec.logic||''}</textarea>
+      <div style="font-size:12px;color:#7a8aa0;margin-bottom:4px;">📝 답안 개선 방향 <span style="color:#9aa3bd;">(채점 후 수험생에게 공개되는 교수자 피드백)</span></div>
+      <textarea class="admin-input" id="epAdvice" style="min-height:70px;margin-bottom:8px;" placeholder="예: 판례 인용 시 정확한 법령 조문을 병기할 것. 비례원칙 3단계 구조(목적 정당성→수단 적합성→침해 최소성)를 명시할 것.">${rec.advice||''}</textarea>
+      <div class="prompt-editor-actions">
+        <div style="flex:1;"></div>
+        <button class="btn-secondary" id="epCancel">취소</button>
+        <button class="btn-submit" id="epSave" style="flex:none;">저장</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  document.getElementById('epCancel').onclick=()=>overlay.remove();
+  document.getElementById('epSave').onclick=()=>{
+    rec.chapter = document.getElementById('epChapter').value.trim();
+    rec.topic = document.getElementById('epTopic').value.trim();
+    rec.case = document.getElementById('epCase').value;
+    rec.answer = document.getElementById('epAnswer').value;
+    rec.keyword = document.getElementById('epKeyword').value;
+    rec.logic = document.getElementById('epLogic').value;
+    rec.advice = document.getElementById('epAdvice').value;
+    rec.title = rec.case.slice(0,30)+(rec.case.length>30?'...':'');
+    saveProblems(list);
+    if(currentProblemNumber===number) applyLeftContent();
+    overlay.remove();
+    renderProblemTable();
+    toast(number+'번 문제가 수정되었습니다');
+  };
+}
+
+function toggleProblemStatus(number){
+  const list=getProblems();
+  const rec=list.find(p=>p.number===number);
+  if(!rec) return;
+  rec.status = (rec.status==='확정') ? '초안' : '확정';
+  saveProblems(list);
+  renderProblemTable();
+  renderStagePanel();
+  toast(number+'번 문제가 "'+rec.status+'" 상태로 변경되었습니다');
+}
+
+/* ================= PER-LEARNER PROGRESS (starts at 0, grows as learner solves) ================= */
+const LEARNER_PROGRESS_KEY='1h2p_bs_learner_progress';
+const STAGE_CAPS={ STAGE2:3, STAGE3:5 };
+
+function getLearnerProgress(){
+  try{
+    return JSON.parse(localStorage.getItem(LEARNER_PROGRESS_KEY)) || {POOL:0,STAGE1:0,STAGE2:0,STAGE3:0,CLEAR:0};
+  }catch(e){
+    return {POOL:0,STAGE1:0,STAGE2:0,STAGE3:0,CLEAR:0};
+  }
+}
+function saveLearnerProgress(p){ localStorage.setItem(LEARNER_PROGRESS_KEY, JSON.stringify(p)); }
+
+// Record that the learner moved a solved problem from `from` stage to `to` stage.
+function recordLearnerStageMove(from, to){
+  const p=getLearnerProgress();
+  if(p[from]!==undefined && p[from]>0) p[from]--;
+  if(p[to]!==undefined) p[to]++;
+  saveLearnerProgress(p);
+}
+// Record that the learner newly started/solved a problem now sitting in `stage` for the first time.
+function recordLearnerFirstAttempt(stage){
+  const p=getLearnerProgress();
+  if(p[stage]!==undefined) p[stage]++;
+  saveLearnerProgress(p);
+}
+
+
+/* ================= STAGE BLOCK MODAL ================= */
+function showStageBlockModal(msg){
+  const overlay=document.createElement('div');
+  overlay.className='prompt-editor-overlay';
+  overlay.innerHTML=`
+    <div class="prompt-editor-box" style="max-width:420px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:12px;">🔒</div>
+      <h4 style="margin-bottom:12px;color:var(--navy);">스테이지 잠금</h4>
+      <div class="api-key-note" style="margin-bottom:20px;font-size:13px;line-height:1.7;">${msg}</div>
+      <button class="btn-submit" onclick="this.closest('.prompt-editor-overlay').remove()">확인</button>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+/* ── CLEAR STACK 목록 열람 ── */
+function toggleClearStackList(){
+  const container = document.getElementById('clearStackList');
+  const btn = document.getElementById('clearStackToggle');
+  if(container.style.display === 'none'){
+    // 열기
+    const cleared = getProblems().filter(p=>p.stage==='CLEAR');
+    if(cleared.length === 0){
+      container.innerHTML = '<div style="font-size:11.5px;color:var(--muted);padding:4px 0;">아직 졸업한 문제가 없습니다.</div>';
+    } else {
+      container.innerHTML = cleared.map((p,i)=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #ede9d8;cursor:pointer;"
+             onclick="switchToProblem('${p.number}'); toggleClearStackList();">
+          <span style="font-size:11px;font-weight:800;color:var(--gold);">${p.number}</span>
+          <span style="font-size:12px;color:var(--navy);flex:1;">${p.title||(p.case||'').slice(0,25)||'(제목없음)'}</span>
+          <span style="font-size:10px;color:var(--muted);">${getAttemptCount(p.number)}회</span>
+        </div>
+      `).join('');
+    }
+    container.style.display = '';
+    btn.textContent = '목록 ▴';
+  } else {
+    container.style.display = 'none';
+    btn.textContent = '목록 ▾';
+  }
+}
+
+/* ── 풀이 횟수 조회 ── */
+function getAttemptCount(number){
+  return parseInt(localStorage.getItem('1h2p_bs_attempts_' + number) || '0');
+}
+
+/* ── 좌측 패널 스테이지 배지에 풀이 횟수 표시 ── */
+function renderAttemptBadge(){
+  const count = getAttemptCount(currentProblemNumber);
+  const el = document.getElementById('attemptBadge');
+  if(el) el.textContent = count > 0 ? `${count}회 도전` : '첫 도전';
+}
+
+function renderStagePanel(){
+  // 실제 문제 데이터에서 스테이지별 카운트 (learnerProgress 대신)
+  const problems = getProblems();
+  const counts = {POOL:0, STAGE1:0, STAGE2:0, STAGE3:0, CLEAR:0};
+  problems.forEach(p=>{ if(counts[p.stage]!==undefined) counts[p.stage]++; });
+
+  const totalRegistered = problems.length || 1;
+  document.getElementById('totalProblemCount').textContent = totalRegistered;
+
+  document.getElementById('countPool').textContent = counts.POOL.toLocaleString();
+  document.getElementById('countS1').textContent = counts.STAGE1.toLocaleString();
+  document.getElementById('countClear').textContent = counts.CLEAR.toLocaleString();
+
+  // STAGE1 progress bar
+  const s1pct = Math.min(100, Math.round((counts.STAGE1/20)*100));
+  document.getElementById('barS1').style.width = s1pct+'%';
+
+  // STAGE2
+  const s2cap = STAGE_CAPS.STAGE2;
+  const s2cur = Math.min(counts.STAGE2, s2cap);
+  const s2full = counts.STAGE2 >= s2cap;
+  document.getElementById('countS2').innerHTML = `${s2cur}/${s2cap}`+(s2full?' <span class="full-tag">FULL</span>':'');
+  document.getElementById('barS2').style.width = Math.round((s2cur/s2cap)*100)+'%';
+  document.getElementById('noteS2').style.display = s2full ? '' : 'none';
+
+  // STAGE3
+  const s3cap = STAGE_CAPS.STAGE3;
+  const s3cur = Math.min(counts.STAGE3, s3cap);
+  const s3full = counts.STAGE3 >= s3cap;
+  document.getElementById('countS3').innerHTML = `${s3cur}/${s3cap}`+(s3full?' <span class="full-tag">FULL</span>':'');
+  document.getElementById('barS3').style.width = Math.round((s3cur/s3cap)*100)+'%';
+  document.getElementById('noteS3').style.display = s3full ? '' : 'none';
+
+  // 상단 알림 배너
+  const alertEl=document.getElementById('stageAlert');
+  if(s2full && s3full){
+    alertEl.style.display='';
+    alertEl.innerHTML=`⚠️ <div><b>STAGE 2·3 집중 모드</b><br>STAGE 2(${s2cap}개)와 STAGE 3(${s3cap}개)가 가득 찼습니다.<br>해당 스테이지 문제들을 먼저 풀어서 털어내세요.</div>`;
+  } else if(s2full){
+    alertEl.style.display='';
+    alertEl.innerHTML=`🔒 <div><b>STAGE 2 집중 모드</b><br>STAGE 2가 ${s2cap}개로 가득 찼습니다.<br>STAGE 2 문제들을 먼저 풀어서 털어내야 STAGE 1에서 올라올 수 있습니다.</div>`;
+  } else if(s3full){
+    alertEl.style.display='';
+    alertEl.innerHTML=`🔒 <div><b>STAGE 3 집중 모드</b><br>STAGE 3가 ${s3cap}개로 가득 찼습니다.<br>STAGE 3 문제들을 먼저 풀어서 털어내야 STAGE 2에서 올라올 수 있습니다.</div>`;
+  } else {
+    alertEl.style.display='none';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', renderStagePanel);
+
+/* ================= LEARNER PROBLEM SEARCH ================= */
+function renderLearnerSearch(query){
+  const resultsEl=document.getElementById('learnerSearchResults');
+  const q=(query||'').trim().toLowerCase();
+  const all=getProblems();
+
+  let matches;
+  if(!q){
+    matches=all;
+  } else {
+    matches=all.filter(p=>{
+      const haystack=[p.chapter,p.topic,p.title,p.keyword,p.case].filter(Boolean).join(' ').toLowerCase();
+      return haystack.includes(q);
+    });
+  }
+
+  if(matches.length===0){
+    resultsEl.innerHTML='<div style="font-size:11.5px;color:var(--muted);">검색 결과가 없습니다.</div>';
+    return;
+  }
+
+  const stageTagMap={POOL:'pool',STAGE1:'s1',STAGE2:'s2',STAGE3:'s3',CLEAR:'clear'};
+  resultsEl.innerHTML = matches.map(p=>{
+    const stage=p.stage||'POOL';
+    const tagClass=stageTagMap[stage]||'pool';
+    const title=p.title || (p.case ? p.case.slice(0,28)+(p.case.length>28?'...':'') : '(제목 미입력)');
+    const isCurrent = p.number===currentProblemNumber;
+    return `<div style="border:1px solid ${isCurrent?'var(--blue)':'var(--line)'};background:${isCurrent?'#eef3fb':'#fff'};border-radius:8px;padding:8px 10px;font-size:12px;cursor:pointer;" onclick="switchToProblem('${p.number}')">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+        <b>${p.number}${isCurrent?' (현재)':''}</b>
+        <span class="tag ${tagClass}" style="font-size:10px;">${stage}</span>
+      </div>
+      <div style="color:var(--muted);font-size:11px;">${p.chapter||''} ${p.topic? '· '+p.topic : ''}</div>
+      <div style="margin-top:3px;">${title}</div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('learnerSearchInput').addEventListener('input',(e)=>{
+  renderLearnerSearch(e.target.value);
+});
+document.getElementById('problemListSearch').addEventListener('input',()=>{
+  renderProblemTable();
+});
+window.addEventListener('DOMContentLoaded',()=> renderLearnerSearch(''));
+
+window.addEventListener('DOMContentLoaded', renderProblemTable);
+
+/* ================= EXPORT ALL PROBLEMS (for book editing) ================= */
+function exportAllProblemsJSON(){
+  const all=getProblems();
+  if(all.length===0){ toast('등록된 문제가 없습니다'); return; }
+
+  // sort by chapter > topic > number for book ordering
+  const sorted=[...all].sort((a,b)=>{
+    const ca=(a.chapter||''), cb=(b.chapter||'');
+    if(ca!==cb) return ca.localeCompare(cb,'ko');
+    const ta=(a.topic||''), tb=(b.topic||'');
+    if(ta!==tb) return ta.localeCompare(tb,'ko');
+    return (a.number||'').localeCompare(b.number||'');
+  });
+
+  const blob=new Blob([JSON.stringify(sorted,null,2)],{type:'application/json;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='1행2필_문제전체_'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast(sorted.length+'개 문제를 JSON으로 내보냈습니다');
+}
+
+function exportAllProblemsDocx(){
+  const all=getProblems();
+  if(all.length===0){ toast('등록된 문제가 없습니다'); return; }
+
+  const sorted=[...all].sort((a,b)=>{
+    const ca=(a.chapter||''), cb=(b.chapter||'');
+    if(ca!==cb) return ca.localeCompare(cb,'ko');
+    const ta=(a.topic||''), tb=(b.topic||'');
+    if(ta!==tb) return ta.localeCompare(tb,'ko');
+    return (a.number||'').localeCompare(b.number||'');
+  });
+
+  let lines=[];
+  lines.push('1행2필 행정법 사례답안 — 도서 편집용 원고');
+  lines.push('생성일: '+new Date().toLocaleString('ko-KR'));
+  lines.push('총 문항 수: '+sorted.length+'개 (확정 '+sorted.filter(p=>p.status==='확정').length+' / 초안 '+sorted.filter(p=>p.status!=='확정').length+')');
+  lines.push('='.repeat(60));
+
+  let lastChapter='', lastTopic='';
+  sorted.forEach(p=>{
+    if(p.chapter && p.chapter!==lastChapter){
+      lines.push('');
+      lines.push('■ '+p.chapter);
+      lastChapter=p.chapter;
+      lastTopic='';
+    }
+    if(p.topic && p.topic!==lastTopic){
+      lines.push('');
+      lines.push('  ◆ '+p.topic);
+      lastTopic=p.topic;
+    }
+    lines.push('');
+    lines.push('  ──────────────────────────');
+    lines.push('  [문제 '+p.number+'] ('+(p.status||'초안')+')');
+    lines.push('  '+(p.title||''));
+    lines.push('');
+    lines.push('  <사례지문>');
+    lines.push('  '+(p.case||''));
+    lines.push('');
+    lines.push('  <정답>');
+    lines.push('  '+(p.answer||''));
+    lines.push('');
+    lines.push('  <핵심키워드>');
+    lines.push('  '+(p.keyword||''));
+    lines.push('');
+    lines.push('  <핵심논리>');
+    lines.push('  '+(p.logic||''));
+    if(p.advice){
+      lines.push('');
+      lines.push('  <답안 개선 방향>');
+      lines.push('  '+p.advice);
+    }
+  });
+
+  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='1행2필_원고초안_'+new Date().toISOString().slice(0,10)+'.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('원고용 텍스트를 내보냈습니다 (Word에 붙여넣어 편집하세요)');
+}
+
+/* ── 원격 배포용 problems_bs.json 내보내기 ──
+   이 파일을 GitHub Pages의 HTML과 같은 폴더에 올리면 학습자에게 자동 반영된다.
+   version은 내보낼 때마다 자동으로 새로 부여(Date.now())되어, 업로드 시 전 학습자가 갱신본을 받는다. */
+function exportRemoteJSON(){
+  const all=getProblems();
+  if(all.length===0){ toast('등록된 문제가 없습니다'); return; }
+  const problems=all.map(p=>({
+    number:p.number,
+    chapter:p.chapter||'',
+    topic:p.topic||'',
+    case:p.case||'',
+    answer:p.answer||'',
+    keyword:p.keyword||'',
+    logic:p.logic||'',
+    advice:p.advice||'',
+    title:p.title||((p.case||'').slice(0,30)),
+    status:p.status||'초안',
+    middle:p.middle||null
+  }));
+  const payload={ version:Date.now(), exportedAt:new Date().toLocaleString('ko-KR'), count:problems.length, problems };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='problems_bs.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('problems_bs.json 생성 완료 — GitHub Pages에 업로드하세요');
+}
+
+
+
+/* ================= MODE SWITCH ================= */
+document.querySelectorAll('.mode-switch button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.mode-switch button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMode = btn.dataset.mode;
+    activeTabs = {};
+    document.getElementById('modeHint').textContent = currentMode==='advanced'
+      ? '※ 상급자 모드에서는 보다 심화된 논리 구성과 완성도 높은 답안을 작성합니다.'
+      : '※ 초보자 모드에서는 4단계 구조로 차근차근 답안을 작성합니다.';
+    renderSteps();
+  });
+});
+
+document.getElementById('structureEditBtn').addEventListener('click', openStructureEditor);
+
+/* ================= LEARNING DOMAIN BADGE (admin-editable) ================= */
+const DOMAIN_KEY='1h2p_bs_domain_label';
+function renderDomainBadge(){
+  const val = localStorage.getItem(DOMAIN_KEY) || '';
+  const badge = document.getElementById('domainBadge');
+  badge.textContent = val ? val : '변시';
+}
+function openDomainEditor(){
+  if(!adminAuthed){ askAdminPassword(()=>openDomainEditor()); return; }
+
+  const cur = localStorage.getItem(DOMAIN_KEY) || '';
+  const overlay = document.createElement('div');
+  overlay.className='prompt-editor-overlay';
+  overlay.innerHTML=`
+    <div class="prompt-editor-box" style="max-width:420px;">
+      <h4>학습영역 설정</h4>
+      <div class="api-key-note" style="margin-bottom:10px;">현재 학습엔진의 학습영역(주제)을 입력하세요. 예: 대상적격, 원고적격, 협의의 소익</div>
+      <input class="admin-input" id="domainInput" style="margin-bottom:12px;" value="${cur.replace(/"/g,'&quot;')}" placeholder="예: 대상적격">
+      <div class="prompt-editor-actions">
+        <button class="admin-btn secondary" id="domainClear" style="width:auto;">비우기</button>
+        <div style="flex:1;"></div>
+        <button class="btn-secondary" id="domainCancel">취소</button>
+        <button class="btn-submit" id="domainSave" style="flex:none;">저장</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const input = document.getElementById('domainInput');
+  input.focus();
+  input.select();
+  input.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ e.preventDefault(); document.getElementById('domainSave').click(); } });
+
+  document.getElementById('domainCancel').onclick=()=>overlay.remove();
+  document.getElementById('domainClear').onclick=()=>{ input.value=''; };
+  document.getElementById('domainSave').onclick=()=>{
+    const trimmed = input.value.trim();
+    if(trimmed) localStorage.setItem(DOMAIN_KEY, trimmed);
+    else localStorage.removeItem(DOMAIN_KEY);
+    renderDomainBadge();
+    overlay.remove();
+    toast('학습영역이 설정되었습니다');
+  };
+}
+document.getElementById('domainEditBtn').addEventListener('click', openDomainEditor);
+window.addEventListener('DOMContentLoaded', renderDomainBadge);
+document.getElementById('saveTemp').addEventListener('click',()=>{
+  toast('임시저장되었습니다');
+});
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  if(!confirm('작성한 내용을 모두 초기화하시겠습니까?')) return;
+  if(answers[currentProblemNumber]) answers[currentProblemNumber][currentMode]={};
+  // 자가체크 섹션 리셋
+  document.getElementById('kwCheckSection').style.display='none';
+  document.getElementById('kwList').innerHTML='';
+  document.getElementById('kwResult').textContent='';
+  const kwBtn=document.getElementById('kwSubmitBtn');
+  kwBtn.disabled=false;
+  kwBtn.textContent='✓ 체크 완료 — 점수 반영하기';
+  renderSteps();
+  toast('초기화되었습니다');
+});
+document.getElementById('submitBtn').addEventListener('click',()=>{
+  const cfg = buildStepsConfig(currentMode);
+  const filled = cfg.every((_,i)=> getStepText(i).trim().length>0);
+  if(!filled){
+    toast('모든 영역을 작성한 후 채점할 수 있습니다');
+    return;
+  }
+
+  // 정답/키워드/개선방향 공개
+  document.querySelectorAll('.field-box.blurred').forEach(el=>{
+    el.classList.remove('blurred');
+    el.classList.add('revealed');
+  });
+  document.querySelectorAll('.lock-icon').forEach(el=> el.textContent='✓');
+
+  // 키워드 자가체크 섹션 활성화
+  const curProblem = getCurrentProblem();
+  const kwRaw = curProblem.keyword || '';
+  const keywords = kwRaw.split(/[\/,，]/).map(k=>k.trim()).filter(k=>k.length>0);
+  const section = document.getElementById('kwCheckSection');
+  const kwList = document.getElementById('kwList');
+  const kwResult = document.getElementById('kwResult');
+
+  if(keywords.length === 0){
+    // 키워드 없으면 바로 0점 처리
+    document.getElementById('scoreDisplay').innerHTML = '0<span class="unit">점</span>';
+    const rateEl = document.querySelector('[data-field="rate"]');
+    if(rateEl) rateEl.textContent = '키워드 없음';
+    applyStageLogic(0);
+    return;
+  }
+
+  kwList.innerHTML = keywords.map((kw,i)=>`
+    <div class="kw-item locked" id="kwItem${i}" onclick="toggleKwItem(${i})">
+      <span class="kw-cb"></span>
+      <span>${kw}</span>
+    </div>
+  `).join('');
+  kwResult.textContent = '';
+  section.style.display = '';
+
+  // 체크박스 클릭 가능하게 잠금 해제
+  setTimeout(()=>{
+    document.querySelectorAll('.kw-item').forEach(el=>el.classList.remove('locked'));
+  }, 300);
+
+  section.scrollIntoView({behavior:'smooth', block:'center'});
+  toast('핵심키워드를 자가체크 후 점수를 반영해주세요');
+});
+
+function toggleKwItem(idx){
+  const el = document.getElementById('kwItem'+idx);
+  if(!el) return;
+  el.classList.toggle('checked');
+
+  // 실시간 카운트 표시
+  const total = document.querySelectorAll('.kw-item').length;
+  const checked = document.querySelectorAll('.kw-item.checked').length;
+  document.getElementById('kwResult').textContent = `현재 ${checked} / ${total}개 체크됨`;
+}
+
+document.getElementById('kwSubmitBtn').addEventListener('click',()=>{
+  const items = document.querySelectorAll('.kw-item');
+  const total = items.length;
+  const checked = document.querySelectorAll('.kw-item.checked').length;
+  if(total === 0) return;
+
+  const score = Math.round((checked / total) * 100);
+  const rateText = `${checked}/${total} (${score}%)`;
+
+  document.getElementById('scoreDisplay').innerHTML = score+'<span class="unit">점</span>';
+  const rateEl = document.querySelector('[data-field="rate"]');
+  if(rateEl) rateEl.textContent = rateText;
+  document.getElementById('kwResult').textContent = `✅ ${checked}/${total}개 체크 → 예상점수 ${score}점`;
+
+  // 체크박스 잠금 (재클릭 방지)
+  document.querySelectorAll('.kw-item').forEach(el=>el.classList.add('locked'));
+  document.getElementById('kwSubmitBtn').disabled = true;
+  document.getElementById('kwSubmitBtn').textContent = '점수 반영 완료';
+
+  applyStageLogic(score);
+});
+
+function applyStageLogic(total){
+  const STAGE_ORDER=['POOL','STAGE1','STAGE2','STAGE3','CLEAR'];
+  const rec = getCurrentProblem();
+  const curStage = rec.stage || 'POOL';
+  let newStage = curStage;
+  let blocked = false;
+  let blockMsg = '';
+
+  if(total >= 71){
+    const idx = STAGE_ORDER.indexOf(curStage);
+    const next = (idx >= 0 && idx < STAGE_ORDER.length-1) ? STAGE_ORDER[idx+1] : curStage;
+
+    // 가득 찬 스테이지로는 이동 불가 (해당 스테이지 문제를 먼저 털어내야 함)
+    const problems = getProblems();
+    const s2count = problems.filter(p=>p.stage==='STAGE2').length;
+    const s3count = problems.filter(p=>p.stage==='STAGE3').length;
+
+    if(next==='STAGE2' && s2count >= STAGE_CAPS.STAGE2){
+      blocked = true;
+      blockMsg = `STAGE 2가 ${STAGE_CAPS.STAGE2}개로 가득 찼습니다.\nSTAGE 2 문제들을 먼저 풀어서 털어내세요.`;
+    } else if(next==='STAGE3' && s3count >= STAGE_CAPS.STAGE3){
+      blocked = true;
+      blockMsg = `STAGE 3가 ${STAGE_CAPS.STAGE3}개로 가득 찼습니다.\nSTAGE 3 문제들을 먼저 풀어서 털어내세요.`;
+    } else {
+      newStage = next;
+    }
+  } else {
+    // 70점 이하
+    if(curStage === 'POOL') newStage = 'POOL';           // POOL → POOL 유지
+    else if(curStage === 'STAGE1') newStage = 'STAGE1';  // STAGE1 → STAGE1 잔류
+    else newStage = 'STAGE1';                             // STAGE2/3 → STAGE1 강등
+  }
+
+  if(blocked){
+    showStageBlockModal(blockMsg);
+    return;
+  }
+
+  // 시도 기록 및 스테이지 갱신 (풀이 횟수 카운터)
+  const attemptedKey = '1h2p_bs_attempts_' + currentProblemNumber;
+  const prevCount = parseInt(localStorage.getItem(attemptedKey) || '0');
+  localStorage.setItem(attemptedKey, String(prevCount + 1));
+  if(prevCount === 0){
+    recordLearnerFirstAttempt(newStage);
+  } else if(newStage !== curStage){
+    recordLearnerStageMove(curStage, newStage);
+  }
+
+  if(newStage !== curStage){
+    updateCurrentProblem('stage', newStage);
+    updateCurrentStageBadge(newStage);
+  }
+  renderStagePanel();
+  renderAttemptBadge();
+
+  const stageLabel = {POOL:'POOL',STAGE1:'STAGE 1',STAGE2:'STAGE 2',STAGE3:'STAGE 3',CLEAR:'CLEAR STACK(졸업)'}[newStage] || newStage;
+  if(total >= 71) toast(`예상점수 ${total}점 — ${stageLabel}로 이동했습니다`);
+  else if(curStage === 'POOL') toast(`예상점수 ${total}점 — POOL에 머무릅니다`);
+  else if(curStage === 'STAGE1') toast(`예상점수 ${total}점 — STAGE 1에 잔류합니다`);
+  else toast(`예상점수 ${total}점 — STAGE 1로 강등되었습니다`);
+}
+
+document.getElementById('revealBtn').addEventListener('click',()=>{
+  document.querySelectorAll('.field-box.blurred').forEach(el=>{
+    el.classList.remove('blurred');
+    el.classList.add('revealed');
+  });
+  document.querySelectorAll('.lock-icon').forEach(el=> el.textContent='✓');
+  toast('결과가 공개되었습니다');
+});
+
+function getOrderedProblemNumbers(){
+  const nums = getProblems().map(p=>p.number);
+  if(!nums.includes('0001')) nums.unshift('0001');
+  return [...new Set(nums)].sort();
+}
+document.getElementById('prevProblem').addEventListener('click',()=>{
+  const nums=getOrderedProblemNumbers();
+  const idx=nums.indexOf(currentProblemNumber);
+  if(idx<=0){ toast('첫 번째 문제입니다'); return; }
+  switchToProblem(nums[idx-1]);
+});
+document.getElementById('nextProblem').addEventListener('click',()=>{
+  const nums=getOrderedProblemNumbers();
+  const idx=nums.indexOf(currentProblemNumber);
+  if(idx===-1 || idx>=nums.length-1){ toast('마지막 문제입니다'); return; }
+  switchToProblem(nums[idx+1]);
+});
+
+/* ================= EXPORT RESULT ================= */
+const NAME_KEY='1h2p_bs_learner_name';
+window.addEventListener('DOMContentLoaded',()=>{
+  const nameInput=document.getElementById('learnerName');
+  const headerName=document.getElementById('userNameInput');
+  const saved=localStorage.getItem(NAME_KEY);
+
+  // 초기값 복원
+  if(saved){ nameInput.value=saved; headerName.value=saved; }
+
+  // 좌측 이름란 → 헤더 동기화
+  nameInput.addEventListener('input',()=>{
+    localStorage.setItem(NAME_KEY,nameInput.value);
+    headerName.value=nameInput.value;
+  });
+
+  // 헤더 이름란 → 좌측 동기화
+  headerName.addEventListener('input',()=>{
+    localStorage.setItem(NAME_KEY,headerName.value);
+    nameInput.value=headerName.value;
+  });
+});
+
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  const name=document.getElementById('learnerName').value.trim()||'(이름미입력)';
+  const now=new Date();
+  const dateStr=now.toLocaleString('ko-KR');
+  const cfg=buildStepsConfig(currentMode);
+  const scoreText=document.getElementById('scoreDisplay').textContent.replace('점','').trim();
+  const rateText=document.querySelector('[data-field="rate"]')?.textContent||'(미채점)';
+  const kwResultText=document.getElementById('kwResult')?.textContent||'';
+  const curStage=(getCurrentProblem().stage)||'POOL';
+  const stageLabel={POOL:'POOL',STAGE1:'STAGE 1',STAGE2:'STAGE 2',STAGE3:'STAGE 3',CLEAR:'CLEAR STACK'}[curStage]||curStage;
+
+  // 자가체크 키워드 목록
+  const kwItems=document.querySelectorAll('.kw-item');
+  const kwCheckLines=[];
+  if(kwItems.length>0){
+    kwItems.forEach(el=>{
+      const checked=el.classList.contains('checked');
+      const kw=el.querySelector('span:last-child')?.textContent||'';
+      kwCheckLines.push((checked?'✓':'✗')+' '+kw);
+    });
+  }
+
+  let lines=[];
+  lines.push('===== 1행2필 행정법 사례답안 학습 결과 =====');
+  lines.push('학습자: '+name);
+  lines.push('문제번호: '+currentProblemNumber);
+  lines.push('문제영: '+(getCurrentProblem().title||'(미입력)'));
+  lines.push('학습모드: '+(currentMode==='advanced'?'상급자 모드':'초보자 모드'));
+  lines.push('현재 스테이지: '+stageLabel);
+  lines.push('예상점수: '+(scoreText||'(미채점)')+'점');
+  lines.push('키워드 일치율: '+rateText);
+  lines.push('제출일시: '+dateStr);
+
+  if(kwCheckLines.length>0){
+    lines.push('');
+    lines.push('----- 핵심키워드 자가체크 결과 -----');
+    kwCheckLines.forEach(l=>lines.push(l));
+    if(kwResultText) lines.push(kwResultText);
+  }
+
+  lines.push('');
+  lines.push('----- 작성 답안 -----');
+  cfg.forEach((step,i)=>{
+    lines.push('');
+    lines.push('['+step.roman+'. '+step.label+']');
+    lines.push((getStepText(i)||'(미작성)'));
+  });
+
+  const studentMsg = document.getElementById('studentMessage')?.value.trim();
+  if(studentMsg){
+    lines.push('');
+    lines.push('----- 교수님께 드리는 말씀 -----');
+    lines.push(studentMsg);
+  }
+
+  const blob=new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const safeName=name.replace(/[^a-zA-Z0-9가-힣]/g,'_');
+  a.href=url;
+  a.download=`학습결과_${currentProblemNumber}_${safeName}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('학습결과가 다운로드되었습니다');
+});
+
+/* ================= TOAST ================= */
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+/* ================= ADMIN CONSOLE ================= */
+const ADMIN_PW = '1행2필';
+let adminUnlocked = false;
+let adminAuthed = false;
+// 입력값을 최대한 너그럽게 정규화: 공백 제거 + 전각/호환문자 흡수
+function normPw(x){ return (x||'').replace(/\s+/g,'').normalize('NFKC'); }
+// 브라우저 prompt 대신 화면 내장 입력창으로 비밀번호 확인 (격리환경/모바일에서도 안전)
+function askAdminPassword(onSuccess){
+  if(adminAuthed){ if(typeof onSuccess==='function') onSuccess(); return; }
+  const overlay=document.createElement('div');
+  overlay.className='prompt-editor-overlay';
+  overlay.innerHTML=`
+    <div class="prompt-editor-box" style="max-width:360px;">
+      <h4>🔒 관리자 비밀번호</h4>
+      <input class="admin-input" id="admPwInput" type="password" placeholder="비밀번호를 입력하세요" style="background:#fff;color:var(--navy);border:1px solid var(--line);margin-bottom:10px;">
+      <div id="admPwErr" style="display:none;color:var(--red);font-size:12px;margin:-4px 0 10px;">비밀번호가 일치하지 않습니다</div>
+      <div class="prompt-editor-actions">
+        <div style="flex:1;"></div>
+        <button class="btn-secondary" id="admPwCancel">취소</button>
+        <button class="btn-submit" id="admPwOk" style="flex:none;">확인</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const input=document.getElementById('admPwInput');
+  setTimeout(()=>{ try{ input.focus(); }catch(e){} },50);
+  function submit(){
+    if(normPw(input.value)===normPw(ADMIN_PW)){
+      adminAuthed=true; overlay.remove();
+      if(typeof onSuccess==='function') onSuccess();
+    }else{
+      document.getElementById('admPwErr').style.display='';
+      input.value=''; input.focus();
+    }
+  }
+  document.getElementById('admPwOk').onclick=submit;
+  document.getElementById('admPwCancel').onclick=()=>overlay.remove();
+  input.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); submit(); } });
+}
+
+function toggleAdmin(){
+  const panel = document.getElementById('adminConsole');
+  if(panel.classList.contains('open')){ panel.classList.remove('open'); return; }
+  if(adminAuthed){ panel.classList.add('open'); return; }
+  askAdminPassword(()=> panel.classList.add('open'));
+}
+document.getElementById('adminFloatBtn').addEventListener('click',toggleAdmin);
+document.getElementById('adminBtnTop').addEventListener('click',toggleAdmin);
+document.getElementById('adminClose').addEventListener('click',toggleAdmin);
+
+document.querySelectorAll('.admin-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.admin-tab-content').forEach(c=>{
+      c.style.display = c.dataset.content===tab.dataset.tab ? 'block':'none';
+    });
+  });
+});
+
+/* ================= API KEY ================= */
+const LS_KEY='1h2p_bs_claude_api_key';
+function getApiKey(){ return localStorage.getItem(LS_KEY)||''; }
+function saveApiKey(){
+  const v = document.getElementById('adminApiKeyInput').value.trim();
+  if(v){ localStorage.setItem(LS_KEY,v); toast('API 키가 저장되었습니다'); }
+}
+document.getElementById('apiKeyBtn').addEventListener('click',()=>{
+  toggleAdmin();
+  if(!document.getElementById('adminConsole').classList.contains('open')) return;
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector('.admin-tab[data-tab="settings"]').classList.add('active');
+  document.querySelectorAll('.admin-tab-content').forEach(c=> c.style.display = c.dataset.content==='settings'?'block':'none');
+});
+window.addEventListener('load',()=>{
+  const k=getApiKey();
+  if(k) document.getElementById('adminApiKeyInput').value=k;
+});
+
+/* ================= AI CHAT ================= */
+const chatMessages = document.getElementById('chatMessages');
+const chatInput = document.getElementById('chatInput');
+
+/* ── 프록시 설정 ── */
+var PROXY_URL = 'https://YOUR-WORKER.workers.dev';  // Cloudflare Worker URL 입력
+
+/* ── 채팅 히스토리 24시간 자동소멸 ── */
+var CHAT_LS_KEY = "1h2p_bs_chat_history";
+var CHAT_TS_KEY = "1h2p_bs_chat_ts";
+
+function saveChatHistory(){
+  try{
+    localStorage.setItem(CHAT_LS_KEY, JSON.stringify(chatHistory));
+    if(!localStorage.getItem(CHAT_TS_KEY)) localStorage.setItem(CHAT_TS_KEY, String(Date.now()));
+  }catch(e){}
+}
+function loadChatHistory(){
+  try{
+    var ts = parseInt(localStorage.getItem(CHAT_TS_KEY)||'0');
+    if(ts && Date.now()-ts > 24*60*60*1000){
+      localStorage.removeItem(CHAT_LS_KEY);
+      localStorage.removeItem(CHAT_TS_KEY);
+      return null; // 만료
+    }
+    var h = JSON.parse(localStorage.getItem(CHAT_LS_KEY)||'null');
+    return h;
+  }catch(e){ return null; }
+}
+function clearChatHistory(){
+  localStorage.removeItem(CHAT_LS_KEY);
+  localStorage.removeItem(CHAT_TS_KEY);
+}
+
+let chatHistory=[];
+
+function appendMsg(text, who){
+  const d=document.createElement('div');
+  d.className='msg '+who;
+  const escaped=(text||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\n/g,'<br>');
+  d.innerHTML=escaped;
+  chatMessages.appendChild(d);
+  chatMessages.scrollTop=chatMessages.scrollHeight;
+  return d;
+}
+
+
+
+/* ================= sendChat 개선 (API키 불필요, 맥락 반영) ================= */
+let chatSending=false;
+async function sendChat(text){
+  if(!text.trim()||chatSending) return;
+  chatSending=true;
+  document.getElementById('chatSuggest').style.display='none';
+  appendMsg(text,'user');
+  chatHistory.push({role:'user',content:text});
+  saveChatHistory();
+  chatInput.value='';
+  chatInput.style.height='auto';
+  document.getElementById('chatSend').disabled=true;
+  const loadingEl=appendMsg('답변 작성 중...','bot loading');
+
+  const curRec=getCurrentProblem();
+  const cfg=buildStepsConfig(currentMode);
+  let ansSummary='';
+  cfg.forEach(function(step,i){
+    const t=getStepText(i).trim();
+    if(t) ansSummary+=step.roman+'. '+step.label+': '+t.slice(0,120)+(t.length>120?'...':'')+'\n';
+  });
+
+  const sys=[]
+  sys.push('당신은 1행2필 사례형 답안 학습 AI 튜터입니다.');
+  sys.push('행정법 수험(변시/5급/7.9급/노무사) 사례형 답안 작성을 돕습니다.');
+  sys.push('실로기스무스(대전제->소전제->결론) 서술 방식을 권장하세요.');
+  sys.push('판례 인용시 판례번호와 조문을 명시하세요.');
+  sys.push('답변은 핵심 중심으로 간결하게 한국어로 작성하세요.');
+  sys.push('');
+  sys.push('[현재 문제]');
+  sys.push('번호:'+currentProblemNumber+' / 스테이지:'+(curRec.stage||'POOL'));
+  sys.push('단원:'+(curRec.chapter||'-')+' / 주제:'+(curRec.topic||'-'));
+  sys.push('사례:'+(curRec.case||'-').slice(0,300));
+  sys.push('키워드:'+(curRec.keyword||'-'));
+  if(ansSummary){ sys.push(''); sys.push('[학생 답안]'); sys.push(ansSummary); }
+  const systemPrompt=sys.join('\n');
+
+  try{
+    const res=await fetch(PROXY_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        system:systemPrompt,
+        messages:chatHistory.slice(-10)
+      })
+    });
+    const data=await res.json();
+    loadingEl.remove();
+    if(data.content){
+      const aiText=data.content.filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('\n');
+      appendMsg(aiText||'(응답 없음)','bot');
+      chatHistory.push({role:'assistant',content:aiText});
+      saveChatHistory();
+    } else {
+      appendMsg('오류: '+(data.error&&data.error.message?data.error.message:'알 수 없는 오류'),'bot');
+    }
+  }catch(e){
+    loadingEl.remove();
+    appendMsg('API 호출 오류: '+e.message,'bot');
+  }
+  chatSending=false;
+  document.getElementById('chatSend').disabled=false;
+  setTimeout(function(){chatInput.focus();},80);
+}
+
+/* ================= chatInput keydown (Enter 전송, 자동 높이) ================= */
+/* ================= 단일 사례 직접 투입 ================= */
+function submitSingleProblem(){
+  const chapter=(document.getElementById('singleChapter')||{value:''}).value.trim();
+  const topic=(document.getElementById('singleTopic')||{value:''}).value.trim();
+  const case_=(document.getElementById('singleCase')||{value:''}).value.trim();
+  const answer=(document.getElementById('singleAnswer')||{value:''}).value.trim();
+  const keyword=(document.getElementById('singleKeyword')||{value:''}).value.trim();
+  const logic=(document.getElementById('singleLogic')||{value:''}).value.trim();
+  const advice=(document.getElementById('singleAdvice')||{value:''}).value.trim();
+  if(!case_||!answer||!keyword||!logic){ toast('사례지문/정답/키워드/핵심논리는 필수입니다'); return; }
+  const existing=getProblems();
+  const num=String(existing.length+1).padStart(4,'0');
+  const newP={
+    number:num,chapter:chapter,topic:topic,
+    case:case_,answer:answer,keyword:keyword,logic:logic,advice:advice,
+    stage:'POOL',status:'초안',
+    title:case_.slice(0,30)+(case_.length>30?'...':'')
+  };
+  saveProblems(existing.concat([newP]));
+  renderProblemTable();
+  renderStagePanel();
+  ['singleChapter','singleTopic','singleCase','singleAnswer','singleKeyword','singleLogic','singleAdvice'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  toast(num+'번 사례가 POOL에 등록되었습니다');
+}
+
+
+document.getElementById('chatSend').addEventListener('click',()=> sendChat(chatInput.value));
+chatInput.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendChat(chatInput.value); }
+  chatInput.style.height='auto';
+  chatInput.style.height=Math.min(chatInput.scrollHeight,100)+'px';
+});
+document.querySelectorAll('#chatSuggest button').forEach(b=>{
+  b.addEventListener('click',()=> sendChat(b.dataset.q));
+});
+document.getElementById('clearChat').addEventListener('click',()=>{
+  chatMessages.innerHTML='<div class="msg bot" style="background:#fdf3e3;border:1px solid #f1ddb0;color:#8a6a1f;">📢 <b>AI 대화창 준비 중</b><br>현재 AI 대화 기능은 준비 중입니다. 곧 활성화될 예정이니 조금만 기다려 주세요. 😊</div>';
+  chatHistory=[];
+  clearChatHistory();
+  document.getElementById('chatSuggest').style.display='flex';
+});
+
+/* INIT */
+renderSteps();
+
+/* ── 채팅 히스토리 복원 ── */
+(function(){
+  var ts = parseInt(localStorage.getItem(CHAT_TS_KEY)||'0');
+  var expired = ts && (Date.now()-ts > 24*60*60*1000);
+  var saved = loadChatHistory();
+  var box = document.getElementById('chatMessages');
+  if(expired || !saved || !saved.length){
+    // 만료 안내 메시지
+    if(expired){
+      var notice = document.createElement('div');
+      notice.className='msg bot';
+      notice.style.cssText='background:#fdf3e3;border:1px solid #f1ddb0;color:#8a6a1f;font-size:11.5px;';
+      notice.textContent='📢 24시간이 경과하여 이전 대화 기록이 자동 소멸되었습니다. 새로운 대화를 시작해 주세요.';
+      box.appendChild(notice);
+    }
+  } else {
+    // 히스토리 복원
+    chatHistory = saved;
+    document.getElementById('chatSuggest').style.display='none';
+    saved.forEach(function(m){
+      appendMsg(m.content, m.role==='user'?'user':'bot');
+    });
+    // 남은 시간 계산
+    var remain = Math.ceil((24*60*60*1000-(Date.now()-ts))/3600000);
+    var notice = document.createElement('div');
+    notice.className='msg bot';
+    notice.style.cssText='background:#f0f4ff;border:1px solid #c5d0f0;color:#2a3a6e;font-size:11px;';
+    notice.textContent='📢 대화 기록이 복원되었습니다. 약 '+remain+'시간 후 자동 소멸됩니다.';
+    box.appendChild(notice);
+    box.scrollTop=box.scrollHeight;
+  }
+})();
+</script>
+</body>
+</html>

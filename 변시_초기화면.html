@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>베리타스 PASS:ON — 과목·선생님 선택</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1F3C; --navy2:#12294d; --panel:#152a4d; --panel2:#1b3358;
+  --line:#284872; --gold:#C9A227; --gold2:#e5be44;
+  --ink:#eaf0fb; --sub:#9db0cf; --dim:#6f85a8; --ok:#4a9d7f;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--navy);color:var(--ink);font-family:'Noto Sans KR',sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+.top{background:linear-gradient(135deg,var(--navy),var(--navy2));border-bottom:1px solid var(--line)}
+.topin{display:flex;align-items:center;gap:16px;padding:13px 22px;max-width:1120px;margin:0 auto;flex-wrap:wrap}
+.brand{font-family:'Noto Serif KR',serif;font-weight:900;color:var(--gold);font-size:1.12rem}
+.brand small{font-family:'Noto Sans KR';font-weight:500;color:var(--sub);font-size:.72rem;margin-left:8px}
+.back{margin-left:auto;border:1px solid var(--gold);background:none;color:var(--gold);font-size:.76rem;font-weight:700;border-radius:999px;padding:7px 16px;cursor:pointer;transition:.2s}
+.back:hover{background:var(--gold);color:var(--navy)}
+.hero{padding:40px 0 8px;text-align:center}
+.eyebrow{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.14em;color:var(--navy);background:var(--gold);padding:4px 12px;border-radius:999px;margin-bottom:16px}
+.hero h1{font-family:'Noto Serif KR',serif;font-weight:900;font-size:2.05rem;margin:0 0 10px;letter-spacing:-.01em}
+.hero h1 .hl{color:var(--gold)}
+.hero p{color:var(--sub);font-size:.98rem;margin:0 auto;max-width:640px}
+/* enrol strip */
+.enrol{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:26px 0 6px}
+.enrol .fld{display:flex;flex-direction:column;gap:5px}
+.enrol label{font-size:.72rem;color:var(--dim);padding-left:3px}
+.enrol select,.enrol input{background:var(--navy2);border:1px solid var(--line);border-radius:9px;color:var(--ink);
+  padding:9px 13px;font-size:.85rem;font-family:'Noto Sans KR';outline:none;min-width:150px}
+.enrol select:focus,.enrol input:focus{border-color:var(--gold)}
+.prodtog{display:flex;gap:5px;background:#0c1a30;border-radius:999px;padding:4px;align-self:flex-end;height:39px}
+.ptog{border:none;background:none;color:var(--sub);border-radius:999px;padding:0 15px;cursor:pointer;font-family:'Noto Sans KR';font-size:.82rem;font-weight:700;transition:.16s}
+.ptog.on{background:var(--gold);color:var(--navy)}
+/* subject sections */
+.subs{margin:30px 0 10px;display:flex;flex-direction:column;gap:14px}
+.subcard{background:linear-gradient(160deg,var(--panel),var(--navy2));border:1px solid var(--line);border-radius:15px;overflow:hidden}
+.subhd{display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--line);background:var(--navy2)}
+.subhd .sx{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--gold),#8a6f1a);
+  display:grid;place-items:center;font-family:'Noto Serif KR';font-weight:900;color:var(--navy);font-size:.95rem;flex:none}
+.subhd .snm{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.08rem}
+.subhd .scnt{margin-left:auto;font-size:.76rem;color:var(--sub)}
+.teachers{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:9px;padding:15px 20px}
+.tcard{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid var(--line);
+  background:var(--navy2);cursor:pointer;transition:.15s;text-decoration:none;color:inherit}
+.tcard:hover{border-color:var(--gold);background:#173059;transform:translateY(-1px)}
+.tav{width:38px;height:38px;border-radius:50%;flex:none;display:grid;place-items:center;
+  font-family:'Noto Serif KR';font-weight:900;font-size:1.15rem;color:var(--navy);background:linear-gradient(135deg,var(--gold),#a5842a)}
+.tinfo{min-width:0;flex:1}
+.tname{font-weight:700;font-size:.92rem;display:block}
+.tname .flag{font-size:.62rem;font-weight:700;color:var(--navy);background:var(--ok);border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+.tmeta{font-size:.74rem;color:var(--dim);margin-top:3px;display:block;line-height:1.35}
+.tgo{color:var(--gold);font-size:.8rem;flex:none}
+.note{text-align:center;color:var(--dim);font-size:.78rem;margin:8px 0 0}
+.foot{color:var(--dim);font-size:.72rem;text-align:center;padding:30px 22px 46px;line-height:1.7}
+.toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);background:var(--gold);color:var(--navy);font-weight:700;font-size:.84rem;padding:11px 20px;border-radius:999px;opacity:0;transition:.3s;pointer-events:none;z-index:80}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="topin">
+    <div class="brand">베리타스 PASS:ON <small>변시 합격의 24h 동반자</small></div>
+    <button class="back" onclick="location.href='변시_학습포털.html'">← 학습포털로</button>
+  </div>
+</div>
+<div class="wrap">
+  <div class="hero">
+    <span class="eyebrow">START · 과목과 선생님을 고르세요</span>
+    <h1>어느 <span class="hl">과목</span>, 어느 <span class="hl">선생님</span>으로 시작할까요</h1>
+    <p>변시 7법과 각 과목 선생님이 모두 있습니다. 선택하면 자가진단으로 들어가, 당신에게 맞는 강의를 골라 드립니다.</p>
+  </div>
+  <div class="enrol">
+    <div class="fld"><label>로스쿨</label><select id="school"><option>선택하세요</option><option>서울대</option><option>연세대</option><option>고려대</option><option>지방 로스쿨</option><option>졸업(N시생)</option></select></div>
+    <div class="fld"><label>학년</label><select id="grade"><option>선택하세요</option><option>1학년</option><option>2학년</option><option>3학년</option><option>졸업</option></select></div>
+    <div class="fld"><label>성명</label><input id="name" placeholder="이름"></div>
+    <div class="fld"><label>수강 상품</label>
+      <div class="prodtog"><button class="ptog on" id="pgJong" onclick="setProd('jong')">종합반</button><button class="ptog" id="pgDan" onclick="setProd('dan')">단과반</button></div>
+    </div>
+  </div>
+  <p class="note">시연에서는 선택 없이 아래 선생님 카드를 바로 눌러도 진단으로 들어갑니다.</p>
+
+  <div class="subs" id="subs"></div>
+</div>
+<div class="foot">
+  본 화면은 시연용 데모입니다. 과목·강사 구성은 고시닷컴 변호사시험 강사진을 참고한 예시이며 실제와 다를 수 있습니다.<br>
+  1행2필 행정법구조연구소 × 베리타스법학원 제안 자료 · 2026. 8.
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SUBJECTS=[
+ {nm:"헌법", x:"憲", teachers:["금동흠","전효진","박도현"], live:"금동흠"},
+ {nm:"민법", x:"民", teachers:["이관형","이태섭","곽낙규","장용준","김형진","김대정"]},
+ {nm:"형법", x:"刑", teachers:["정현석","정인수","이인규","남형율","서정원","이승철","박지훈"]},
+ {nm:"행정법", x:"行", teachers:["류준세","정선균","조홍주","서창교","박도현","전효진"]},
+ {nm:"민사소송법", x:"民訴", teachers:["이관형","이종훈","장용준","김형진","박서현"]},
+ {nm:"형사소송법", x:"刑訴", teachers:["정현석","정인수","김영환","유안석","서정원","이승철","박지훈"]},
+ {nm:"상법", x:"商", teachers:["이관형","정현아","황의영","장용준","김형진","박지훈"]},
+]
+let prod='jong';
+function setProd(p){ prod=p;
+  document.getElementById('pgJong').className='ptog'+(p==='jong'?' on':'');
+  document.getElementById('pgDan').className='ptog'+(p==='dan'?' on':'');
+}
+function pickTeacher(subj,teacher){
+  // 헌법·금동흠은 완성된 진단 화면으로. 그 외는 시연 안내 후 동일 진단 화면.
+  var url='변시_진단처방여정.html';
+  if(subj!=='헌법'||teacher!=='금동흠'){
+    toast(subj+' · '+teacher+' 선생님 — 시연에서는 헌법·금동흠 진단 화면으로 안내합니다');
+    setTimeout(function(){ location.href=url; }, 1200);
+  } else {
+    location.href=url;
+  }
+}
+function render(){
+  const wrap=document.getElementById('subs'); wrap.innerHTML='';
+  SUBJECTS.forEach(function(s){
+    const cards=s.teachers.map(function(name){
+      const flag=(s.live===name)?'<span class="flag">대표</span>':'';
+      return '<a class="tcard" data-subj="'+s.nm+'" data-teacher="'+name+'">'+
+        '<span class="tav">'+name.charAt(0)+'</span>'+
+        '<span class="tinfo"><span class="tname">'+name+' 선생님'+flag+'</span></span>'+
+        '<span class="tgo">→</span>'+
+      '</a>';
+    }).join('');
+    wrap.insertAdjacentHTML('beforeend',
+      '<div class="subcard"><div class="subhd"><span class="sx">'+s.x+'</span><span class="snm">'+s.nm+'</span>'+
+      '<span class="scnt">선생님 '+s.teachers.length+'명</span></div><div class="teachers">'+cards+'</div></div>');
+  });
+  document.querySelectorAll('.tcard').forEach(function(a){
+    a.addEventListener('click',function(){ pickTeacher(a.getAttribute('data-subj'),a.getAttribute('data-teacher')); });
+  });
+}
+let tt=null;
+function toast(m){var el=document.getElementById('toast');el.textContent=m;el.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){el.classList.remove('show');},2400);}
+render();
+</script>
+</body>
+</html>
