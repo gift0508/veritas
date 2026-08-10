@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>선택형 학습엔진 | 1행2필</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-dark:#070b0e;
+  --bg-gradient:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  --glass:rgba(255,255,255,0.05);
+  --glass-border:rgba(255,255,255,0.10);
+  --gold:#d4af37;
+  --gold-grad:linear-gradient(to right,#bf953f,#fcf6ba,#b38728,#fbf5b7,#aa771c);
+  --cyan:#00f2fe;
+  --green:#20bf6b;
+  --red:#ff0844;
+  --text:#fff;
+  --text-sub:#a8b2d1;
+  --correct-grad:linear-gradient(135deg,#4facfe,#00f2fe);
+  --wrong-grad:linear-gradient(135deg,#ff0844,#ffb199);
+  --r:12px;
+}
+*{box-sizing:border-box;font-family:'Pretendard',sans-serif;-webkit-tap-highlight-color:transparent}
+body{margin:0;padding:2vh 2vw;min-height:100vh;background:var(--bg-dark);color:var(--text);overflow-x:hidden;display:flex;flex-direction:column;-webkit-text-size-adjust:100%}
+button{-webkit-appearance:none;-webkit-user-select:none;user-select:none;font-family:inherit}
+
+/* ── 컨테이너 ── */
+.container{flex:1;display:flex;flex-direction:column;padding:20px 28px;background:var(--bg-gradient);border:2px solid var(--gold);border-radius:16px;box-shadow:0 0 24px rgba(212,175,55,0.15),inset 0 0 15px rgba(212,175,55,0.05)}
+
+/* ── 헤더 ── */
+.header{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;margin-bottom:10px;flex-wrap:wrap;gap:12px;border-bottom:1px solid rgba(212,175,55,0.2)}
+.header-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.system-title{font-size:1.7rem;font-weight:900;margin:0;background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.learner-input{background:rgba(0,0,0,0.25);border:1px solid rgba(212,175,55,0.35);color:var(--gold);padding:6px 12px;border-radius:20px;font-size:0.9rem;font-weight:700;width:110px;text-align:center;outline:none}
+.learner-input::placeholder{color:rgba(212,175,55,0.45);font-weight:600}
+.data-counter{font-size:0.9rem;background:var(--glass);padding:5px 13px;border-radius:20px;color:var(--gold);border:1px solid rgba(212,175,55,0.3);font-weight:700;white-space:nowrap}
+.admin-btn{background:var(--glass);color:#fff;border:1px solid var(--glass-border);padding:8px 16px;font-size:0.88rem;font-weight:700;border-radius:20px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.admin-btn:hover{background:rgba(255,255,255,0.14);box-shadow:0 0 10px rgba(255,255,255,0.18)}
+
+/* ── 과목 탭 ── */
+.subject-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.subject-label{font-size:0.82rem;color:var(--text-sub);font-weight:700;white-space:nowrap}
+.subject-tab{padding:6px 15px;background:rgba(0,0,0,0.3);border:1px solid var(--glass-border);color:var(--text-sub);border-radius:20px;cursor:pointer;font-weight:700;font-size:0.88rem;transition:all 0.22s;display:inline-flex;align-items:center;gap:5px}
+.subject-tab.active{background:var(--gold-grad);color:#1a1a1a;border-color:transparent;box-shadow:0 3px 10px rgba(212,175,55,0.3)}
+.subject-tab .scount{font-size:0.76rem;opacity:0.82}
+.no-subject-msg{color:var(--text-sub);font-size:0.9rem;padding:6px 0}
+
+/* ── 메인 레이아웃 ── */
+.main-layout{display:flex;flex:1;gap:22px;min-height:0}
+.content-area{flex:3;display:flex;flex-direction:column;gap:11px;position:relative}
+
+/* ── 단계 탭 ── */
+.stage-tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:4px}
+.stage-tab{padding:7px 15px;background:rgba(0,0,0,0.3);border:1px solid var(--glass-border);color:var(--text-sub);border-radius:20px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:5px;transition:all 0.25s;font-size:0.88rem}
+.stage-tab.active{background:var(--correct-grad);color:#fff;border-color:transparent;box-shadow:0 3px 10px rgba(0,242,254,0.25);transform:translateY(-1px)}
+.stage-tab.locked{opacity:0.28;cursor:not-allowed;pointer-events:none}
+
+/* ── 카드 ── */
+.card{background:var(--glass);border-radius:var(--r);padding:18px 20px;box-shadow:0 4px 14px rgba(0,0,0,0.22);backdrop-filter:blur(10px);display:flex;flex-direction:column;font-size:1.15rem;transition:transform 0.18s;word-break:keep-all;line-height:1.55}
+.card-label{font-size:0.82rem;font-weight:800;margin-bottom:7px;letter-spacing:1px}
+.label-q{color:var(--cyan)}.label-a{color:var(--green)}.label-e{color:var(--gold)}
+.question-card{flex:2;font-weight:600;border:2px solid var(--cyan);box-shadow:inset 0 0 14px rgba(0,242,254,0.09),0 4px 14px rgba(0,0,0,0.2)}
+
+/* ── 객관식 선지 ── */
+.choices-wrap{margin-top:12px;display:flex;flex-direction:column;gap:7px}
+.choice-btn{text-align:left;background:rgba(0,0,0,0.22);border:1.5px solid var(--glass-border);color:#e8eef5;border-radius:9px;padding:11px 14px;font-size:1.02rem;cursor:pointer;transition:all 0.14s;font-weight:600;line-height:1.4;display:flex;gap:9px;align-items:flex-start}
+.choice-btn:hover:not(:disabled){background:rgba(0,242,254,0.09);border-color:var(--cyan)}
+.choice-btn .cnum{flex-shrink:0;width:23px;height:23px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:0.82rem;font-weight:800}
+.choice-btn.correct{background:rgba(32,191,107,0.16);border-color:var(--green);color:#7fffb0}
+.choice-btn.correct .cnum{background:var(--green);color:#fff}
+.choice-btn.wrong{background:rgba(255,8,68,0.16);border-color:var(--red);color:#ffb199}
+.choice-btn.wrong .cnum{background:var(--red);color:#fff}
+.choice-btn:disabled{cursor:default}
+
+/* ── 정답·해설 카드 ── */
+.answer-card{flex:1;cursor:pointer;position:relative;font-weight:800}
+.answer-card.blind{background:repeating-linear-gradient(45deg,rgba(255,255,255,0.02),rgba(255,255,255,0.02) 10px,rgba(0,0,0,0.1) 10px,rgba(0,0,0,0.1) 20px);color:rgba(255,255,255,0.28);border:2px solid rgba(32,191,107,0.45);align-items:center;text-align:center;font-weight:600}
+.answer-card.unblind{background:rgba(32,191,107,0.07);border:2px solid var(--green);color:var(--green);box-shadow:inset 0 0 18px rgba(32,191,107,0.13)}
+.explanation-card{flex:1.5;cursor:pointer;position:relative;font-size:1.05rem;color:#dcdde1}
+.explanation-card.blind{background:repeating-linear-gradient(45deg,rgba(255,255,255,0.02),rgba(255,255,255,0.02) 10px,rgba(0,0,0,0.1) 10px,rgba(0,0,0,0.1) 20px);color:rgba(255,255,255,0.28);border:2px solid rgba(212,175,55,0.45);align-items:center;text-align:center;font-weight:600}
+.explanation-card.unblind{background:rgba(212,175,55,0.07);border:2px solid var(--gold);color:#fff;box-shadow:inset 0 0 18px rgba(212,175,55,0.13)}
+
+/* ── 컨트롤 버튼 ── */
+.control-panel{display:flex;gap:16px;height:58px;margin-top:4px}
+.btn-action{flex:1;border:none;border-radius:28px;font-size:1.3rem;font-weight:800;color:#fff;cursor:pointer;transition:all 0.18s cubic-bezier(0.175,0.885,0.32,1.275);box-shadow:0 5px 14px rgba(0,0,0,0.22)}
+.btn-action:hover{transform:translateY(-3px) scale(1.01)}
+.btn-action:active{transform:translateY(1px) scale(0.98)}
+.btn-correct{background:var(--correct-grad)}.btn-wrong{background:var(--wrong-grad)}
+
+/* ── 애니메이션 ── */
+.anim-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:4.5rem;font-weight:900;pointer-events:none;z-index:100;opacity:0;text-align:center;width:100%;text-shadow:0 6px 22px rgba(0,0,0,0.8)}
+@keyframes popBounce{0%{transform:translate(-50%,-50%) scale(0.3);opacity:0}40%{transform:translate(-50%,-50%) scale(1.08);opacity:1}60%{transform:translate(-50%,-50%) scale(0.96);opacity:1}80%{transform:translate(-50%,-50%) scale(1.01);opacity:1}100%{transform:translate(-50%,-50%) scale(0.82);opacity:0}}
+.anim-go{animation:popBounce 1s cubic-bezier(0.25,0.46,0.45,0.94) forwards}
+
+/* ── 사이드바 ── */
+.sidebar{flex:1.2;background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:12px;box-shadow:0 8px 22px rgba(0,0,0,0.25);backdrop-filter:blur(10px)}
+.sidebar h3{margin:0 0 4px 0;font-size:1.1rem;color:var(--cyan);text-align:center;font-weight:800;letter-spacing:1px}
+.gauge-row{display:flex;flex-direction:column;gap:5px}
+.gauge-labels{display:flex;justify-content:space-between;font-size:0.87rem;font-weight:700;color:var(--text-sub)}
+.gauge-bar{width:100%;height:16px;background:rgba(0,0,0,0.4);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.04)}
+.gauge-fill{height:100%;transition:width 0.5s cubic-bezier(0.4,0,0.2,1);border-radius:8px;box-shadow:0 0 7px rgba(255,255,255,0.35)}
+.gauge-fill.inf{background:linear-gradient(90deg,#ff0844,#ffb199);width:100%}
+.brand-logo{margin-top:auto;text-align:center;font-size:2rem;font-weight:900;background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:5px;padding-top:14px;opacity:0.95}
+
+/* ── 학습결과 내보내기 버튼 ── */
+.export-btn{background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.4);color:var(--gold);padding:8px 12px;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;width:100%;transition:all 0.2s;text-align:center}
+.export-btn:hover{background:rgba(212,175,55,0.22)}
+
+/* ══════════════════════════════
+   관리자 모달
+══════════════════════════════ */
+.modal-backdrop{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.88);z-index:999;backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;visibility:hidden;opacity:0;transition:0.28s ease;padding:16px}
+.modal-backdrop.on{visibility:visible;opacity:1}
+.modal-box{background:#1e2529;border:1px solid #34495e;width:100%;max-width:940px;padding:28px;border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,0.6);max-height:92vh;overflow-y:auto;color:#fff}
+.modal-box h2{margin-top:0;color:var(--cyan);border-bottom:1px solid #34495e;padding-bottom:14px;font-size:1.35rem}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.sec{background:rgba(255,255,255,0.04);padding:16px;border-radius:10px;border:1px solid rgba(255,255,255,0.05)}
+.sec h4{margin:0 0 11px 0;color:#fff;font-size:0.97rem;font-weight:800}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
+.fg label{font-size:0.82rem;color:var(--text-sub);font-weight:700}
+.fg input,.fg textarea,.fg select{background:rgba(0,0,0,0.22);border:1px solid #4b5563;color:#fff;padding:10px 11px;border-radius:6px;font-family:inherit;width:100%;font-size:15px;outline:none;transition:border-color 0.2s}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--cyan)}
+.fg textarea{resize:vertical;min-height:70px}
+
+/* 선지 입력행 */
+.mc-row{display:flex;gap:7px;align-items:center;margin-bottom:6px}
+.mc-row .cn{width:24px;height:24px;border-radius:50%;background:rgba(0,242,254,0.14);color:var(--cyan);font-size:0.78rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mc-row input[type=text]{flex:1;background:rgba(0,0,0,0.2);border:1px solid #4b5563;color:#fff;padding:9px;border-radius:6px;font-size:15px}
+.mc-row .radio-wrap{flex-shrink:0;display:flex;align-items:center;gap:3px;font-size:0.77rem;color:var(--text-sub);white-space:nowrap}
+
+/* 과목 pill */
+.subj-pill{background:rgba(0,0,0,0.3);border:1px solid #4b5563;border-radius:14px;padding:4px 8px 4px 12px;font-size:0.82rem;display:inline-flex;align-items:center;gap:6px}
+.subj-pill .del-x{background:none;border:none;color:var(--red);cursor:pointer;font-size:1rem;line-height:1;padding:0}
+
+/* 버튼들 */
+.btn-primary{background:var(--correct-grad);color:#fff;border:none;padding:10px;border-radius:6px;font-weight:800;cursor:pointer;width:100%;transition:0.18s;font-size:0.95rem}
+.btn-primary:hover{opacity:0.88}
+.btn-ghost{background:rgba(255,255,255,0.07);color:#fff;border:1px solid #4b5563;padding:7px 12px;border-radius:6px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;transition:0.18s}
+.btn-ghost:hover{background:rgba(255,255,255,0.13)}
+
+/* 문제 목록 */
+.mitem{background:rgba(0,0,0,0.22);border:1px solid #34495e;border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:9px}
+.mnum{flex-shrink:0;width:26px;height:26px;border-radius:6px;background:rgba(0,242,254,0.13);color:var(--cyan);font-size:0.78rem;font-weight:800;display:flex;align-items:center;justify-content:center}
+.mbody{flex:1;min-width:0}
+.mq{font-size:0.88rem;color:#fff;font-weight:600;line-height:1.4;word-break:break-all}
+.mmeta{font-size:0.73rem;color:var(--text-sub);margin-top:3px}
+.mtag{display:inline-block;background:rgba(255,255,255,0.07);border-radius:8px;padding:1px 7px;margin-right:4px;font-weight:700}
+.mactions{display:flex;gap:5px;flex-shrink:0}
+.mbtn-edit{background:rgba(0,242,254,0.12);border:1px solid rgba(0,242,254,0.35);color:var(--cyan);border-radius:6px;padding:5px 9px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit}
+.mbtn-del{background:rgba(255,8,68,0.12);border:1px solid rgba(255,8,68,0.35);color:#ff8095;border-radius:6px;padding:5px 9px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit}
+.mbtn-edit:hover{background:rgba(0,242,254,0.22)}.mbtn-del:hover{background:rgba(255,8,68,0.26)}
+.mlist-empty{text-align:center;color:var(--text-sub);font-size:0.85rem;padding:18px}
+
+/* 공유 버튼 */
+.share-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:7px;margin-top:11px}
+.share-btn{padding:9px 7px;font-weight:800;border-radius:6px;border:none;cursor:pointer;transition:0.18s;color:#fff;font-size:0.83rem;font-family:inherit}
+.share-btn:hover{opacity:0.8;transform:translateY(-1px)}
+
+/* 푸터 액션 */
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #34495e;padding-top:18px;margin-top:14px;flex-wrap:wrap}
+.btn-footer{padding:9px 18px;border:none;border-radius:6px;font-weight:800;cursor:pointer;flex:1;min-width:120px;text-align:center;font-family:inherit}
+
+/* 수정 모달 */
+.edit-modal-box{max-width:680px}
+
+/* ── 반응형 ── */
+@media(max-width:768px){
+  .main-layout{flex-direction:column;gap:18px}
+  .content-area,.sidebar{flex:none;width:100%}
+  .admin-grid{grid-template-columns:1fr}
+  .share-grid{grid-template-columns:1fr 1fr}
+  .card{padding:14px;font-size:1.08rem}
+  .container{padding:14px 14px}
+  .system-title{font-size:1.35rem}
+  .anim-overlay{font-size:3rem}
+  .btn-action{font-size:1.05rem}
+}
+@media(min-width:769px) and (max-width:1200px){
+  .main-layout{display:grid;grid-template-columns:1fr 280px;gap:20px}
+  .content-area,.sidebar{flex:none;width:100%}
+}
+
+/* ── AI 대화창 ── */
+.chat-modal-box{max-width:560px;padding:0;overflow:hidden;border-radius:16px;display:flex;flex-direction:column;height:80vh;max-height:680px}
+.chat-header{padding:18px 22px;background:linear-gradient(135deg,#0f2027,#203a43);border-bottom:1px solid rgba(0,242,254,0.2);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.chat-header h2{margin:0;color:var(--cyan);font-size:1.1rem;border:none;padding:0}
+.chat-header-sub{font-size:0.75rem;color:var(--text-sub);margin-top:2px}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#111820}
+.chat-messages::-webkit-scrollbar{width:4px}
+.chat-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:2px}
+.msg{max-width:88%;line-height:1.55;font-size:0.93rem;padding:10px 13px;border-radius:12px;word-break:keep-all}
+.msg-user{align-self:flex-end;background:rgba(0,242,254,0.15);border:1px solid rgba(0,242,254,0.3);color:#e8f4ff;border-radius:12px 12px 3px 12px}
+.msg-ai{align-self:flex-start;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#dde4f0;border-radius:12px 12px 12px 3px}
+.msg-ai.thinking{color:var(--text-sub);font-style:italic;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}}
+.chat-quick{padding:8px 14px;display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,0.06);background:#0d1520;flex-shrink:0}
+.quick-btn{background:rgba(0,242,254,0.08);border:1px solid rgba(0,242,254,0.2);color:var(--cyan);padding:5px 10px;border-radius:14px;font-size:0.75rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:0.18s}
+.quick-btn:hover{background:rgba(0,242,254,0.18)}
+.chat-input-row{padding:12px 14px;display:flex;gap:8px;align-items:flex-end;border-top:1px solid rgba(255,255,255,0.08);background:#0d1520;flex-shrink:0}
+.chat-input{flex:1;background:rgba(0,0,0,0.35);border:1px solid #4b5563;color:#fff;padding:10px 13px;border-radius:10px;font-family:inherit;font-size:0.93rem;resize:none;min-height:42px;max-height:100px;outline:none;line-height:1.45;transition:border-color 0.2s}
+.chat-input:focus{border-color:var(--cyan)}
+.chat-send-btn{background:var(--correct-grad);color:#fff;border:none;width:40px;height:40px;border-radius:10px;font-size:1.1rem;cursor:pointer;flex-shrink:0;transition:0.18s;display:flex;align-items:center;justify-content:center}
+.chat-send-btn:hover{opacity:0.85;transform:scale(1.05)}
+.chat-send-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.chat-close-btn{background:none;border:none;color:var(--text-sub);font-size:1.3rem;cursor:pointer;padding:0;line-height:1}
+.chat-close-btn:hover{color:#fff}
+
+/* ── 사례 지문 박스 ── */
+.case-box{
+  background:rgba(0,0,0,0.25);border:1px solid rgba(212,175,55,0.35);
+  border-radius:8px;padding:11px 14px;margin-bottom:10px;
+  font-size:1.0rem;font-weight:500;color:#e8dfc8;line-height:1.6;
+  white-space:pre-wrap;word-break:keep-all;
+}
+.case-label{
+  font-size:0.75rem;font-weight:800;color:var(--gold);
+  letter-spacing:1px;margin-bottom:5px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- 헤더 -->
+  <div class="header">
+    <div class="header-left">
+      <h1 class="system-title">1행2필 선택형 학습엔진</h1>
+      <input class="learner-input" id="learner-name" type="text" placeholder="이름 입력" maxlength="10">
+      <div class="data-counter">📚 총 <span id="total-count">0</span>문항</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="admin-btn" id="chat-open-btn" style="background:rgba(0,242,254,0.1);border-color:rgba(0,242,254,0.35);color:var(--cyan)">💬 AI 질문</button>
+      <button class="admin-btn" id="admin-open-btn">⚙️ 교수자 관리</button>
+    </div>
+  </div>
+
+  <!-- 과목 탭 -->
+  <div class="subject-bar" id="subject-bar"></div>
+
+  <!-- 메인 레이아웃 -->
+  <div class="main-layout">
+    <div class="content-area">
+      <div class="stage-tabs" id="stage-tabs"></div>
+
+      <!-- 문제 카드 -->
+      <div class="card question-card" id="q-card">
+        <!-- 사례 지문 (있을 때만 표시) -->
+        <div id="case-box-wrap" style="display:none">
+          <div class="case-label">📋 사례 지문</div>
+          <div class="case-box" id="case-content"></div>
+        </div>
+        <div class="card-label label-q">Q. 문제</div>
+        <div id="q-content">⬆ 과목을 선택하거나, 교수자 관리에서 과목과 문제를 등록하세요.</div>
+        <div class="choices-wrap" id="choices-wrap" style="display:none"></div>
+      </div>
+
+      <!-- 정답 카드 (단답형) -->
+      <div class="card answer-card blind" id="a-card" style="display:none">
+        <div class="card-label label-a" id="a-label" style="display:none">A. 정답</div>
+        <div id="a-content">✨ 탭하여 정답 확인하기</div>
+      </div>
+
+      <!-- 해설 카드 -->
+      <div class="card explanation-card blind" id="e-card">
+        <div class="card-label label-e" id="e-label" style="display:none">💡 해설 / 암기포인트</div>
+        <div id="e-content">💡 정답 선택 후 해설이 표시됩니다.</div>
+      </div>
+
+      <!-- 컨트롤 버튼 -->
+      <div class="control-panel" id="ctrl-panel">
+        <button class="btn-action btn-correct" id="btn-ok">🔥 정답 (Level Up!)</button>
+        <button class="btn-action btn-wrong" id="btn-ng">💀 오답 (포승줄 회귀)</button>
+      </div>
+
+      <!-- 애니메이션 -->
+      <div class="anim-overlay" id="anim-overlay"></div>
+    </div>
+
+    <!-- 사이드바 -->
+    <div class="sidebar" id="sidebar">
+      <h3>📈 STAGE GAUGE</h3>
+      <div id="gauge-area"></div>
+
+      <!-- CLEAR STACK -->
+      <div id="clear-stack-zone" style="margin-top:4px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:0.95rem;font-weight:800;color:var(--gold)">🏆 CLEAR STACK</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span id="clear-count" style="font-size:1.1rem;font-weight:900;color:var(--gold)">0</span>
+            <button id="clear-list-btn" style="background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.35);color:var(--gold);padding:3px 9px;border-radius:12px;font-size:0.78rem;font-weight:700;cursor:pointer">목록 ▾</button>
+          </div>
+        </div>
+        <div id="clear-list" style="display:none;max-height:160px;overflow-y:auto;background:rgba(0,0,0,0.25);border-radius:8px;border:1px solid rgba(212,175,55,0.2)"></div>
+      </div>
+
+      <button class="export-btn" id="export-btn">📤 학습결과 내보내기</button>
+      <div class="brand-logo">1행2필</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ 비밀번호 모달 ════════ -->
+<div class="modal-backdrop" id="pw-modal">
+  <div class="modal-box" style="max-width:370px;text-align:center">
+    <h2 style="border:none;text-align:center">🔒 교수자 인증</h2>
+    <p style="color:var(--text-sub);font-size:0.9rem;margin:0 0 14px 0">관리 콘솔 접근 비밀번호를 입력하세요.</p>
+    <input type="password" id="pw-input" placeholder="비밀번호" style="width:100%;background:rgba(0,0,0,0.3);border:1px solid #4b5563;color:#fff;padding:13px;border-radius:8px;font-size:16px;text-align:center;letter-spacing:2px;margin-bottom:10px;outline:none">
+    <div id="pw-err" style="color:var(--red);font-size:0.83rem;font-weight:700;min-height:16px;margin-bottom:11px"></div>
+    <div style="display:flex;gap:9px">
+      <button class="btn-primary" id="pw-submit-btn">확인</button>
+      <button class="btn-ghost" style="padding:10px 16px" id="pw-cancel-btn">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ 관리자 콘솔 ════════ -->
+<div class="modal-backdrop" id="admin-modal">
+  <div class="modal-box">
+    <h2>🛠️ 교수자 전용 마스터 관리 콘솔</h2>
+
+    <!-- 과목 관리 -->
+    <div class="sec" style="margin-bottom:16px">
+      <h4>📚 과목 관리</h4>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="new-subj-input" placeholder="새 과목명 (예: 변시 행정법)" style="flex:1;background:rgba(0,0,0,0.2);border:1px solid #4b5563;color:#fff;padding:9px;border-radius:6px;font-size:15px;outline:none">
+        <button class="btn-ghost" id="add-subj-btn">+ 추가</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px" id="subj-pills"></div>
+    </div>
+
+    <div class="admin-grid">
+      <!-- 일괄 등록 -->
+      <div class="sec">
+        <h4>📥 일괄 등록 (txt)</h4>
+        <p style="font-size:0.79rem;color:var(--text-sub);margin:0 0 11px 0">각 문항은 <b>===</b> 줄로 구분합니다. 양식 파일을 참고하세요. 선택 과목의 <b>1단계(POOL)</b>에 등록됩니다.</p>
+        <div class="fg"><label>과목 선택</label><select id="bulk-subj"></select></div>
+        <div class="fg"><input type="file" id="bulk-file" accept=".txt"></div>
+        <button class="btn-primary" id="bulk-upload-btn">파일 업로드 및 일괄 등록</button>
+        <button class="btn-ghost" style="margin-top:7px;width:100%" id="template-btn">📄 양식 파일 다운로드</button>
+        <div id="bulk-result" style="font-size:0.79rem;color:var(--text-sub);margin-top:9px;line-height:1.6"></div>
+      </div>
+
+      <!-- 단일 등록 -->
+      <div class="sec">
+        <h4>➕ 단일 문항 직접 등록</h4>
+        <div class="fg"><label>과목 선택</label><select id="single-subj"></select></div>
+        <div class="fg"><label>단원 <span style="font-size:0.73rem;color:var(--text-sub)">(선택)</span></label><input type="text" id="single-unit" placeholder="예) 제1절 통치행위"></div>
+        <div class="fg"><label>주제 <span style="font-size:0.73rem;color:var(--text-sub)">(선택)</span></label><input type="text" id="single-topic" placeholder="예) 통치행위"></div>
+        <div class="fg"><label>사례 지문 <span style="font-size:0.73rem;color:var(--text-sub)">(선택 — 없으면 비워두세요)</span></label><textarea id="single-case" rows="3" placeholder="예) 甲은 A시장으로부터 식품위생법 위반을 이유로 영업정지 30일 처분을 받았다..."></textarea></div>
+        <div class="fg"><label>발문 (문제)</label><textarea id="single-q" rows="2" placeholder="예) 다음 중 甲이 취할 수 있는 불복 수단으로 옳지 않은 것은?"></textarea></div>
+        <div class="fg">
+          <label>선지 <span style="font-size:0.75rem;color:var(--text-sub)">(정답 ● 선택)</span></label>
+          <div id="mc-choices"></div>
+          <button class="btn-ghost" style="margin-top:5px;width:100%" id="add-choice-btn">+ 선지 추가</button>
+        </div>
+        <div class="fg"><label>해설 / 암기포인트 (선택)</label><input type="text" id="single-exp" placeholder="예) 💡 행정지도는 비권력적 사실행위  📖 p.42"></div>
+        <button class="btn-primary" id="single-submit-btn">문항 등록</button>
+      </div>
+    </div>
+
+    <!-- 문제 목록 관리 -->
+    <div class="sec" style="margin-bottom:16px">
+      <h4>🗂️ 등록 문제 관리 (수정 · 삭제)</h4>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <select id="mng-subj" style="flex:1;background:rgba(0,0,0,0.2);border:1px solid #4b5563;color:#fff;padding:8px;border-radius:6px;font-size:15px;min-width:140px"></select>
+        <select id="mng-stage" style="flex:1;background:rgba(0,0,0,0.2);border:1px solid #4b5563;color:#fff;padding:8px;border-radius:6px;font-size:15px;min-width:100px">
+          <option value="all">전체 단계</option>
+          <option value="1">1단계</option><option value="2">2단계</option><option value="3">3단계</option>
+          <option value="4">4단계</option><option value="5">5단계</option><option value="6">6단계</option>
+        </select>
+      </div>
+      <div id="mng-list" style="max-height:280px;overflow-y:auto"></div>
+    </div>
+
+    <!-- 리포트 -->
+    <div class="sec" style="background:rgba(255,8,68,0.08);border-color:rgba(255,8,68,0.25);margin-bottom:16px">
+      <h4 style="color:#ffb199">🎯 단계별 리포트 센터</h4>
+      <p style="font-size:0.82rem;color:var(--text-sub);margin:0 0 10px 0">과목 「<span id="rpt-subj-name">-</span>」의 문항을 리포팅합니다.</p>
+      <div class="fg" style="margin-bottom:10px"><select id="rpt-stage">
+        <option value="1">1단계 (포승줄 · 오답 잔류)</option>
+        <option value="2">2단계</option><option value="3">3단계</option>
+        <option value="4">4단계</option><option value="5">5단계</option>
+        <option value="6">6단계 (마스터 직전)</option>
+        <option value="all">전체 단계</option>
+      </select></div>
+      <div class="share-grid">
+        <button class="share-btn" style="background:#fa8231" id="rpt-print-btn">🖨 인쇄</button>
+        <button class="share-btn" style="background:#34495e" id="rpt-dl-btn">💾 다운로드</button>
+        <button class="share-btn" style="background:#6c5ce7" id="rpt-mail-btn">📋 클립보드 복사</button>
+        <button class="share-btn" style="background:#00b894" id="rpt-share-btn">📝 txt 미리보기</button>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-footer" style="background:#4b7bec;color:#fff" id="backup-export-btn">💾 전체 백업(.json)</button>
+      <button class="btn-footer" style="background:#8854d0;color:#fff" id="backup-import-btn">📂 백업 불러오기</button>
+      <button class="btn-footer" style="background:var(--red);color:#fff" id="reset-all-btn">🚨 전체 초기화</button>
+      <button class="btn-footer" style="background:#a5b1c2;color:#000" id="admin-close-btn">🔒 닫기</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════ AI 대화창 모달 ════════ -->
+<div class="modal-backdrop" id="chat-modal">
+  <div class="modal-box chat-modal-box">
+    <div class="chat-header">
+      <div>
+        <h2>💬 AI 학습도우미</h2>
+        <div class="chat-header-sub">현재 문제·단계 맥락을 반영합니다</div>
+      </div>
+      <button class="chat-close-btn" id="chat-close-btn">✕</button>
+    </div>
+
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg msg-ai" style="background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.35);color:#a87f2e;">📢 <b>AI 대화창 준비 중</b><br>현재 AI 대화 기능은 준비 중입니다. 곧 활성화될 예정이니 조금만 기다려 주세요. 😊</div>
+    </div>
+
+    <!-- 빠른 질문 버튼 -->
+    <div class="chat-quick" id="chat-quick" style="display:none!important">
+      <button class="quick-btn" data-q="지금 문제를 다시 설명해줘">📋 현재 문제 설명</button>
+      <button class="quick-btn" data-q="정답이 왜 그 번호인지 설명해줘">🎯 정답 근거</button>
+      <button class="quick-btn" data-q="이 주제에서 자주 출제되는 판례를 알려줘">⚖️ 관련 판례</button>
+      <button class="quick-btn" data-q="헷갈리는 유사 개념과 비교해줘">🔀 유사 개념 비교</button>
+      <button class="quick-btn" data-q="이 문제를 변시 수준으로 심화해줘">🔥 심화 해설</button>
+    </div>
+
+    <div class="chat-input-row">
+      <textarea class="chat-input" id="chat-input" placeholder="현재 AI 대화 기능 준비 중입니다." rows="1" disabled style="opacity:0.45;cursor:not-allowed;"></textarea>
+      <button class="chat-send-btn" id="chat-send-btn" disabled style="opacity:0.35;cursor:not-allowed;">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- 숨겨진 백업 파일 인풋 -->
+<input type="file" id="backup-file-input" accept=".json" style="display:none">
+
+<!-- ════════ 문제 수정 모달 ════════ -->
+<div class="modal-backdrop" id="edit-modal">
+  <div class="modal-box edit-modal-box">
+    <h2>✏️ 문항 수정</h2>
+    <input type="hidden" id="edit-subj">
+    <input type="hidden" id="edit-stage">
+    <input type="hidden" id="edit-idx">
+    <div style="display:flex;gap:8px">
+      <div class="fg" style="flex:1"><label>단원</label><input type="text" id="edit-unit" placeholder="예) 제1절 통치행위"></div>
+      <div class="fg" style="flex:1"><label>주제</label><input type="text" id="edit-topic" placeholder="예) 통치행위"></div>
+    </div>
+    <div class="fg"><label>사례 지문 <span style="font-size:0.73rem;color:var(--text-sub)">(없으면 비워두세요)</span></label><textarea id="edit-case" rows="3" placeholder="사례 지문이 있는 경우 입력..."></textarea></div>
+    <div class="fg"><label>발문 (문제)</label><textarea id="edit-q" rows="3"></textarea></div>
+    <div class="fg">
+      <label>선지 <span style="font-size:0.75rem;color:var(--text-sub)">(정답 ● 선택)</span></label>
+      <div id="edit-mc-choices"></div>
+      <button class="btn-ghost" style="margin-top:5px;width:100%" id="edit-add-choice-btn">+ 선지 추가</button>
+    </div>
+    <div class="fg"><label>정답 (선지에서 ● 선택됨 / 또는 직접 입력)</label><input type="text" id="edit-a" placeholder="예) 3번"></div>
+    <div class="fg"><label>해설 / 암기포인트</label><input type="text" id="edit-exp"></div>
+    <div style="display:flex;gap:9px;margin-top:10px">
+      <button class="btn-primary" id="edit-save-btn">저장</button>
+      <button class="btn-ghost" style="padding:10px 18px" id="edit-cancel-btn">취소</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+// 설정
+// ════════════════════════════════════════════
+var ADMIN_PASS = '1행2필';
+var LS_DB      = 'iq_db_v1';
+var LS_META    = 'iq_meta_v1';
+var STAGE_CAP  = {1:'무제한', 2:20, 3:30, 4:40, 5:60, 6:80};
+var STAGE_CLR  = {1:'#ff0844',2:'#ffb199',3:'#f6d365',4:'#4facfe',5:'#00f2fe',6:'#a18cd1'};
+var STAGE_LEAVE= {1:0, 2:5, 3:8, 4:10, 5:15, 6:0};
+var SCORE_LOG  = [];  // {q, correct, stage, ts}
+
+// ════════════════════════════════════════════
+// 상태
+// ════════════════════════════════════════════
+var DB          = {};   // DB[subj] = {1:[],2:[],...,6:[], ever:{2:f,...}}
+var SUBJECTS    = [];
+var activeSubj  = null;
+var activeStage = 1;
+var curItem     = null;
+var editMcCount = 0;
+var singleMcCnt = 0;
+
+// ════════════════════════════════════════════
+// 저장 / 불러오기
+// ════════════════════════════════════════════
+function saveLS(){
+  try{
+    localStorage.setItem(LS_DB, JSON.stringify(DB));
+    localStorage.setItem(LS_META, JSON.stringify({subjects:SUBJECTS, active:activeSubj, stage:activeStage}));
+  }catch(e){}
+}
+function saveAll(){
+  saveLS();
+  try{
+    if(window.storage && window.storage.set){
+      window.storage.set(LS_DB, JSON.stringify(DB));
+      window.storage.set(LS_META, JSON.stringify({subjects:SUBJECTS, active:activeSubj, stage:activeStage}));
+    }
+  }catch(e){}
+}
+async function boot(){
+  var loaded = loadLocal();
+  if(!loaded){
+    try{
+      var r1=await window.storage.get(LS_DB), r2=await window.storage.get(LS_META);
+      if(r1&&r1.value&&r2&&r2.value) loaded={db:JSON.parse(r1.value), meta:JSON.parse(r2.value)};
+    }catch(e){}
+  }
+  if(loaded){ DB=loaded.db||{}; SUBJECTS=loaded.meta.subjects||[]; activeSubj=loaded.meta.active||null; activeStage=loaded.meta.stage||1; }
+  if(!activeSubj || SUBJECTS.indexOf(activeSubj)<0) activeSubj = SUBJECTS[0]||null;
+  SUBJECTS.forEach(function(s){ if(!DB[s]) initDB(s); });
+  /* ── 채팅 히스토리 복원 ── */
+  (function(){
+    var ts=parseInt(localStorage.getItem(CHAT_TS_KEY)||'0');
+    var expired=ts&&(Date.now()-ts>24*60*60*1000);
+    var saved=loadChatHistory();
+    var box=document.getElementById('chat-messages');
+    if(!box) return;
+    if(expired||!saved||!saved.length){
+      if(expired){
+        var n=document.createElement('div'); n.className='msg msg-ai';
+        n.style.cssText='background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);font-size:0.82rem;color:#a87f2e;';
+        n.textContent='📢 24시간이 경과하여 이전 대화 기록이 자동 소멸되었습니다.';
+        box.appendChild(n);
+      }
+    } else {
+      chatHistory=saved;
+      saved.forEach(function(m){
+        var d=document.createElement('div');
+        d.className='msg '+(m.role==='user'?'msg-user':'msg-ai');
+        d.textContent=m.content;
+        box.appendChild(d);
+      });
+      var remain=Math.ceil((24*60*60*1000-(Date.now()-ts))/3600000);
+      var n=document.createElement('div'); n.className='msg msg-ai';
+      n.style.cssText='font-size:0.78rem;color:var(--text-sub);';
+      n.textContent='📢 대화 기록 복원됨 — 약 '+remain+'시간 후 자동 소멸';
+      box.appendChild(n); box.scrollTop=box.scrollHeight;
+    }
+  })();
+
+  window.addEventListener('pagehide', saveLS);
+  window.addEventListener('beforeunload', saveLS);
+  document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='hidden') saveLS(); });
+  render();
+}
+function loadLocal(){
+  try{
+    var d=localStorage.getItem(LS_DB), m=localStorage.getItem(LS_META);
+    if(d&&m) return {db:JSON.parse(d), meta:JSON.parse(m)};
+  }catch(e){}
+  return null;
+}
+function initDB(s){ DB[s]={1:[],2:[],3:[],4:[],5:[],6:[],clear:[],ever:{2:false,3:false,4:false,5:false,6:false}}; }
+function cDB(){ if(!DB[activeSubj]) initDB(activeSubj); var d=DB[activeSubj]; if(!d.ever) d.ever={2:false,3:false,4:false,5:false,6:false}; if(!d.clear) d.clear=[]; return d; }
+
+// ════════════════════════════════════════════
+// 전체 렌더
+// ════════════════════════════════════════════
+function render(){
+  renderSubjectBar();
+  buildStageTabs();
+  renderGauges();
+  renderClearStack();
+  renderQuestion();
+  refreshTotal();
+}
+
+// ════════════════════════════════════════════
+// 과목 바
+// ════════════════════════════════════════════
+function renderSubjectBar(){
+  var bar = document.getElementById('subject-bar');
+  if(SUBJECTS.length===0){
+    bar.innerHTML='<span class="no-subject-msg">⬆ 교수자 관리 → 과목을 추가해 주세요.</span>';
+    return;
+  }
+  var html='<span class="subject-label">과목</span>';
+  SUBJECTS.forEach(function(s){
+    var n=totalInSubj(s);
+    html+='<button class="subject-tab'+(s===activeSubj?' active':'')+'" data-s="'+escAttr(s)+'">'+escHtml(s)+'<span class="scount">'+n+'</span></button>';
+  });
+  bar.innerHTML=html;
+  bar.querySelectorAll('.subject-tab').forEach(function(btn){
+    btn.addEventListener('click', function(){ switchSubj(this.dataset.s); });
+  });
+}
+function totalInSubj(s){ var db=DB[s]||{}; var n=0; for(var i=1;i<=6;i++) if(db[i]) n+=db[i].length; return n; }
+function switchSubj(s){ activeSubj=s; activeStage=1; saveAll(); render(); }
+
+function refreshTotal(){
+  var t=0; SUBJECTS.forEach(function(s){ t+=totalInSubj(s); });
+  document.getElementById('total-count').textContent=t;
+}
+
+// ════════════════════════════════════════════
+// 단계 탭
+// ════════════════════════════════════════════
+function isLocked(st){
+  // 1단계는 항상 열림
+  if(st===1||!activeSubj) return false;
+  var db=cDB();
+  var cnt=db[st].length;
+  var cap=STAGE_CAP[st]; // 숫자
+
+  // ① 해당 단계에 문제가 있으면 → 열림 (학습 가능)
+  if(cnt>0) return false;
+
+  // ② 해당 단계가 비어있으면 → 잠금 (아직 문제가 올라오지 않음)
+  return true;
+}
+
+// 단계 이동 가능 여부 (1단계 정답 시 다음 단계로 올릴 수 있는가)
+function canPromote(fromStage){
+  if(!activeSubj) return false;
+  var db=cDB();
+  var nextSt=fromStage+1;
+  if(nextSt>6) return true; // 6단계 → CLEAR STACK
+  var cap=STAGE_CAP[nextSt];
+  // 다음 단계가 가득 찼으면 → 올릴 수 없음 (비워야 함)
+  if(typeof cap==='number' && db[nextSt].length>=cap) return false;
+  return true;
+}
+function updateEver(){
+  if(!activeSubj) return;
+  var db=cDB();
+  for(var i=2;i<=6;i++){ if(typeof STAGE_CAP[i]==='number' && db[i].length>=STAGE_CAP[i]) db.ever[i]=true; }
+}
+function buildStageTabs(){
+  updateEver();
+  var ct=document.getElementById('stage-tabs');
+  if(!activeSubj||SUBJECTS.length===0){ ct.innerHTML=''; return; }
+  var db=cDB(); var html='';
+  for(var i=1;i<=6;i++){
+    var lk=isLocked(i); var cnt=db[i].length;
+    var capTxt=STAGE_CAP[i]==='무제한'?'∞':STAGE_CAP[i];
+    var cls='stage-tab'+(i===activeStage?' active':'')+(lk?' locked':'');
+    html+='<button class="'+cls+'" data-st="'+i+'">'+i+'단계 <b>'+cnt+(STAGE_CAP[i]==='무제한'?'':'/'+capTxt)+'</b></button>';
+  }
+  ct.innerHTML=html;
+  ct.querySelectorAll('.stage-tab:not(.locked)').forEach(function(btn){
+    btn.addEventListener('click', function(){ switchStage(+this.dataset.st); });
+  });
+}
+function switchStage(st){
+  if(isLocked(st)){ anim('🔒 아직 잠긴 단계','#a8b2d1'); return; }
+  activeStage=st; saveAll(); buildStageTabs(); renderQuestion();
+}
+
+// ════════════════════════════════════════════
+// 게이지
+// ════════════════════════════════════════════
+function renderGauges(){
+  var zone=document.getElementById('gauge-area');
+  var db=(activeSubj&&SUBJECTS.length>0)?cDB():null;
+  var html='';
+  for(var i=1;i<=6;i++){
+    var cnt=db?db[i].length:0; var cap=STAGE_CAP[i];
+    var pct,lbl;
+    if(i===1){ pct=cnt>0?100:0; lbl=cnt+' (∞)'; }
+    else{ pct=Math.min(100,Math.round(cnt/cap*100)); lbl=cnt+'/'+cap; }
+    var inf=(i===1)?' inf':'';
+    html+='<div class="gauge-row"><div class="gauge-labels"><span>'+i+'단계</span><span style="color:'+STAGE_CLR[i]+'">'+lbl+'</span></div>'
+      +'<div class="gauge-bar"><div class="gauge-fill'+inf+'" style="width:'+pct+'%;background:'+STAGE_CLR[i]+'"></div></div></div>';
+  }
+  zone.innerHTML=html;
+}
+
+function renderClearStack(){
+  var db=(activeSubj&&SUBJECTS.length>0)?cDB():null;
+  var cleared=db?( db.clear||[]):[];
+  document.getElementById('clear-count').textContent=cleared.length;
+
+  var listEl=document.getElementById('clear-list');
+  if(!cleared.length){
+    listEl.innerHTML='<div style="text-align:center;color:var(--text-sub);font-size:0.8rem;padding:12px">아직 마스터한 문제가 없습니다.</div>';
+    return;
+  }
+  listEl.innerHTML=cleared.map(function(item,i){
+    var d=new Date(item.ts);
+    var ds=d.getMonth()+1+'/'+(d.getDate())+' '+(d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes();
+    return '<div style="padding:8px 10px;border-bottom:1px solid rgba(212,175,55,0.12);cursor:pointer" class="cs-item" data-i="'+i+'">'
+      +'<div style="font-size:0.82rem;font-weight:700;color:#fff;line-height:1.35">'+escHtml((item.q||'').slice(0,45))+(item.q&&item.q.length>45?'…':'')+'</div>'
+      +'<div style="font-size:0.73rem;color:var(--gold);margin-top:2px">정답: '+escHtml(item.a||'')+'&nbsp;·&nbsp;'+ds+'</div>'
+      +'</div>';
+  }).reverse().join(''); // 최신 순
+}
+
+// ════════════════════════════════════════════
+// 문제 렌더
+// ════════════════════════════════════════════
+function renderQuestion(){
+  var qc=document.getElementById('q-content');
+  var cw=document.getElementById('choices-wrap');
+  var ac=document.getElementById('a-card'), al=document.getElementById('a-label'), av=document.getElementById('a-content');
+  var ec=document.getElementById('e-card'), el=document.getElementById('e-label'), ev=document.getElementById('e-content');
+  var ctrl=document.getElementById('ctrl-panel');
+
+  // 기본 상태 리셋
+  al.style.display='none'; el.style.display='none';
+  cw.style.display='none'; cw.innerHTML='';
+  ec.className='card explanation-card blind';
+
+  if(!activeSubj||SUBJECTS.length===0){
+    qc.textContent='⬆ 교수자 관리에서 과목과 문제를 등록하세요.';
+    ac.style.display='none'; ctrl.style.display='flex'; return;
+  }
+
+  var db=cDB();
+  if(db[activeStage] && db[activeStage].length>0){
+    curItem=db[activeStage][0];
+    // 사례 지문 처리
+    var caseWrap=document.getElementById('case-box-wrap');
+    var caseContent=document.getElementById('case-content');
+    if(curItem.case&&curItem.case.trim()){
+      caseContent.textContent=curItem.case;
+      caseWrap.style.display='block';
+    }else{
+      caseWrap.style.display='none';
+    }
+    qc.textContent=curItem.q;
+
+    if(curItem.type==='mc' && curItem.choices){
+      // 객관식
+      cw.style.display='flex';
+      cw.innerHTML=curItem.choices.map(function(ch,i){
+        return '<button class="choice-btn" data-i="'+i+'" data-ok="'+(ch.correct?1:0)+'">'
+          +'<span class="cnum">'+(i+1)+'</span><span>'+escHtml(ch.t)+'</span></button>';
+      }).join('');
+      cw.querySelectorAll('.choice-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){ pickChoice(this, +this.dataset.ok); });
+      });
+      ac.style.display='none';
+      ctrl.style.display='none';
+      ev.textContent='💡 정답 선택 후 해설이 표시됩니다.';
+    }else{
+      // 단답형
+      ac.style.display='flex';
+      ac.className='card answer-card blind';
+      av.textContent='✨ 탭하여 정답 확인하기';
+      ev.textContent='💡 탭하여 해설/암기포인트 확인하기';
+      ctrl.style.display='flex';
+      ctrl.innerHTML='<button class="btn-action btn-correct" id="btn-ok">🔥 정답 (Level Up!)</button><button class="btn-action btn-wrong" id="btn-ng">💀 오답 (포승줄 회귀)</button>';
+      document.getElementById('btn-ok').addEventListener('click',function(){engine(true);});
+      document.getElementById('btn-ng').addEventListener('click',function(){engine(false);});
+    }
+  }else{
+    curItem=null;
+    document.getElementById('case-box-wrap').style.display='none';
+    qc.textContent=activeStage+'단계에 등록된 문제가 없습니다. 다른 단계를 선택하거나 문제를 추가하세요.';
+    ac.style.display='none'; cw.style.display='none';
+    ctrl.style.display='flex';
+    ctrl.innerHTML='<button class="btn-action btn-correct" id="btn-ok">🔥 정답 (Level Up!)</button><button class="btn-action btn-wrong" id="btn-ng">💀 오답 (포승줄 회귀)</button>';
+    document.getElementById('btn-ok').addEventListener('click',function(){engine(true);});
+    document.getElementById('btn-ng').addEventListener('click',function(){engine(false);});
+    ev.textContent='ㅡ'; ec.className='card explanation-card blind';
+  }
+}
+
+function toggleBlind(){
+  if(!curItem||curItem.type==='mc') return;
+  var ac=document.getElementById('a-card'), al=document.getElementById('a-label'), av=document.getElementById('a-content');
+  var ec=document.getElementById('e-card'), el=document.getElementById('e-label'), ev=document.getElementById('e-content');
+  if(ac.classList.contains('blind')){
+    ac.className='card answer-card unblind'; av.textContent=curItem.a; al.style.display='block';
+    ec.className='card explanation-card unblind'; ev.textContent=curItem.exp||'별도 해설 없음.'; el.style.display='block';
+  }else{
+    ac.className='card answer-card blind'; av.textContent='✨ 탭하여 정답 확인하기'; al.style.display='none';
+    ec.className='card explanation-card blind'; ev.textContent='💡 탭하여 해설/암기포인트 확인하기'; el.style.display='none';
+  }
+}
+
+function pickChoice(btn, isOk){
+  if(!curItem) return;
+  var wrap=document.getElementById('choices-wrap');
+  if(wrap.querySelector('.correct,.wrong')) return; // 이미 판정됨
+  wrap.querySelectorAll('.choice-btn').forEach(function(b){
+    b.disabled=true;
+    if(curItem.choices[+b.dataset.i].correct) b.classList.add('correct');
+  });
+  if(!isOk) btn.classList.add('wrong');
+  // 해설 표시
+  var ec=document.getElementById('e-card'), el=document.getElementById('e-label'), ev=document.getElementById('e-content');
+  ec.className='card explanation-card unblind'; el.style.display='block';
+  ev.textContent=curItem.exp||'별도 해설 없음.';
+  // 다음 버튼
+  var ctrl=document.getElementById('ctrl-panel'); ctrl.style.display='flex';
+  var lbl=isOk?'✅ 정답!  다음 문제 →':'💀 오답 — 다음 문제 →';
+  var col=isOk?'var(--correct-grad)':'var(--wrong-grad)';
+  ctrl.innerHTML='<button class="btn-action" style="background:'+col+';flex:1">'+lbl+'</button>';
+  ctrl.querySelector('button').addEventListener('click',function(){ engine(!!isOk); });
+  // 로그
+  SCORE_LOG.push({q:(curItem.q||'').slice(0,40), correct:!!isOk, stage:activeStage, ts:Date.now()});
+}
+
+// ════════════════════════════════════════════
+// 엔진 (단계 이동)
+// ════════════════════════════════════════════
+function engine(isOk){
+  if(!curItem) return;
+  var db=cDB();
+  var popped=db[activeStage].shift();
+  SCORE_LOG.push({q:(popped.q||'').slice(0,40), correct:isOk, stage:activeStage, ts:Date.now()});
+  if(isOk){
+    if(activeStage===6){
+      db.clear.push({q:popped.q, a:popped.a, ts:Date.now()});
+      anim('🎉 마스터!','#00f2fe');
+    }
+    else if(!canPromote(activeStage)){
+      // 다음 단계가 가득 참 → 1단계로 임시 보류
+      db[1].push(popped);
+      anim('🔒 '+( activeStage+1)+'단계 FULL! 비워주세요','#f6d365');
+    }
+    else{ db[activeStage+1].push(popped); anim('✨ Level Up!','#00f2fe'); }
+  }else{
+    db[1].push(popped); anim('💀 포승줄!','var(--red)');
+  }
+  updateEver(); saveAll(); renderSubjectBar(); buildStageTabs(); renderGauges(); renderClearStack(); refreshTotal();
+  setTimeout(function(){
+    if(db[activeStage].length===0){
+      for(var i=1;i<=6;i++){ if(db[i].length>0 && !isLocked(i)){ activeStage=i; buildStageTabs(); break; } }
+    }
+    renderQuestion();
+  }, 1050);
+}
+
+function anim(txt, col){
+  var el=document.getElementById('anim-overlay');
+  el.textContent=txt; el.style.color=col;
+  el.classList.remove('anim-go'); void el.offsetWidth; el.classList.add('anim-go');
+}
+
+// ════════════════════════════════════════════
+// 학습결과 내보내기
+// ════════════════════════════════════════════
+function exportResult(){
+  var name=(document.getElementById('learner-name').value||'미입력').trim();
+  if(SCORE_LOG.length===0){ alert('아직 학습 기록이 없습니다.'); return; }
+  var ok=SCORE_LOG.filter(function(x){return x.correct;}).length;
+  var ng=SCORE_LOG.length-ok;
+  var pct=Math.round(ok/SCORE_LOG.length*100);
+  var txt='[1행2필 선택형 학습엔진 — 학습결과]\n';
+  txt+='학습자: '+name+'\n';
+  txt+='과목: '+(activeSubj||'-')+'\n';
+  txt+='일시: '+new Date().toLocaleString('ko-KR')+'\n\n';
+  txt+='정답: '+ok+'문항 / 오답: '+ng+'문항 / 정답률: '+pct+'%\n\n';
+  txt+='── 상세 기록 ──\n';
+  SCORE_LOG.forEach(function(r,i){
+    txt+=(i+1)+'. ['+(r.correct?'O':'X')+'] '+r.q+' ('+r.stage+'단계)\n';
+  });
+  var fname='학습결과_'+name+'_'+(activeSubj||'전체')+'.txt';
+  dlBlob(fname, txt, 'text/plain;charset=utf-8');
+}
+
+// ════════════════════════════════════════════
+// 관리자 콘솔
+// ════════════════════════════════════════════
+function openAdmin(){
+  document.getElementById('pw-modal').classList.add('on');
+  setTimeout(function(){ var el=document.getElementById('pw-input'); if(el){el.value='';el.focus();} },120);
+  document.getElementById('pw-err').textContent='';
+}
+function submitPw(){
+  var pw=document.getElementById('pw-input').value;
+  if(pw===ADMIN_PASS){
+    document.getElementById('pw-modal').classList.remove('on');
+    document.getElementById('admin-modal').classList.add('on');
+    refreshAdminUI();
+    if(document.getElementById('mc-choices').children.length===0) resetSingleChoices();
+  }else{
+    document.getElementById('pw-err').textContent='비밀번호가 일치하지 않습니다.';
+  }
+}
+function closeAdmin(){ document.getElementById('admin-modal').classList.remove('on'); }
+function refreshAdminUI(){
+  var opts=SUBJECTS.map(function(s){return '<option value="'+escAttr(s)+'">'+escHtml(s)+'</option>';}).join('');
+  ['bulk-subj','single-subj','mng-subj'].forEach(function(id){
+    var el=document.getElementById(id); if(el){ el.innerHTML=opts; if(activeSubj) el.value=activeSubj; }
+  });
+  document.getElementById('rpt-subj-name').textContent=activeSubj||'-';
+  renderSubjPills();
+  renderMngList();
+}
+
+// 과목 pill
+function renderSubjPills(){
+  var box=document.getElementById('subj-pills');
+  box.innerHTML=SUBJECTS.map(function(s){
+    var n=totalInSubj(s);
+    return '<div class="subj-pill">'+escHtml(s)+' <span style="color:var(--text-sub)">('+n+')</span>'
+      +'<button class="del-x" data-s="'+escAttr(s)+'">×</button></div>';
+  }).join('');
+  box.querySelectorAll('.del-x').forEach(function(btn){
+    btn.addEventListener('click', function(){ delSubj(this.dataset.s); });
+  });
+}
+function addSubj(){
+  var inp=document.getElementById('new-subj-input'); var name=inp.value.trim();
+  if(!name) return alert('과목명을 입력하세요.');
+  if(SUBJECTS.indexOf(name)>=0) return alert('이미 있는 과목입니다.');
+  SUBJECTS.push(name); initDB(name); if(!activeSubj) activeSubj=name;
+  inp.value=''; saveAll(); renderSubjectBar(); refreshAdminUI();
+}
+function delSubj(name){
+  if(!confirm('"'+name+'" 과목과 모든 문제를 삭제합니다. 계속하시겠습니까?')) return;
+  SUBJECTS=SUBJECTS.filter(function(s){return s!==name;}); delete DB[name];
+  if(activeSubj===name) activeSubj=SUBJECTS[0]||null;
+  saveAll(); render(); refreshAdminUI();
+}
+
+// ── 단일 등록 선지
+function addSingleChoice(txt, isCorrect){
+  if(singleMcCnt>=8){ alert('선지는 최대 8개입니다.'); return; }
+  singleMcCnt++;
+  var n=singleMcCnt;
+  var row=document.createElement('div'); row.className='mc-row';
+  row.innerHTML='<div class="cn">'+n+'</div>'
+    +'<input type="text" class="mc-text" placeholder="선지 '+n+'" value="'+(txt||'')+'">'
+    +'<label class="radio-wrap"><input type="radio" name="sc-correct" '+(isCorrect?'checked':'')+'>정답</label>';
+  document.getElementById('mc-choices').appendChild(row);
+}
+function resetSingleChoices(){
+  document.getElementById('mc-choices').innerHTML=''; singleMcCnt=0;
+  addSingleChoice();addSingleChoice();addSingleChoice();addSingleChoice();addSingleChoice();
+}
+function submitSingle(){
+  var subj=document.getElementById('single-subj').value;
+  if(!subj) return alert('과목을 먼저 선택하세요.');
+  var unit_=document.getElementById('single-unit')?document.getElementById('single-unit').value.trim():'';
+  var topic_=document.getElementById('single-topic')?document.getElementById('single-topic').value.trim():'';
+  var case_=document.getElementById('single-case')?document.getElementById('single-case').value.trim():'';
+  var q=document.getElementById('single-q').value.trim();
+  var exp=document.getElementById('single-exp').value.trim();
+  if(!q) return alert('문제를 입력하세요.');
+  if(!DB[subj]) initDB(subj);
+  var rows=document.querySelectorAll('#mc-choices .mc-row');
+  var choices=[]; var hasC=false;
+  rows.forEach(function(r){
+    var t=r.querySelector('.mc-text').value.trim();
+    var c=r.querySelector('input[type=radio]').checked;
+    if(t){ choices.push({t:t,correct:c}); if(c) hasC=true; }
+  });
+  if(choices.length<2) return alert('선지를 2개 이상 입력하세요.');
+  if(!hasC) return alert('정답 선지를 선택하세요.');
+  var ansNum=0; choices.forEach(function(c,i){ if(c.correct) ansNum=i+1; });
+  DB[subj][1].push({q:q, case:case_||'', unit:unit_||'', topic:topic_||'', type:'mc', choices:choices, a:ansNum+'번', exp:exp||'해설 없음'});
+  document.getElementById('single-q').value=''; document.getElementById('single-exp').value='';
+  if(document.getElementById('single-case')) document.getElementById('single-case').value='';
+  if(document.getElementById('single-unit')) document.getElementById('single-unit').value='';
+  if(document.getElementById('single-topic')) document.getElementById('single-topic').value='';
+  resetSingleChoices();
+  postInject(); alert('「'+subj+'」 1단계에 문항이 등록되었습니다.');
+}
+function postInject(){ saveAll(); render(); refreshAdminUI(); }
+
+// ── 일괄 등록
+function bulkUpload(){
+  var subj=document.getElementById('bulk-subj').value;
+  var resEl=document.getElementById('bulk-result');
+  if(!subj){ resEl.textContent='먼저 과목을 추가/선택하세요.'; return; }
+  var fi=document.getElementById('bulk-file');
+  if(!fi.files.length){ resEl.textContent='먼저 txt 파일을 선택하세요.'; return; }
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var parsed=parseBulk(e.target.result);
+    if(parsed.items.length===0){
+      resEl.innerHTML='⚠ 등록 가능한 문항이 없습니다. 양식을 확인해주세요.';
+      if(parsed.errors.length) resEl.innerHTML+='<br>'+parsed.errors.join('<br>');
+      return;
+    }
+    if(!DB[subj]) initDB(subj);
+    parsed.items.forEach(function(it){ DB[subj][1].push(it); });
+    var html='✅ '+parsed.items.length+'개 문항이 「'+escHtml(subj)+'」 1단계에 등록되었습니다.';
+    if(parsed.errors.length) html+='<br>⚠ '+parsed.errors.length+'개 블록 형식 오류로 제외:<br>'+parsed.errors.map(escHtml).join('<br>');
+    resEl.innerHTML=html;
+    postInject(); fi.value='';
+  };
+  reader.readAsText(fi.files[0],'UTF-8');
+}
+function parseBulk(text){
+  var blocks=text.split(/\n\s*={3,}\s*\n|\n{3,}/).map(function(b){return b.trim();}).filter(Boolean);
+  var items=[], errors=[];
+  blocks.forEach(function(block,idx){
+    function get(label){
+      var re=new RegExp(label+'\\s*[:：]\\s*([\\s\\S]*?)(?=\\n(?:단원|주제|사례|문제|선지|정답|해설)\\s*[:：]|$)');
+      var m=block.match(re); return m?m[1].trim():'';
+    }
+    var unit_=get('단원'), topic_=get('주제'), case_=get('사례'), q=get('문제'), choicesRaw=get('선지'), answerRaw=get('정답'), exp=get('해설');
+    if(!q||!choicesRaw){ errors.push('#'+(idx+1)+': 문제/선지 누락'); return; }
+    var lines=choicesRaw.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+    var choices=[]; var hasC=false; var correctIdx=-1;
+    var circleMap={'①':1,'②':2,'③':3,'④':4,'⑤':5};
+    lines.forEach(function(line,li){
+      var isC=false; var t=line;
+      if(t.charAt(0)==='*'){ isC=true; t=t.substring(1).trim(); }
+      // ①② 원문자 제거
+      t=t.replace(/^[①②③④⑤][).]?\s*/,'');
+      // 숫자) 또는 숫자. 제거
+      t=t.replace(/^\d+[.)]\s*/,'');
+      choices.push({t:t,correct:isC}); if(isC){hasC=true;correctIdx=li;}
+    });
+    if(!hasC && answerRaw){
+      var num=parseInt(answerRaw.replace(/[^0-9]/g,''));
+      if(num>=1&&num<=choices.length){ choices[num-1].correct=true; hasC=true; correctIdx=num-1; }
+    }
+    if(choices.length<2){ errors.push('#'+(idx+1)+': 선지 2개 이상 필요'); return; }
+    if(!hasC){ errors.push('#'+(idx+1)+': 정답 표시 없음 (* 또는 "정답: N")'); return; }
+    items.push({q:q, case:case_||'', unit:unit_||'', topic:topic_||'', type:'mc', choices:choices, a:(correctIdx+1)+'번', exp:exp||'해설 없음'});
+  });
+  return {items:items, errors:errors};
+}
+function downloadTemplate(){
+  var s=
+    // ─── 유형1: 순수 객관식 (사례 없음) ───
+    "※ [유형1] 순수 객관식 — 사례 없이 문제+선지만\n"
+   +"\n"
+   +"문제: 법률유보의 원칙에 관한 설명 중 옳지 않은 것은?\n"
+   +"선지:\n"
+   +"1) 급부행정 영역에서는 기본권침해 영역보다 위임의 구체성 요구가 다소 약화되어도 무방하다.\n"
+   +"2) 법률이 공법적 단체의 정관에 자치법적 사항을 위임한 경우 포괄위임금지원칙이 원칙적으로 적용되지 않는다.\n"
+   +"*3) 기본권 제한에 관한 법률유보원칙은 법률에 의한 규율만을 요청하므로 기본권 제한의 형식은 반드시 법률이어야 한다.\n"
+   +"4) 의회유보원칙상 국민의 기본권 실현에 관련된 본질적 사항은 입법자 스스로 결정하여야 한다.\n"
+   +"5) 시행령은 법률에 의한 위임 없이 법률이 규정한 권리·의무 내용을 변경·보충할 수 없다.\n"
+   +"해설: 💡 법률유보원칙은 법률에 의한 규율이 아닌 법률에 근거한 규율을 요청함. 위임입법 가능.\n"
+   +"정답: 3\n"
+   +"\n===\n\n"
+    // ─── 유형2: ㄱㄴㄷㄹ 보기형 (사례 없음) ───
+   +"※ [유형2] ㄱㄴㄷㄹ 보기형 — 사례란에 ㄱㄴㄷㄹ 지문 입력\n"
+   +"\n"
+   +"사례:\n"
+   +"ㄱ. 헌법재판소는 대통령의 긴급재정경제명령은 통치행위에 해당하므로 사법심사가 제한된다고 판시하였다.\n"
+   +"ㄴ. 헌법재판소는 대통령의 일반사병 이라크파병결정에 대하여 사법적 기준만으로 심판하는 것은 자제되어야 한다고 판시하였다.\n"
+   +"ㄷ. 대법원은 계엄선포의 당·부당을 판단할 권한은 사법부에 없다고 하여 비상계엄선포행위에 대한 사법심사를 거부한 바 있다.\n"
+   +"ㄹ. 대법원은 남북정상회담 개최과정에서 북한측에 송금한 행위 자체는 사법심사의 대상이 되지 않는다고 판시하였다.\n"
+   +"문제: 판례에 따를 경우 통치행위에 관한 설명으로 옳은 것만을 모두 고른 것은?\n"
+   +"선지:\n"
+   +"1) ㄱ, ㄴ\n"
+   +"2) ㄱ, ㄷ\n"
+   +"*3) ㄴ, ㄷ\n"
+   +"4) ㄴ, ㄹ\n"
+   +"5) ㄷ, ㄹ\n"
+   +"해설: 💡 ㄱ×(긴급재정경제명령도 기본권 침해 시 헌재 심판대상) ㄹ×(송금행위 자체는 사법심사 대상)\n"
+   +"정답: 3\n"
+   +"\n===\n\n"
+    // ─── 유형3: 사례형 객관식 ───
+   +"※ [유형3] 사례형 객관식 — 사례란에 사실관계, 문제란에 발문\n"
+   +"\n"
+   +"사례:\n"
+   +"甲은 2013. 3. 6. 산림 내에서의 토석채취허가신청을 하였는데 허가권자인 A는 2013. 4. 1. 인근 주민들의 동의서를 제출하지 않았다는 사유로 이를 반려하였다. 이에 甲은 서울행정법원에 위 반려처분의 취소를 구하는 소를 제기하였다.\n"
+   +"문제: 위 사례에 관한 설명 중 옳은 것은?\n"
+   +"선지:\n"
+   +"1) 행정처분의 존부는 자백의 대상이 되므로 당사자가 다투지 않으면 법원은 그대로 인정하여야 한다.\n"
+   +"2) 행정소송에서는 변론주의가 적용되지 않으므로 법원은 당사자 사이에 다툼 없는 사실도 증거로 확정해야 한다.\n"
+   +"*3) 법원은 처분 당시 행정청이 알고 있었던 자료뿐만 아니라 사실심 변론종결 당시까지 제출된 모든 자료를 종합하여 위법 여부를 판단할 수 있다.\n"
+   +"4) A가 소송 중 공익상 이유를 처분사유로 추가하는 것은 기본적 사실관계의 동일성이 있으므로 허용된다.\n"
+   +"5) 취소판결 확정 후 A는 변론종결 이후 발생한 새로운 사유를 내세워 다시 거부처분을 할 수 없다.\n"
+   +"해설: 💡 처분의 존부=직권조사사항·자백불가 / 변론주의 기본구조 유지 / 기속력 시적한계=처분시\n"
+   +"정답: 3\n"
+   +"\n"
+   +"──────────────────────────────────\n"
+   +"※ 등록 규칙\n"
+   +"· 문항 구분: === (빈 줄 포함)\n"
+   +"· 정답 선지 앞에 * 표시 (예: *3) ...) 또는 하단에 정답: 3 표시\n"
+   +"· 사례: 항목은 선택 (없으면 생략)\n"
+   +"· 유형2는 사례: 란에 ㄱㄴㄷㄹ 지문 입력\n"
+   +"· 해설: 항목은 선택 (없으면 생략)\n";
+  dlBlob('선택형_일괄등록_양식.txt', s, 'text/plain;charset=utf-8');
+}
+
+// ── 문제 목록·수정·삭제
+function renderMngList(){
+  var box=document.getElementById('mng-list'); if(!box) return;
+  var subj=document.getElementById('mng-subj').value||activeSubj;
+  var stF=document.getElementById('mng-stage').value;
+  if(!subj||!DB[subj]){ box.innerHTML='<div class="mlist-empty">과목을 선택하세요.</div>'; return; }
+  var rows=[];
+  for(var st=1;st<=6;st++){
+    if(stF!=='all' && +stF!==st) continue;
+    (DB[subj][st]||[]).forEach(function(item,idx){ rows.push({stage:st,idx:idx,item:item}); });
+  }
+  if(!rows.length){ box.innerHTML='<div class="mlist-empty">해당 조건에 등록된 문제가 없습니다.</div>'; return; }
+  box.innerHTML=rows.map(function(r,i){
+    return '<div class="mitem"><div class="mnum">'+(i+1)+'</div>'
+      +'<div class="mbody"><div class="mq">'+escHtml(r.item.q)+'</div>'
+      +'<div class="mmeta"><span class="mtag">'+r.stage+'단계</span><span class="mtag">객관식</span>정답: '+escHtml(r.item.a||'')+'</div></div>'
+      +'<div class="mactions">'
+      +'<button class="mbtn-edit" data-subj="'+escAttr(subj)+'" data-st="'+r.stage+'" data-idx="'+r.idx+'">수정</button>'
+      +'<button class="mbtn-del" data-subj="'+escAttr(subj)+'" data-st="'+r.stage+'" data-idx="'+r.idx+'">삭제</button>'
+      +'</div></div>';
+  }).join('');
+  box.querySelectorAll('.mbtn-edit').forEach(function(btn){
+    btn.addEventListener('click',function(){ openEditModal(this.dataset.subj,+this.dataset.st,+this.dataset.idx); });
+  });
+  box.querySelectorAll('.mbtn-del').forEach(function(btn){
+    btn.addEventListener('click',function(){ deleteQ(this.dataset.subj,+this.dataset.st,+this.dataset.idx); });
+  });
+}
+function deleteQ(subj,stage,idx){
+  if(!DB[subj]||!DB[subj][stage]) return;
+  var item=DB[subj][stage][idx]; if(!item) return;
+  if(!confirm('이 문제를 삭제할까요?\n\n'+item.q.slice(0,50))) return;
+  DB[subj][stage].splice(idx,1);
+  saveAll(); render(); refreshAdminUI();
+}
+
+// ── 수정 모달
+var editMcCnt=0;
+function openEditModal(subj,stage,idx){
+  var item=DB[subj][stage][idx]; if(!item) return;
+  document.getElementById('edit-subj').value=subj;
+  document.getElementById('edit-stage').value=stage;
+  document.getElementById('edit-idx').value=idx;
+  document.getElementById('edit-unit').value=item.unit||'';
+  document.getElementById('edit-topic').value=item.topic||'';
+  document.getElementById('edit-case').value=item.case||'';
+  document.getElementById('edit-q').value=item.q||'';
+  document.getElementById('edit-a').value=item.a||'';
+  document.getElementById('edit-exp').value=item.exp||'';
+  // 선지
+  document.getElementById('edit-mc-choices').innerHTML=''; editMcCnt=0;
+  (item.choices||[]).forEach(function(ch){ addEditChoice(ch.t, ch.correct); });
+  if(editMcCnt===0) addEditChoice();
+  document.getElementById('edit-modal').classList.add('on');
+}
+function addEditChoice(txt, isCorrect){
+  if(editMcCnt>=8){ alert('선지는 최대 8개입니다.'); return; }
+  editMcCnt++;
+  var n=editMcCnt;
+  var row=document.createElement('div'); row.className='mc-row';
+  row.innerHTML='<div class="cn">'+n+'</div>'
+    +'<input type="text" class="mc-text" placeholder="선지 '+n+'" value="'+escAttr(txt||'')+'">'
+    +'<label class="radio-wrap"><input type="radio" name="ec-correct" '+(isCorrect?'checked':'')+'>정답</label>';
+  document.getElementById('edit-mc-choices').appendChild(row);
+}
+function saveEdit(){
+  var subj=document.getElementById('edit-subj').value;
+  var stage=+document.getElementById('edit-stage').value;
+  var idx=+document.getElementById('edit-idx').value;
+  var editUnit=document.getElementById('edit-unit')?document.getElementById('edit-unit').value.trim():'';
+  var editTopic=document.getElementById('edit-topic')?document.getElementById('edit-topic').value.trim():'';
+  var editCase=document.getElementById('edit-case')?document.getElementById('edit-case').value.trim():'';
+  var q=document.getElementById('edit-q').value.trim();
+  var a=document.getElementById('edit-a').value.trim();
+  var exp=document.getElementById('edit-exp').value.trim();
+  if(!q) return alert('문제를 입력하세요.');
+  if(!DB[subj]||!DB[subj][stage]) return;
+  var rows=document.querySelectorAll('#edit-mc-choices .mc-row');
+  var choices=[]; var hasC=false; var ansNum=0;
+  rows.forEach(function(r,i){
+    var t=r.querySelector('.mc-text').value.trim();
+    var c=r.querySelector('input[type=radio]').checked;
+    if(t){ choices.push({t:t,correct:c}); if(c){hasC=true;ansNum=choices.length;} }
+  });
+  if(choices.length<2) return alert('선지를 2개 이상 입력하세요.');
+  if(!hasC && !a) return alert('정답 선지를 선택하거나 정답을 입력하세요.');
+  var finalA=hasC?(ansNum+'번'):a;
+  if(hasC) choices.forEach(function(c,i){ if(c.correct) finalA=(i+1)+'번'; });
+  DB[subj][stage][idx]={q:q, case:editCase||'', unit:editUnit||'', topic:editTopic||'', type:'mc', choices:choices, a:finalA, exp:exp||'해설 없음'};
+  // 현재 출제중이던 문제면 갱신
+  if(subj===activeSubj && stage===activeStage && idx===0) curItem=null;
+  saveAll(); render(); refreshAdminUI();
+  document.getElementById('edit-modal').classList.remove('on');
+  alert('수정되었습니다.');
+}
+
+// ── 리포트
+function getReportItems(){
+  if(!activeSubj) return [];
+  var sel=document.getElementById('rpt-stage').value;
+  var db=cDB(); var arr=[];
+  if(sel==='all'){ for(var i=1;i<=6;i++) (db[i]||[]).forEach(function(it){arr.push({stage:i,item:it});}); }
+  else{ var n=+sel; (db[n]||[]).forEach(function(it){arr.push({stage:n,item:it});}); }
+  return arr;
+}
+function getReportText(){
+  var sel=document.getElementById('rpt-stage').value;
+  var list=getReportItems(); if(!list.length) return null;
+  var title=sel==='all'?'전체 단계':sel+'단계';
+  var txt='[1행2필 선택형 학습엔진 리포트 — '+activeSubj+' · '+title+']\n\n';
+  list.forEach(function(o,i){
+    txt+='Q'+(i+1)+(sel==='all'?' ['+o.stage+'단계]':'')+'. '+o.item.q+'\n정답: '+(o.item.a||'')+'\n💡 '+( o.item.exp||'')+'\n\n';
+  });
+  return txt;
+}
+function rptDownload(){ var t=getReportText(); if(!t) return alert('해당 단계에 문항이 없습니다.'); var sel=document.getElementById('rpt-stage').value; dlBlob('1행2필_리포트_'+activeSubj+'_'+sel+'단계.txt',t,'text/plain;charset=utf-8'); }
+function rptEmail(){ var t=getReportText(); if(!t) return alert('해당 단계에 문항이 없습니다.'); navigator.clipboard.writeText(t).then(function(){alert('클립보드에 복사되었습니다! 카카오톡·메모장 등에 붙여넣기 하세요.');}).catch(function(){alert('복사 실패 — 다운로드를 이용해 주세요.');}); }
+function rptShare(){
+  var t=getReportText(); if(!t) return alert('해당 단계에 문항이 없습니다.');
+  var w=window.open('','_blank','width=700,height=500');
+  w.document.write('<html><head><title>리포트 미리보기</title><style>body{font-family:monospace;padding:20px;white-space:pre-wrap;font-size:13px;line-height:1.6;}</style></head><body>');
+  w.document.write(t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+  w.document.write('</body></html>');
+  w.document.close();
+}
+function rptPrint(){
+  var sel=document.getElementById('rpt-stage').value;
+  var list=getReportItems(); if(!list.length) return alert('해당 단계에 문항이 없습니다.');
+  if(list.length > 50){
+    if(!confirm(list.length+'개 문항을 인쇄합니다. 문항 수가 많아 시간이 걸릴 수 있습니다. 계속하시겠습니까?')) return;
+  }
+  var title=sel==='all'?'전체':sel+'단계';
+  var w=window.open('','_blank','width=800,height=600');
+  var html='<html><head><title>1행2필 리포트</title><style>body{font-family:sans-serif;padding:28px}.box{border:1px solid #ccc;padding:14px;margin-bottom:14px;border-radius:8px}.stg{font-size:0.78rem;color:#888;font-weight:700}.q{font-weight:800;color:#c23616;margin-bottom:6px}.a{background:#f1f2f6;padding:9px;font-weight:700}.e{background:#fffacd;padding:9px;margin-top:5px;color:#555}h2{border-bottom:2px solid #000;padding-bottom:8px}</style></head><body>';
+  html+='<h2>🎯 1행2필 리포트: '+escHtml(activeSubj)+' · '+title+'</h2><p>총 '+list.length+'문항</p>';
+  list.forEach(function(o,i){ html+='<div class="box">'+(sel==='all'?'<div class="stg">['+o.stage+'단계]</div>':'')+'<div class="q">Q'+(i+1)+'. '+escHtml(o.item.q)+'</div><div class="a">정답: '+escHtml(o.item.a||'')+'</div><div class="e">💡 '+escHtml(o.item.exp||'')+'</div></div>'; });
+  html+='</body></html>';
+  w.document.write(html); w.document.close(); w.focus(); setTimeout(function(){w.print();},400);
+}
+
+// ── 백업
+function exportBackup(){ dlBlob('1행2필_선택형_백업.json', JSON.stringify({subjects:SUBJECTS,db:DB},null,2),'application/json'); }
+function importBackup(){
+  document.getElementById('backup-file-input').value='';
+  document.getElementById('backup-file-input').click();
+}
+function handleBackupFile(e){
+  var file=e.target.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      var data=JSON.parse(ev.target.result);
+      if(!data.subjects||!data.db) return alert('올바른 백업 파일이 아닙니다.');
+      if(!confirm('현재 데이터를 백업 파일로 덮어씁니다. 계속하시겠습니까?')) return;
+      SUBJECTS=data.subjects; DB=data.db;
+      if(!activeSubj||SUBJECTS.indexOf(activeSubj)<0) activeSubj=SUBJECTS[0]||null;
+      activeStage=1; saveAll(); render(); refreshAdminUI();
+      alert('백업 데이터가 불러와졌습니다.');
+    }catch(err){ alert('파일 파싱 오류: '+err.message); }
+  };
+  reader.readAsText(file,'UTF-8');
+}
+function resetAll(){
+  if(!confirm('🚨 주의: 모든 과목·문제·진도가 삭제됩니다. 계속하시겠습니까?')) return;
+  DB={}; SUBJECTS=[]; activeSubj=null; activeStage=1;
+  saveAll(); render(); refreshAdminUI(); alert('초기화되었습니다.');
+}
+
+
+// ════════════════════════════════════════════
+// AI 대화창
+// ════════════════════════════════════════════
+/* ── 프록시 설정 ── */
+var PROXY_URL = 'https://YOUR-WORKER.workers.dev';  // Cloudflare Worker URL 입력
+
+/* ── 채팅 히스토리 24시간 자동소멸 ── */
+var CHAT_LS_KEY = 'iq_chat_history';
+var CHAT_TS_KEY  = 'iq_chat_ts';
+function saveChatHistory(){
+  try{
+    localStorage.setItem(CHAT_LS_KEY, JSON.stringify(chatHistory));
+    if(!localStorage.getItem(CHAT_TS_KEY)) localStorage.setItem(CHAT_TS_KEY, String(Date.now()));
+  }catch(e){}
+}
+function loadChatHistory(){
+  try{
+    var ts=parseInt(localStorage.getItem(CHAT_TS_KEY)||'0');
+    if(ts && Date.now()-ts > 24*60*60*1000){
+      localStorage.removeItem(CHAT_LS_KEY); localStorage.removeItem(CHAT_TS_KEY); return null;
+    }
+    return JSON.parse(localStorage.getItem(CHAT_LS_KEY)||'null');
+  }catch(e){ return null; }
+}
+function clearChatHistory(){
+  localStorage.removeItem(CHAT_LS_KEY); localStorage.removeItem(CHAT_TS_KEY);
+}
+
+var chatHistory = [];  // {role:'user'|'assistant', content:'...'}
+var chatLoading = false;
+
+function openChat(){
+  document.getElementById('chat-modal').classList.add('on');
+  setTimeout(function(){ document.getElementById('chat-input').focus(); }, 150);
+}
+function closeChat(){
+  document.getElementById('chat-modal').classList.remove('on');
+}
+
+// 현재 학습 맥락 수집
+function buildContext(){
+  var ctx = '';
+  ctx += '[현재 학습 상태]\n';
+  ctx += '과목: ' + (activeSubj || '미선택') + '\n';
+  ctx += '단계: ' + activeStage + '단계\n';
+  if(curItem){
+    ctx += '\n[현재 문제]\n' + curItem.q + '\n';
+    if(curItem.choices){
+      curItem.choices.forEach(function(c,i){
+        ctx += (i+1) + ') ' + c.t + (c.correct?' ← 정답':'') + '\n';
+      });
+    }
+    if(curItem.a) ctx += '정답: ' + curItem.a + '\n';
+    if(curItem.exp) ctx += '해설: ' + curItem.exp + '\n';
+  }
+  return ctx;
+}
+
+function appendMsg(role, text, isThinking){
+  var box = document.getElementById('chat-messages');
+  var div = document.createElement('div');
+  div.className = 'msg ' + (role==='user' ? 'msg-user' : 'msg-ai') + (isThinking ? ' thinking' : '');
+  div.id = isThinking ? 'thinking-msg' : '';
+  // 줄바꿈 처리
+  div.innerHTML = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+function removeThinking(){
+  var el = document.getElementById('thinking-msg');
+  if(el) el.remove();
+}
+
+async function sendChat(userText){
+  if(chatLoading || !userText.trim()) return;
+  chatLoading = true;
+
+  var sendBtn = document.getElementById('chat-send-btn');
+  sendBtn.disabled = true;
+
+  // 사용자 메시지 표시
+  appendMsg('user', userText);
+  chatHistory.push({role:'user', content:userText});
+  saveChatHistory();
+
+  // 입력창 초기화
+  var inp = document.getElementById('chat-input');
+  inp.value = ''; inp.style.height = 'auto';
+
+  // 생각 중 표시
+  appendMsg('ai', '생각하는 중...', true);
+
+  // 시스템 프롬프트 (맥락 포함)
+  var systemPrompt =
+    '당신은 1행2필 행정법 학습 플랫폼의 AI 학습도우미입니다. '
+  + '수험생이 선택형(객관식) 문제를 학습하는 중입니다. '
+  + '행정법, 헌법, 공법 관련 질문에 정확하고 간결하게 답하세요. '
+  + '판례 인용 시 판례번호를 포함하고, 법 조문은 조항을 명시하세요. '
+  + '답변은 핵심을 먼저 쓰고, 이유·근거를 설명하는 구조로 작성하세요. '
+  + '수험 목적에 맞게 암기 포인트와 유사 지문 비교도 함께 제시하면 좋습니다.\n\n'
+  + buildContext();
+
+  // 메시지 배열 구성 (최근 10턴 유지)
+  var msgs = chatHistory.slice(-10);
+
+  try{
+    var resp = await fetch(PROXY_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: msgs
+      })
+    });
+
+    removeThinking();
+
+    if(!resp.ok){
+      var err = await resp.json().catch(function(){return {};});
+      appendMsg('ai', '⚠ API 오류 (' + resp.status + '): ' + (err.error&&err.error.message ? err.error.message : '알 수 없는 오류'));
+      chatLoading = false; sendBtn.disabled = false; return;
+    }
+
+    var data = await resp.json();
+    var aiText = '';
+    (data.content||[]).forEach(function(block){
+      if(block.type==='text') aiText += block.text;
+    });
+
+    if(aiText){
+      appendMsg('ai', aiText);
+      chatHistory.push({role:'assistant', content:aiText});
+      saveChatHistory();
+    }
+
+  }catch(e){
+    removeThinking();
+    appendMsg('ai', '⚠ 네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.\n(' + e.message + ')');
+  }
+
+  chatLoading = false;
+  sendBtn.disabled = false;
+  setTimeout(function(){ document.getElementById('chat-input').focus(); }, 100);
+}
+
+// 빠른 질문 버튼 클릭
+function bindQuickBtns(){
+  document.getElementById('chat-quick').querySelectorAll('.quick-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      sendChat(this.dataset.q);
+    });
+  });
+}
+
+// ── 유틸
+function dlBlob(fname,content,mime){
+  try{
+    var blob=new Blob([content],{type:(mime||'text/plain')+';charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.href=url; a.download=fname;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},100);
+  }catch(err){ alert('다운로드 실패: '+err.message); }
+}
+function escHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escAttr(s){return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');}
+
+// ════════════════════════════════════════════
+// 이벤트 바인딩 (addEventListener 방식 — 삼성 브라우저 호환)
+// ════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function(){
+  // AI 대화창
+  document.getElementById('chat-open-btn').addEventListener('click', openChat);
+  document.getElementById('chat-close-btn').addEventListener('click', closeChat);
+  document.getElementById('chat-send-btn').addEventListener('click', function(){
+    sendChat(document.getElementById('chat-input').value);
+  });
+  document.getElementById('chat-input').addEventListener('keydown', function(e){
+    if(e.key==='Enter' && !e.shiftKey){
+      e.preventDefault();
+      sendChat(this.value);
+    }
+    // 자동 높이 조절
+    this.style.height='auto';
+    this.style.height=Math.min(this.scrollHeight,100)+'px';
+  });
+  document.getElementById('chat-modal').addEventListener('click', function(e){
+    if(e.target===this) closeChat();
+  });
+  bindQuickBtns();
+
+  // 관리자 버튼
+  document.getElementById('admin-open-btn').addEventListener('click', openAdmin);
+  document.getElementById('pw-submit-btn').addEventListener('click', submitPw);
+  document.getElementById('pw-cancel-btn').addEventListener('click', function(){ document.getElementById('pw-modal').classList.remove('on'); });
+  document.getElementById('pw-input').addEventListener('keydown', function(e){ if(e.key==='Enter') submitPw(); });
+  document.getElementById('admin-close-btn').addEventListener('click', closeAdmin);
+
+  // 과목
+  document.getElementById('add-subj-btn').addEventListener('click', addSubj);
+  document.getElementById('new-subj-input').addEventListener('keydown', function(e){ if(e.key==='Enter') addSubj(); });
+
+  // 일괄 등록
+  document.getElementById('bulk-upload-btn').addEventListener('click', bulkUpload);
+  document.getElementById('template-btn').addEventListener('click', downloadTemplate);
+
+  // 단일 등록
+  document.getElementById('add-choice-btn').addEventListener('click', function(){ addSingleChoice(); });
+  document.getElementById('single-submit-btn').addEventListener('click', submitSingle);
+
+  // 문제 관리
+  document.getElementById('mng-subj').addEventListener('change', renderMngList);
+  document.getElementById('mng-stage').addEventListener('change', renderMngList);
+
+  // 수정 모달
+  document.getElementById('edit-add-choice-btn').addEventListener('click', function(){ addEditChoice(); });
+  document.getElementById('edit-save-btn').addEventListener('click', saveEdit);
+  document.getElementById('edit-cancel-btn').addEventListener('click', function(){ document.getElementById('edit-modal').classList.remove('on'); });
+
+  // 리포트
+  document.getElementById('rpt-print-btn').addEventListener('click', rptPrint);
+  document.getElementById('rpt-dl-btn').addEventListener('click', rptDownload);
+  document.getElementById('rpt-mail-btn').addEventListener('click', rptEmail);
+  document.getElementById('rpt-share-btn').addEventListener('click', rptShare);
+
+  // 백업
+  document.getElementById('backup-export-btn').addEventListener('click', exportBackup);
+  document.getElementById('backup-import-btn').addEventListener('click', importBackup);
+  document.getElementById('backup-file-input').addEventListener('change', handleBackupFile);
+  document.getElementById('reset-all-btn').addEventListener('click', resetAll);
+
+  // 정답·해설 블라인드 토글
+  document.getElementById('a-card').addEventListener('click', toggleBlind);
+  document.getElementById('e-card').addEventListener('click', toggleBlind);
+
+  // 기본 정답/오답 버튼
+  document.getElementById('btn-ok').addEventListener('click', function(){ engine(true); });
+  document.getElementById('btn-ng').addEventListener('click', function(){ engine(false); });
+
+  // 학습결과 내보내기
+  document.getElementById('export-btn').addEventListener('click', exportResult);
+
+  // CLEAR STACK 목록 토글
+  document.getElementById('clear-list-btn').addEventListener('click', function(){
+    var listEl=document.getElementById('clear-list');
+    var isOpen=listEl.style.display!=='none';
+    listEl.style.display=isOpen?'none':'block';
+    this.textContent=isOpen?'목록 ▾':'목록 ▴';
+    if(!isOpen) renderClearStack();
+  });
+
+  // 모달 배경 클릭 닫기 (선택적)
+  document.getElementById('pw-modal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('on'); });
+  document.getElementById('edit-modal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('on'); });
+
+  // 부팅
+  boot();
+});
+</script>
+</body>
+</html>
