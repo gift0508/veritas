@@ -900,12 +900,12 @@ function openCell(li,si){
 
 /* 선택형=3분류(공법/형사법/민사법) · 사례형=7법 · 데모 있는 것만 열림 */
 var SEL_CATS=[
-  {name:"공법", sub:"헌법 · 행정법", ready:false},
+  {name:"공법", sub:"헌법 · 행정법", ready:true},
   {name:"형사법", sub:"형법 · 형사소송법", ready:false},
   {name:"민사법", sub:"민법 · 민사소송법 · 상법", ready:false},
 ];
 var CASE_CATS=[
-  {name:"헌법",ready:false},{name:"행정법",ready:false},{name:"형법",ready:false},
+  {name:"헌법",ready:false},{name:"행정법",ready:true},{name:"형법",ready:false},
   {name:"형사소송법",ready:false},{name:"민법",ready:false},{name:"민사소송법",ready:false},{name:"상법",ready:false},
 ];
 var TEUK_CATS=[{name:"예비특강",d:"과목별 기초 개념 정리"},{name:"최신판례특강",d:"최근 판례 집중 정리"},{name:"위크포인트특강",d:"취약 쟁점 집중 보강"},{name:"답안작성특강",d:"현출·논증·배점 훈련"}];
@@ -933,7 +933,7 @@ function openChooser(k, kicker, title, cats){
   document.getElementById("ecGrid").innerHTML=cats.map(function(c){
     var sub=c.sub?('<span class="ecsub">'+c.sub+'</span>'):'';
     var price = single ? '<span class="ecprice pay">10만 원</span>' : '<span class="ecprice free">종합반 무료</span>';
-    if(c.ready) return '<button class="eccard ready" onclick="openEngWithCat(\''+k+'\',\''+c.name+'\')"><span class="ecnm">'+c.name+'</span>'+sub+price+'<span class="ecgo">'+(single?'결제하고 열기 →':'열기 →')+'</span></button>';
+    if(c.ready || (window.user&&window.user.admin) || (typeof user!=='undefined'&&user&&user.admin)) return '<button class="eccard ready" onclick="openEngWithCat(\''+k+'\',\''+c.name+'\')"><span class="ecnm">'+c.name+'</span>'+sub+price+'<span class="ecgo">'+(single?'결제하고 열기 →':'열기 →')+'</span></button>';
     return '<button class="eccard blank" onclick="ecBlank(\''+c.name+'\')"><span class="ecnm">'+c.name+'</span>'+sub+price+'<span class="ecwait">미선택</span></button>';
   }).join("");
   document.getElementById("engChooser").classList.add("open");
