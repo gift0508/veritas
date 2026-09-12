@@ -826,7 +826,7 @@ border-radius:999px;padding:4px 12px;font-size:.7rem;cursor:pointer;font-family:
 <script>
 const SB_URL="https://swhkdtjishfigulgpbbj.supabase.co";
 const SB_KEY="sb_publishable_bL6M3894ms5qEdkrIx11EQ_1Fe7EkiU";
-const sb=window.supabase.createClient(SB_URL,SB_KEY);
+const sb=window.supabase.createClient(SB_URL,SB_KEY); window.sb=sb;
 const ADMIN_EMAIL="gift0508@gmail.com"; // 관리자 계정 이메일 (RLS 정책과 동일해야 함)
 function adminProfile(email){ return {admin:1,name:"관리자",school:"베리타스",year:"운영팀",plan:"full",subj:null,subjs:null,email}; }
 </script>
