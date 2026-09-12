@@ -1,0 +1,2035 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>베리타스 PASS:ON — 변시 합격의 24h 동반자 · 나의 학습 일정 관리</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0d1f3c; --navy2:#1a2a4a; --navy3:#243a63; --line:#2e4a7d;
+  --gold:#e8b93c; --gold-dim:#c9a227;
+  --ink:#eef2fa; --sub:#9fb0cd; --mute:#63799f;
+  --done:#3d5a8a; --alert:#e86a5a; --ok:#5ec98f;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Noto Sans KR',sans-serif;font-weight:300;color:var(--ink);
+  background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 60%,#16264a 100%);
+  min-height:100vh;letter-spacing:-.01em;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:14px 26px;
+  padding:26px 0 18px;border-bottom:1px solid var(--line);
+}
+.brand{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.35rem;color:var(--gold)}
+.brand small{font-family:'Noto Sans KR';font-weight:400;font-size:.72rem;color:var(--sub);margin-left:10px;letter-spacing:.06em}
+.top-stats{margin-left:auto;display:flex;gap:26px}
+.tstat{text-align:right}
+.tstat .v{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.5rem;line-height:1;color:var(--ink)}
+.tstat .v em{font-style:normal;color:var(--gold)}
+.tstat .l{font-size:.68rem;color:var(--mute);letter-spacing:.14em;margin-top:4px}
+
+/* ---------- section frame ---------- */
+section{margin-top:54px}
+.step-tag{
+  display:inline-flex;align-items:center;gap:10px;font-size:.72rem;letter-spacing:.22em;
+  color:var(--gold);font-weight:500;
+}
+.step-tag::before{content:"";width:26px;height:1px;background:var(--gold)}
+h2{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.7rem;margin:10px 0 6px}
+.lede{color:var(--sub);font-size:.92rem;max-width:640px;line-height:1.75}
+
+/* ---------- ① 진단 ---------- */
+.profiles{display:flex;gap:14px;margin-top:22px;flex-wrap:wrap}
+.pcard{
+  flex:1;min-width:260px;background:rgba(255,255,255,.03);border:1px solid var(--line);
+  border-radius:14px;padding:20px 22px;cursor:pointer;transition:.25s;
+}
+.pcard:hover{border-color:var(--gold-dim);transform:translateY(-2px)}
+.pcard.on{border-color:var(--gold);background:rgba(232,185,60,.07);box-shadow:0 0 0 1px var(--gold)}
+.pcard h3{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.06rem;margin-bottom:6px}
+.pcard p{font-size:.8rem;color:var(--sub);line-height:1.7}
+.pcard .diag{margin-top:12px;font-size:.75rem;color:var(--gold);font-weight:500;display:none}
+.pcard.on .diag{display:block}
+
+/* ---------- ② 매트릭스 ---------- */
+.matrix-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.legend{display:flex;gap:16px;font-size:.72rem;color:var(--sub);align-items:center;flex-wrap:wrap}
+.chip{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.chip.c-done{background:var(--done)}
+.chip.c-now{background:var(--gold)}
+.chip.c-todo{border:1px solid var(--line)}
+.chip.c-skip{background:repeating-linear-gradient(45deg,var(--navy3) 0 3px,transparent 3px 6px);border:1px solid var(--line)}
+.grid{
+  margin-top:18px;display:grid;grid-template-columns:88px repeat(4,1fr);gap:7px;
+}
+.gh{
+  font-size:.74rem;color:var(--sub);letter-spacing:.1em;text-align:center;padding:8px 0;font-weight:500;
+}
+.gl{
+  font-family:'Noto Serif KR',serif;font-weight:900;font-size:.9rem;color:var(--ink);
+  display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.03);
+  border-radius:10px;border:1px solid transparent;
+}
+.cell{
+  position:relative;border-radius:10px;padding:10px 11px 9px;min-height:74px;cursor:pointer;
+  border:1px solid var(--line);background:rgba(255,255,255,.02);transition:.25s;
+}
+.cell:hover{border-color:var(--gold-dim)}
+.cell .period{font-size:.7rem;color:var(--mute);letter-spacing:.02em}
+.cell .st{font-size:.76rem;font-weight:500;margin-top:3px}
+.cell .dots{position:absolute;right:9px;top:9px;display:flex;gap:4px}
+.dot{width:7px;height:7px;border-radius:50%}
+.d-sel{background:#5aa8e8}.d-case{background:#e8925a}.d-rec{background:var(--ok)}
+.cell.done{background:rgba(61,90,138,.35);border-color:var(--done)}
+.cell.done .st{color:var(--sub)}
+.cell.now{background:rgba(232,185,60,.14);border-color:var(--gold)}
+.cell.now .st{color:var(--gold);font-weight:700}
+.cell.none{background:repeating-linear-gradient(45deg,rgba(255,255,255,.02) 0 5px,transparent 5px 11px);border-color:rgba(255,255,255,.08);opacity:.72}
+.cell.none .st{color:var(--mute)}
+.cell.none .period{opacity:.35}
+.cell.credit{background:rgba(94,201,143,.10);border-color:var(--ok)}
+.cell.credit .st{color:var(--ok);font-weight:700}
+.cell.credit .period{opacity:.6}
+.cell.credit::after{content:"선행";position:absolute;top:7px;right:9px;font-size:.6rem;font-weight:700;color:var(--ok);letter-spacing:.05em}
+.cell.skip{background:repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0 4px,transparent 4px 9px)}
+.cell.skip .st{color:var(--mute)}
+.cell.pulse{animation:pulse 1.6s ease 2}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,185,60,0)}40%{box-shadow:0 0 0 6px rgba(232,185,60,.35);border-color:var(--gold)}}
+.cell .ext{position:absolute;left:11px;bottom:7px;font-size:.66rem;color:var(--alert);font-weight:500;display:none}
+.cell.extended .ext{display:block}
+/* ---------- 최종 (네 번째 정규 단계) ---------- */
+.finalbar{margin-top:20px;border:1.5px dashed var(--gold-dim);border-radius:14px;padding:18px 20px;background:rgba(232,185,60,.05)}
+.finalbar .fhead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.finalbar .ftag{display:inline-flex;align-items:center;gap:8px;font-size:.7rem;letter-spacing:.2em;color:var(--gold);font-weight:600}
+.finalbar .ftag::before{content:"";width:22px;height:1px;background:var(--gold)}
+.finalbar .fopt{margin-left:auto;font-size:.7rem;color:var(--gold);font-weight:700;border:1px solid var(--gold-dim);border-radius:999px;padding:4px 12px}
+.finalbar h3{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.15rem;color:var(--ink);margin:8px 0 4px}
+.finalbar .fsub{font-size:.82rem;color:var(--sub);line-height:1.7;max-width:760px}
+.finalbar .fsub b{color:var(--gold)}
+.finallaws{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.finallaws .flchip{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:rgba(255,255,255,.02);font-size:.8rem;color:var(--sub)}
+.finallaws .flchip .fn{font-family:'Noto Serif KR',serif;font-weight:900;color:var(--ink)}
+.finallaws .flchip .fsel{font-size:.66rem;color:var(--mute);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+.finallaws .flchip.locked{opacity:.55}
+
+/* ---------- detail panel ---------- */
+.detail{
+  margin-top:16px;background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:14px;
+  padding:22px 24px;display:none;
+}
+.detail.open{display:block;animation:fadein .3s}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.detail h3{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.15rem}
+.detail h3 span{color:var(--gold)}
+.detail .meta{font-size:.78rem;color:var(--sub);margin:4px 0 14px}
+.layers{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.layer{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:rgba(0,0,0,.14)}
+.layer .tag{font-size:.68rem;letter-spacing:.16em;font-weight:700;margin-bottom:7px}
+.layer.sel .tag{color:#5aa8e8}.layer.case .tag{color:#e8925a}.layer.rec .tag{color:var(--ok)}
+.layer .eng{font-weight:500;font-size:.9rem;margin-bottom:5px}
+.layer p{font-size:.76rem;color:var(--sub);line-height:1.65}
+.layer.off{opacity:.38}
+.layer.off .eng::after{content:" · 이 단계 미배치";font-size:.7rem;color:var(--mute);font-weight:300}
+
+/* ---------- ③ 오늘의 과업 ---------- */
+.today{display:grid;grid-template-columns:1.25fr .9fr;gap:22px;margin-top:22px}
+@media(max-width:860px){.today{grid-template-columns:1fr}}
+.panel{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+.panel h3{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.05rem;margin-bottom:4px}
+.panel .sub{font-size:.76rem;color:var(--sub);margin-bottom:14px}
+.task{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-top:1px solid rgba(255,255,255,.06)}
+.task:first-of-type{border-top:none}
+.task input{margin-top:4px;width:16px;height:16px;accent-color:var(--gold);cursor:pointer;flex:none}
+.task .tt{font-size:.87rem;font-weight:400}
+.task .tt b{font-weight:700}
+.task .ty{font-size:.68rem;margin-top:3px;letter-spacing:.08em}
+.ty.sel{color:#5aa8e8}.ty.case{color:#e8925a}.ty.rec{color:var(--ok)}
+.task.donetask .tt{color:var(--mute);text-decoration:line-through}
+.setnote{font-size:.74rem;color:var(--sub);line-height:1.6;margin-top:3px}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.badges .ty{letter-spacing:.04em}
+.mini-rate{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);font-size:.8rem;color:var(--sub)}
+.mini-rate b{font-family:'Noto Serif KR',serif;font-weight:900;color:var(--gold);font-size:1.02rem;margin-left:4px}
+.mini-note{font-size:.7rem;color:var(--mute);margin-left:8px}
+/* 강의 해소 카드 */
+.lcard{border:1px solid var(--line);border-radius:12px;padding:14px 16px 12px;margin-top:12px;background:rgba(0,0,0,.14);transition:.3s}
+.lcard:first-child{margin-top:0}
+.lcard.lc-done{border-color:var(--gold);background:rgba(232,185,60,.08)}
+.lhead{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+.lhead b{font-family:'Noto Serif KR',serif;font-weight:900;font-size:.95rem}
+.ltitle{font-size:.78rem;color:var(--sub)}
+.ldue{margin-left:auto;font-size:.7rem;color:var(--mute)}
+.pc{font-size:.66rem;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.04em}
+.pc.ok{color:var(--ok);border:1px solid rgba(94,201,143,.4)}
+.pc.warn{color:var(--alert);border:1px solid rgba(232,106,90,.5);animation:blink 2.2s infinite}
+.pc.near{color:var(--gold);border:1px solid rgba(232,185,60,.45)}
+.pc.done{color:var(--navy);background:var(--gold)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.45}}
+.lrow{display:flex;align-items:center;gap:9px;margin:7px 0}
+.lt{width:44px;font-size:.68rem;font-weight:700;letter-spacing:.06em;flex:none}
+.lt.sel{color:#5aa8e8}.lt.case{color:#e8925a}.lt.rec{color:var(--ok)}
+.ltrack{flex:1;height:9px;background:rgba(0,0,0,.3);border-radius:5px;overflow:hidden}
+.lfill{height:100%;border-radius:5px;transition:width .5s cubic-bezier(.2,.8,.3,1)}
+.lfill.sel{background:linear-gradient(90deg,#3d6cb8,#5aa8e8)}
+.lfill.case{background:linear-gradient(90deg,#c07a48,#e8925a)}
+.lfill.rec{background:linear-gradient(90deg,#3e9c6d,#5ec98f)}
+.lnum{width:66px;text-align:right;font-size:.74rem;color:var(--sub);font-variant-numeric:tabular-nums;flex:none}
+.mini{
+  border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);
+  font-family:'Noto Sans KR';font-size:.7rem;font-weight:500;border-radius:7px;padding:4px 9px;cursor:pointer;transition:.15s;flex:none;
+}
+.mini:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+.mini:disabled{opacity:.3;cursor:default}
+/* 누적탑 */
+.arow{padding:10px 0;border-top:1px solid rgba(255,255,255,.06)}
+.arow:first-child{border-top:none}
+.arow .top{display:flex;align-items:baseline;gap:10px}
+.arow .nm{font-family:'Noto Serif KR',serif;font-weight:900;font-size:.92rem;width:56px;flex:none}
+.arow .cnt{font-variant-numeric:tabular-nums;font-weight:700;font-size:1.02rem;color:var(--ink)}
+.arow .cnt small{font-weight:300;font-size:.72rem;color:var(--mute);margin-left:2px}
+.arow .plus{margin-left:auto;font-size:.74rem;font-weight:700;color:var(--gold);opacity:0;transform:translateY(3px);transition:.35s}
+.arow.gain .plus{opacity:1;transform:none}
+.arow .track2{height:9px;background:rgba(0,0,0,.28);border-radius:5px;overflow:hidden;margin-top:7px}
+.arow .fill2{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--gold-dim),var(--gold));transition:width .7s cubic-bezier(.2,.8,.3,1)}
+.arow .subcnt{font-size:.68rem;color:var(--mute);margin-top:5px;letter-spacing:.02em}
+.arow .subcnt b{color:var(--sub);font-weight:500}
+.arow.gain .track2 .fill2{box-shadow:0 0 12px rgba(232,185,60,.5)}
+.accum-total{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);font-size:.82rem;color:var(--sub)}
+.accum-total b{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.35rem;color:var(--gold);margin:0 3px;font-variant-numeric:tabular-nums}
+#todayAdd{color:var(--ok);font-weight:700;font-size:.78rem;margin-left:8px}
+
+/* ---------- ⑤⑥ 데이터·재조정 ---------- */
+.datazone{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px}
+@media(max-width:860px){.datazone{grid-template-columns:1fr}}
+.bars{margin-top:8px}
+.bar{display:flex;align-items:center;gap:12px;margin:10px 0}
+.bar .bl{width:56px;font-size:.8rem;font-weight:500;flex:none}
+.bar .track{flex:1;height:13px;background:rgba(0,0,0,.28);border-radius:7px;overflow:hidden}
+.bar .fill{height:100%;border-radius:7px;background:linear-gradient(90deg,#4a7bd0,#5aa8e8);transition:width .8s ease}
+.bar.weak .fill{background:linear-gradient(90deg,#c0533f,var(--alert))}
+.bar .bv{width:44px;text-align:right;font-size:.8rem;color:var(--sub);flex:none;font-variant-numeric:tabular-nums}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;margin-top:18px;
+  background:var(--gold);color:var(--navy);font-weight:700;font-size:.9rem;font-family:'Noto Sans KR';
+  border:none;border-radius:999px;padding:13px 26px;cursor:pointer;transition:.2s;
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(232,185,60,.35)}
+.btn:disabled{opacity:.4;cursor:default;transform:none;box-shadow:none}
+.log{margin-top:14px}
+.log .li{
+  font-size:.8rem;line-height:1.7;color:var(--sub);padding:9px 12px;border-left:2px solid var(--gold-dim);
+  background:rgba(0,0,0,.16);border-radius:0 8px 8px 0;margin-top:8px;opacity:0;transform:translateX(-6px);
+  transition:.45s;
+}
+.log .li.show{opacity:1;transform:none}
+.log .li b{color:var(--gold);font-weight:700}
+.log .li.safety b{color:var(--ok)}
+.empty-log{font-size:.78rem;color:var(--mute);margin-top:12px;line-height:1.7}
+
+/* ---------- cycle strip ---------- */
+.cycle{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;align-items:center;font-size:.74rem;color:var(--sub);
+}
+.cnode{border:1px solid var(--line);border-radius:999px;padding:7px 14px;background:rgba(255,255,255,.03)}
+.cnode.hot{border-color:var(--gold);color:var(--gold);font-weight:500}
+.carr{color:var(--mute)}
+.carr.back{color:var(--gold);font-weight:700}
+footer{margin-top:70px;padding-top:18px;border-top:1px solid var(--line);font-size:.72rem;color:var(--mute);line-height:1.8}
+/* 로그인 게이트 */
+.gate{
+  position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 60%,#16264a 100%);padding:20px;
+}
+.gate.hidden{display:none}
+.gatecard{
+  width:100%;max-width:400px;background:rgba(255,255,255,.045);border:1px solid var(--line);
+  border-radius:18px;padding:34px 32px 28px;box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+.gbrand{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.55rem;color:var(--gold);text-align:center;letter-spacing:.01em}
+.gsub{font-size:.76rem;color:var(--sub);text-align:center;margin:6px 0 24px;letter-spacing:.04em}
+.gl2{display:block;font-size:.72rem;color:var(--sub);letter-spacing:.1em;margin:14px 0 6px;font-weight:500}
+.gatecard select,.gatecard input{
+  width:100%;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);font-family:'Noto Sans KR';font-size:.92rem;padding:11px 13px;outline:none;transition:.2s;
+}
+.gatecard select:focus,.gatecard input:focus{border-color:var(--gold)}
+.gatecard select option{background:var(--navy2);color:var(--ink)}
+.gerr{font-size:.74rem;color:var(--alert);min-height:20px;margin-top:10px}
+.gbtn{width:100%;justify-content:center;margin-top:4px}
+.quickbtn{
+  width:100%;margin-top:10px;background:none;border:1px dashed var(--gold-dim);color:var(--gold);
+  font-family:'Noto Sans KR';font-size:.82rem;font-weight:500;border-radius:999px;padding:11px;cursor:pointer;transition:.2s;
+}
+.quickbtn:hover{background:rgba(232,185,60,.1)}
+.planrow{display:flex;gap:8px}
+.planopt{flex:1;text-align:center;border:1px solid var(--line);border-radius:10px;padding:10px 6px;cursor:pointer;
+font-size:.84rem;font-weight:700;color:var(--sub);transition:.2s}
+.planopt small{display:block;font-weight:300;font-size:.64rem;color:var(--mute);margin-top:2px}
+.planopt.on{border-color:var(--gold);color:var(--gold);background:rgba(232,185,60,.08)}
+.ubadge.single{background:#8fa0c0}
+.upgbtn{border:none;background:var(--gold);color:var(--navy);font-family:'Noto Sans KR';font-size:.7rem;font-weight:700;
+border-radius:999px;padding:5px 13px;cursor:pointer;transition:.2s}
+.upgbtn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(232,185,60,.4)}
+.upmodal{position:fixed;inset:0;z-index:72;background:rgba(5,12,26,.72);display:none;align-items:center;justify-content:center;overflow-y:auto;padding:24px 16px}
+.upmodal.open{display:flex}
+.upcard{width:100%;max-width:420px;background:linear-gradient(160deg,#122241,#1a2a4a);border:1px solid var(--gold);
+border-radius:16px;padding:26px 26px 22px;position:relative;box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.upcard h3{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.2rem;color:var(--gold)}
+.upcard .upsub{font-size:.76rem;color:var(--sub);margin:5px 0 14px;line-height:1.65}
+.upcard label{display:block;font-size:.68rem;color:var(--sub);letter-spacing:.1em;margin:10px 0 5px;font-weight:500}
+.upcard select,.upcard input{width:100%;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:9px;
+color:var(--ink);font-family:'Noto Sans KR';font-size:.88rem;padding:10px 12px;outline:none}
+.upcard select:focus,.upcard input:focus{border-color:var(--gold)}
+.upcard select option{background:var(--navy2)}
+.uperr{font-size:.72rem;color:var(--alert);min-height:18px;margin-top:8px}
+.updone{border:1px dashed var(--gold-dim);border-radius:11px;padding:14px;background:rgba(232,185,60,.06);
+font-size:.8rem;line-height:1.75;margin-top:6px}
+.updone b{color:var(--gold)}
+.updiv{height:1px;background:rgba(255,255,255,.1);margin:16px 0 10px}
+.upclose{position:absolute;right:16px;top:14px;background:none;border:1px solid var(--line);color:var(--sub);
+border-radius:999px;padding:4px 12px;font-size:.7rem;cursor:pointer;font-family:'Noto Sans KR'}
+.upclose:hover{border-color:var(--gold);color:var(--gold)}
+.upfeat{color:var(--gold)}
+.engmenu{display:flex;gap:8px;flex-wrap:wrap}
+.engview{position:fixed;inset:0;z-index:70;display:none;flex-direction:column;background:#0a1626}
+.engview.open{display:flex}
+.enghead{display:flex;align-items:center;gap:14px;padding:12px 18px;background:linear-gradient(135deg,var(--navy),var(--navy2));border-bottom:1px solid var(--line);flex:none}
+.enghead b{font-family:'Noto Serif KR',serif;font-weight:900;color:var(--gold);font-size:1rem}
+.enghead .et{font-size:.8rem;color:var(--sub)}
+.engback{margin-left:auto;border:1px solid var(--gold);background:none;color:var(--gold);font-family:'Noto Sans KR';
+  font-size:.78rem;font-weight:700;border-radius:999px;padding:8px 18px;cursor:pointer;transition:.2s}
+.engback:hover{background:var(--gold);color:var(--navy)}
+.engview iframe{flex:1;border:none;width:100%;background:#fff}
+.realbtn{
+  display:inline-flex;align-items:center;gap:8px;margin-top:16px;text-decoration:none;
+  border:1px solid var(--gold);color:var(--gold);font-size:.8rem;font-weight:700;
+  border-radius:999px;padding:10px 20px;transition:.2s;background:rgba(232,185,60,.07);
+}
+.realbtn:hover{background:var(--gold);color:var(--navy)}
+.realbtn small{font-weight:400;color:inherit;opacity:.75;font-size:.68rem}
+.pairlabel{margin-top:18px;font-size:.72rem;letter-spacing:.14em;color:var(--gold);font-weight:700}
+.pairrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.pairrow .realbtn{margin-top:0;flex:1;min-width:260px;justify-content:center}
+.engbtn{border-color:var(--gold-dim);color:var(--gold)}
+/* 순환 자동 시연 */
+.tourbtn{
+  margin-left:auto;background:var(--gold);color:var(--navy);border:none;border-radius:999px;
+  padding:8px 18px;font-family:'Noto Sans KR';font-size:.78rem;font-weight:700;cursor:pointer;transition:.2s;
+}
+.tourbtn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(232,185,60,.35)}
+.tourbtn.stop{background:var(--alert);color:#fff}
+.cnode.active{border-color:var(--gold);color:var(--gold);font-weight:700;box-shadow:0 0 0 3px rgba(232,185,60,.25);background:rgba(232,185,60,.1)}
+.narr{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:57;
+  width:min(680px,calc(100vw - 28px));background:linear-gradient(135deg,#16294e,#1d3158);
+  border:1px solid var(--gold);border-radius:14px;padding:15px 20px;display:none;
+  box-shadow:0 16px 50px rgba(0,0,0,.55);animation:fadein .3s;
+}
+.narr.show{display:block}
+.narr .nstep{font-size:.68rem;letter-spacing:.2em;color:var(--gold);font-weight:700;margin-bottom:5px}
+.narr .ntext{font-size:.88rem;line-height:1.65}
+.narr .ntext b{color:var(--gold);font-weight:700}
+.hl{outline:2px solid var(--gold);outline-offset:3px;border-radius:14px;transition:outline .3s}
+.gnote{font-size:.7rem;color:var(--mute);line-height:1.8;margin-top:18px;text-align:center}
+.gsample{font-size:.66rem;color:var(--mute);line-height:1.6;margin-top:10px;text-align:center;opacity:.85}
+.gnote b{color:var(--sub);font-weight:500}
+/* 유저칩 */
+.userchip{display:flex;align-items:center;gap:10px;font-size:.78rem;color:var(--sub)}
+.userchip #uinfo b{color:var(--ink);font-weight:700}
+.ubadge{font-size:.66rem;font-weight:700;color:var(--navy);background:var(--gold);border-radius:999px;padding:3px 10px;letter-spacing:.02em}
+/* 외부 연결 버튼 */
+.lext{display:flex;gap:8px;margin-top:9px;padding-top:9px;border-top:1px dashed rgba(255,255,255,.1)}
+.extbtn{
+  flex:1;text-align:center;font-size:.7rem;font-weight:500;color:var(--sub);text-decoration:none;
+  border:1px solid var(--line);border-radius:8px;padding:6px 8px;transition:.15s;cursor:pointer;background:none;font-family:'Noto Sans KR';
+}
+.extbtn:hover{border-color:var(--gold);color:var(--gold)}
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(8px);z-index:60;
+  background:var(--gold);color:var(--navy);font-size:.8rem;font-weight:700;border-radius:999px;
+  padding:11px 22px;opacity:0;pointer-events:none;transition:.3s;box-shadow:0 8px 30px rgba(0,0,0,.4);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* 관리자 */
+.gdivider{height:1px;background:rgba(255,255,255,.08);margin:20px 0 14px}
+.gadmin{text-align:center}
+.galink{background:none;border:none;color:var(--mute);font-size:.74rem;font-family:'Noto Sans KR';cursor:pointer;letter-spacing:.04em}
+.galink:hover{color:var(--gold)}
+#adminForm{margin-top:12px;text-align:left}
+.admin{position:fixed;inset:0;z-index:40;overflow-y:auto;display:none;
+  background:linear-gradient(160deg,#0a1830 0%,var(--navy2) 60%,#141f3d 100%);}
+.admin.open{display:block}
+.awrap{max-width:1180px;margin:0 auto;padding:0 20px 60px}
+.akpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:26px}
+.akpi{border:1px solid var(--line);border-radius:12px;padding:16px 14px;text-align:center;background:rgba(255,255,255,.03)}
+.akpi b{display:block;font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.7rem;color:var(--ink)}
+.akpi span{font-size:.68rem;color:var(--mute);letter-spacing:.08em}
+.akpi.warn2 b{color:var(--alert)}
+.akpi.alert2{border-color:rgba(232,106,90,.5)}
+.akpi.alert2 b{color:var(--alert)}
+.akpi.gold2 b{color:var(--gold)}
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px}
+@media(max-width:860px){.agrid{grid-template-columns:1fr}}
+.alertrow{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid rgba(255,255,255,.06);flex-wrap:wrap}
+.alertrow:first-of-type{border-top:none}
+.alname{font-size:.84rem;font-weight:500}
+.aldesc{font-size:.74rem;color:var(--sub);flex:1;min-width:150px}
+.atable{font-size:.8rem}
+.arow2{display:grid;grid-template-columns:1.1fr 1.2fr .8fr 1fr 1fr .9fr;gap:8px;padding:9px 4px;border-top:1px solid rgba(255,255,255,.06);align-items:center}
+.arow2.head{border-top:none;font-size:.68rem;color:var(--mute);letter-spacing:.08em;font-weight:500}
+.arow2 .nm2{font-weight:700}
+.arow2 .lk{font-size:.66rem;font-weight:700;color:var(--navy);background:var(--gold);border-radius:999px;padding:2px 8px;text-align:center}
+.arow2 .nolk{font-size:.66rem;color:var(--mute);text-align:center}
+.arow2.me{background:rgba(232,185,60,.08);border-radius:8px}
+@media(max-width:720px){.arow2{grid-template-columns:1fr 1fr 1fr;font-size:.72rem}.arow2 :nth-child(n+4){display:none}.arow2.head :nth-child(n+4){display:none}}
+.arow2.click{cursor:pointer;transition:.15s}
+.arow2.click:hover{background:rgba(232,185,60,.09);border-radius:8px}
+/* 학생 상세 모달 */
+.smodal{position:fixed;inset:0;z-index:55;background:rgba(5,12,26,.72);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 16px}
+.smodal.open{display:flex}
+.scard{
+  width:100%;max-width:860px;background:linear-gradient(160deg,#122241,#1a2a4a);
+  border:1px solid var(--line);border-radius:16px;padding:26px 28px;position:relative;
+  box-shadow:0 24px 70px rgba(0,0,0,.5);animation:fadein .25s;
+}
+.sclose{position:absolute;right:18px;top:16px;background:none;border:1px solid var(--line);color:var(--sub);
+  border-radius:999px;padding:5px 13px;font-size:.72rem;cursor:pointer;font-family:'Noto Sans KR'}
+.sclose:hover{border-color:var(--gold);color:var(--gold)}
+.shead h3{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1.3rem}
+.smeta{font-size:.8rem;color:var(--sub);margin-top:6px}
+.smeta b{color:var(--ink);font-weight:700}
+.sfeed{font-size:.76rem;color:var(--gold);margin-top:5px}
+.sgrid{display:grid;grid-template-columns:1.1fr 1fr;gap:26px;margin-top:20px}
+@media(max-width:720px){.sgrid{grid-template-columns:1fr}}
+.stt{font-size:.7rem;letter-spacing:.16em;color:var(--mute);font-weight:700;margin-bottom:9px}
+.mrow{display:flex;align-items:center;gap:5px;margin:5px 0}
+.ml{width:52px;font-size:.76rem;font-weight:500;flex:none}
+.ml.weakl{color:var(--alert)}
+.ms{width:26px;height:13px;border-radius:4px;border:1px solid var(--line);flex:none}
+.ms-done{background:var(--done);border-color:var(--done)}
+.ms-now{background:var(--gold);border-color:var(--gold)}
+.mstage{font-size:.66rem;color:var(--mute);margin-left:6px}
+.slec{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:9px;background:rgba(0,0,0,.16)}
+.sacts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+/* 전체 진단 히트맵 */
+.heat{overflow-x:auto}
+.hrow{display:grid;grid-template-columns:110px repeat(7,minmax(46px,1fr)) 90px;gap:5px;align-items:center;padding:4px 0;cursor:pointer;border-radius:8px}
+.hrow:hover{background:rgba(232,185,60,.07)}
+.hrow.hh{cursor:default;font-size:.66rem;color:var(--mute);letter-spacing:.06em;font-weight:700}
+.hrow.hh:hover{background:none}
+.hname{font-size:.78rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hname small{color:var(--mute);font-weight:300;font-size:.66rem;margin-left:4px}
+.hcell{height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:rgba(255,255,255,.85)}
+.hs0{background:#3a4a6d}.hs1{background:#3d6cb8}.hs2{background:#c9a227;color:#0d1f3c}.hs3{background:#3e9c6d}
+.hcell.hw{box-shadow:inset 0 0 0 2px var(--alert)}
+.hstat{font-size:.64rem;font-weight:700;text-align:center;border-radius:999px;padding:3px 6px}
+.hstat.ok{color:var(--ok);border:1px solid rgba(94,201,143,.4)}
+.hstat.warn{color:var(--alert);border:1px solid rgba(232,106,90,.5)}
+.grow{display:grid;grid-template-columns:1.2fr .7fr 1fr 1fr .7fr;gap:8px;padding:8px 4px;border-top:1px solid rgba(255,255,255,.06);align-items:center;font-size:.78rem}
+.grow.head{border-top:none;font-size:.66rem;color:var(--mute);letter-spacing:.06em;font-weight:700}
+.grow .gn{font-weight:700}
+.grow .gwarn{color:var(--alert);font-weight:700}
+.grow .gok{color:var(--mute)}
+@media(max-width:720px){.hrow{grid-template-columns:80px repeat(7,minmax(30px,1fr)) 60px}.hcell{height:20px;font-size:.52rem}}
+/* AI 조교 */
+.fab{
+  position:fixed;right:22px;bottom:22px;z-index:58;display:flex;align-items:center;gap:8px;
+  background:var(--gold);color:var(--navy);border:none;border-radius:999px;padding:13px 20px;
+  font-size:1.05rem;cursor:pointer;font-family:'Noto Sans KR';box-shadow:0 10px 32px rgba(0,0,0,.45);transition:.2s;
+}
+.fab:hover{transform:translateY(-2px)}
+.fabl{font-size:.84rem;font-weight:700}
+.chat{
+  position:fixed;right:22px;bottom:88px;z-index:59;width:min(390px,calc(100vw - 32px));height:min(540px,72vh);
+  background:linear-gradient(165deg,#122241,#182849);border:1px solid var(--line);border-radius:16px;
+  display:none;flex-direction:column;box-shadow:0 24px 70px rgba(0,0,0,.55);overflow:hidden;
+}
+.chat.open{display:flex;animation:fadein .25s}
+.chead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.18)}
+.chead b{font-family:'Noto Serif KR',serif;font-weight:900;font-size:1rem;color:var(--gold)}
+.chsub{display:block;font-size:.66rem;color:var(--sub);margin-top:2px}
+.cbody{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.cmsg{max-width:86%;padding:10px 13px;border-radius:13px;font-size:.84rem;line-height:1.7;white-space:pre-wrap}
+.cmsg.ai{background:rgba(255,255,255,.06);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.cmsg.me{background:var(--gold);color:var(--navy);font-weight:400;align-self:flex-end;border-bottom-right-radius:4px}
+.cmsg.typing{color:var(--sub);font-style:italic}
+.cinput{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);background:rgba(0,0,0,.18)}
+.cinput input{flex:1;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;color:var(--ink);
+  font-family:'Noto Sans KR';font-size:.84rem;padding:10px 12px;outline:none}
+.cinput input:focus{border-color:var(--gold)}
+.csend{background:var(--gold);color:var(--navy);border:none;border-radius:10px;padding:0 16px;font-weight:700;
+  font-family:'Noto Sans KR';font-size:.82rem;cursor:pointer}
+.csend:disabled{opacity:.4}
+@media(max-width:720px){
+  .grid{grid-template-columns:64px repeat(4,1fr)}
+  .gl{font-size:.76rem}
+  .cell{min-height:64px;padding:8px}
+  .cell .period{font-size:.62rem}
+  .cell .st{font-size:.68rem}
+  h2{font-size:1.35rem}
+}
+
+#homeHero{min-height:calc(100vh - 120px);display:flex;align-items:center;justify-content:center;text-align:center;padding:40px 24px}
+.hero-inner{max-width:720px}
+.hero-logo{font-size:32px;font-weight:900;letter-spacing:6px;color:var(--gold);margin-bottom:16px;font-family:'Noto Serif KR',serif}
+.hero-tag{font-size:40px;font-weight:800;color:#fff;line-height:1.35;margin:0 0 22px}
+.hero-accent{color:var(--gold)}
+.vroom{max-width:560px;margin:0 auto 24px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:16px 16px 14px}
+.vroom-head{background:var(--navy2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13px;font-weight:700;color:var(--ink);text-align:center;margin-bottom:14px}
+.vroom-head .live{color:var(--alert);font-weight:800;margin-left:6px;font-size:11px}
+.vgrid{display:flex;flex-wrap:wrap;gap:8px}
+.vseat{width:calc((100% - 40px)/6);height:40px;border-radius:8px;background:rgba(255,255,255,.02);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--mute)}
+.vseat.on{background:rgba(200,162,39,.08);border-color:var(--gold-dim);color:var(--sub)}
+.vseat.me{background:linear-gradient(180deg,rgba(232,185,60,.22),rgba(232,185,60,.10));border:1px solid var(--gold);color:var(--gold);font-weight:800;box-shadow:0 0 0 2px rgba(232,185,60,.22)}
+.vcount{display:flex;align-items:baseline;justify-content:center;gap:8px;margin:2px 0 14px}
+.vcount .n{font-family:'Noto Serif KR',serif;font-size:44px;font-weight:900;color:var(--gold);line-height:1}
+.vcount .t{font-size:14px;color:var(--ink);font-weight:700}
+.vroom-foot{font-size:12px;color:var(--sub);text-align:center;margin-top:13px}
+.vroom-foot b{color:var(--gold)}
+
+.hero-sub{font-size:15px;color:#aeb8cc;line-height:1.8;margin:0}
+.hero-hint{background:#C9A227;color:#0D1F3C;border:none;font-weight:800;padding:5px 13px;border-radius:8px;cursor:pointer;font-size:14px}
+.homebtn{background:transparent;border:1px solid rgba(255,255,255,.25);color:#c7cedc;font-weight:700;font-size:13px;padding:8px 15px;border-radius:9px;cursor:pointer;margin:14px 0 4px}
+.homebtn:hover{border-color:#C9A227;color:#C9A227}
+
+.cellmatch{margin-top:12px;width:100%;background:#0D1F3C;color:#fff;border:1px solid var(--gold,#C9A227);font-weight:800;font-size:13px;padding:11px;border-radius:9px;cursor:pointer}
+.cellmatch:hover{background:#16305c}
+
+.engchooser{position:fixed;inset:0;background:rgba(8,14,30,.8);display:none;align-items:center;justify-content:center;z-index:200;padding:24px}
+.engchooser.open{display:flex}
+.ecbox{background:#12233f;border:1px solid #2a3a5c;border-radius:18px;padding:28px;max-width:640px;width:100%;color:#fff}
+.eckicker{font-size:12px;font-weight:800;letter-spacing:1.5px;color:#C9A227;margin-bottom:6px}
+.ecbox h2{font-size:22px;margin-bottom:18px}
+.ecgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px}
+.eccard{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:15px;border-radius:12px;border:1.5px solid #2a3a5c;background:#0a1730;color:#fff;cursor:pointer;text-align:left}
+.eccard.ready{border-color:#C9A227}
+.eccard.ready:hover{background:#16305c}
+.eccard.blank{opacity:.6;cursor:pointer}
+.ecnm{font-size:15px;font-weight:800}
+.ecsub{font-size:11.5px;color:#9aa6bd}
+.ecgo{font-size:12px;font-weight:800;color:#C9A227;margin-top:6px}
+.ecwait{font-size:11px;color:#7d879e;margin-top:6px}
+.ecclose{margin-top:18px;width:100%;background:transparent;border:1px solid #2a3a5c;color:#c7cedc;font-weight:700;font-size:13px;padding:10px;border-radius:9px;cursor:pointer}
+
+.ecbanner{background:#0a1730;border:1px solid #2a3a5c;border-radius:10px;padding:11px 14px;font-size:13px;color:#c7cedc;margin-bottom:14px}
+.ecprice{font-size:11px;font-weight:800;padding:3px 8px;border-radius:20px;margin-top:6px;display:inline-block}
+.ecprice.pay{background:rgba(201,161,71,.18);color:#C9A227}
+.ecprice.free{background:rgba(94,201,143,.18);color:#5ec98f}
+</style>
+<style>.engmenu{align-items:center}.engmenu .fa{color:#c9a14a;font-weight:800;font-size:.85rem;align-self:center;margin:0 -1px}.engmenu .fa.div{color:#3a4a68;font-weight:400;margin:0 3px}  .secline{border:none;border-top:1px solid rgba(201,162,39,.45);margin:30px 0 22px}
+  .hcell.hsnone{background:rgba(255,255,255,.05);color:rgba(255,255,255,.30)}
+  .passbar{background:linear-gradient(100deg,rgba(232,185,60,.10),rgba(232,185,60,.04));
+    border:1px solid rgba(232,185,60,.38);border-radius:13px;padding:14px 17px;margin-bottom:14px}
+  .passbar .pbk{font-size:11.5px;color:var(--gold,#e8b93c);font-weight:800;margin-bottom:5px}
+  .passbar .pbnum{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+  .passbar .pbnum b{font-size:27px;color:var(--gold,#e8b93c)}
+  .passbar .pbnum span{font-size:12px;color:rgba(255,255,255,.55)}
+  .passbar .pbv{font-size:12px;font-weight:800;padding:3px 11px;border-radius:20px}
+  .passbar .pbv.low{background:rgba(232,106,90,.18);color:#f0a878}
+  .passbar .pbv.ok{background:rgba(94,201,143,.18);color:#8fe0b4}
+  .passbar .pbbar{position:relative;height:9px;border-radius:6px;background:rgba(255,255,255,.09);margin:11px 0 7px}
+  .passbar .pbbar i{display:block;height:100%;border-radius:6px;
+    background:linear-gradient(90deg,#c9a227,#e8b93c)}
+  .passbar .pbmark{position:absolute;top:-3px;bottom:-3px;width:2px;background:#fff;opacity:.8}
+  .passbar .pbmark em{position:absolute;top:-16px;left:50%;transform:translateX(-50%);
+    font-style:normal;font-size:10px;color:#fff;white-space:nowrap;opacity:.85}
+  .passbar .pbmsg{font-size:12.5px;color:rgba(255,255,255,.72)}
+</style></head>
+<body>
+
+<!-- 로그인 -->
+<div class="gate" id="gate">
+  <div class="gatecard">
+    <div class="gbrand">베리타스 PASS:ON</div>
+    <div class="gsub">변시 합격의 24h 동반자 · 수강생 로그인</div>
+    <label class="gl2">이메일</label>
+    <input id="fEmail" type="email" placeholder="example@email.com" autocomplete="username">
+    <label class="gl2">비밀번호 <small style="color:#9aa6bd;font-weight:400">(6자 이상)</small></label>
+    <input id="fPw" type="password" placeholder="비밀번호" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
+    <div id="profileFields">
+    <div style="font-size:12px;color:#9aa6bd;margin:10px 0 2px">처음 가입할 때만 아래 정보를 입력합니다 · 이미 가입했다면 이메일·비밀번호만 넣고 [로그인] · 관리자 계정은 이메일·비밀번호만</div>
+    <label class="gl2">로스쿨</label>
+    <select id="fSchool">
+      <option value="">선택하세요</option>
+      <option>강원대</option><option>건국대</option><option>경북대</option><option>경희대</option>
+      <option>고려대</option><option>동아대</option><option>부산대</option><option>서강대</option>
+      <option>서울대</option><option>서울시립대</option><option>성균관대</option><option>아주대</option>
+      <option>연세대</option><option>영남대</option><option>원광대</option><option>이화여대</option>
+      <option>인하대</option><option>전남대</option><option>전북대</option><option>제주대</option>
+      <option>중앙대</option><option>충남대</option><option>충북대</option><option>한국외대</option><option>한양대</option>
+    </select>
+    <label class="gl2">학년</label>
+    <select id="fYear">
+      <option value="">선택하세요</option>
+      <option>1학년</option><option>2학년</option><option>3학년</option><option>졸업생</option>
+    </select>
+    <label class="gl2">성명</label>
+    <input id="fName" type="text" placeholder="이름을 입력하세요" maxlength="10" onkeydown="if(event.key==='Enter')signup()">
+    <div style="display:none">
+    <label class="gl2">수강 상품</label>
+    <div class="planrow">
+      <label class="planopt on" id="poFull" onclick="setPlan('full')">종합반 <small>순환 완전체</small></label>
+      <label class="planopt" id="poSingle" onclick="setPlan('single')">단과반 <small>과목 한정</small></label>
+    </div>
+    <select id="fSubj" style="display:none;margin-top:8px">
+      <option>행정법</option><option>헌법</option><option>민법</option><option>형법</option>
+      <option>민소법</option><option>형소법</option><option>상법</option>
+    </select>
+    </div>
+    <div style="font-size:12px;color:#9aa6bd;margin-top:10px">가입은 무료입니다 · 종합반/단과반은 입장 후 <b style="color:var(--gold)">신청 → 입금 → 관리자 승인</b>으로 열립니다</div>
+    </div>
+    <div class="gerr" id="gerr"></div>
+    <button class="btn gbtn" onclick="login()">로그인 →</button>
+    <button class="btn gbtn" style="margin-top:8px;background:transparent;border:1px solid var(--gold);color:var(--gold)" onclick="signup()">회원가입 (처음 오셨다면) →</button>
+    <button class="quickbtn" onclick="resetPw()">비밀번호를 잊으셨나요?</button>
+    <button class="quickbtn" onclick="quickLogin('full')">종합반으로 둘러보기 →</button>
+    <button class="quickbtn" onclick="toggleSinglePick()">단과반으로 둘러보기 →</button><div id="singlePick" style="display:none;margin-top:8px"><div style="font-size:12px;color:#9aa6bd;margin-bottom:6px">신청한 수강 과목을 선택하세요 (단과는 신청 과목만 · 복수 선택 가능)</div><div style="display:flex;flex-wrap:wrap;gap:6px 12px;margin-bottom:8px"><label style="font-size:12.5px;color:#fff;display:flex;align-items:center;gap:4px"><input type="checkbox" class="ssubj" value="헌법" checked>헌법</label><label style="font-size:12.5px;color:#fff;display:flex;align-items:center;gap:4px"><input type="checkbox" class="ssubj" value="민법">민법</label><label style="font-size:12.5px;color:#fff;display:flex;align-items:center;gap:4px"><input type="checkbox" class="ssubj" value="형법">형법</label><label style="font-size:12.5px;color:#fff;display:flex;align-items:center;gap:4px"><input type="checkbox" class="ssubj" value="행정법" checked>행정법</label><label style="font-size:12.5px;color:#fff;display:flex;align-items:center;gap:4px"><input type="checkbox" class="ssubj" value="민소법">민소법</label><label style="font-size:12.5px;color:#fff;display:flex;align-items:center;gap:4px"><input type="checkbox" class="ssubj" value="형소법">형소법</label><label style="font-size:12.5px;color:#fff;display:flex;align-items:center;gap:4px"><input type="checkbox" class="ssubj" value="상법">상법</label></div><button class="quickbtn" onclick="quickLogin('single',getSingleSubjs())">선택 과목으로 입장 →</button></div>
+    
+    <div class="gnote">교재 결제는 <b>북라인</b>, 강의 영상은 <b>고시닷컴</b>에서 — 이곳은 나의 로드맵과 누적을 관리하는 학습 일정 관리 공간입니다.<br>등록 정보로 오프라인 특강 연계 시 <b>5% 추가 할인</b>이 적용됩니다.</div>
+    <div class="gdivider"></div>
+    <div class="gadmin">
+      <button class="galink" onclick="document.getElementById('fAdmin').focus()">관리자 입장 →</button>
+      <div id="adminForm" style="display:block">
+        <input id="fAdmin" type="password" placeholder="관리자 코드" oninput="if(this.value.trim()==='veritas')adminLogin()" onkeydown="if(event.key==='Enter')adminLogin()">
+        <button class="btn gbtn" style="margin-top:10px" onclick="adminLogin()">관리자 대시보드 열기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 관리자 대시보드 -->
+<div class="admin" id="adminView">
+  <div class="awrap">
+    <div class="topbar">
+      <div class="brand">베리타스 PASS:ON <small>관리자 대시보드 · 운영 관제</small></div>
+      <div class="userchip" style="display:flex">
+        <span><b style="color:var(--ink)">관리자</b> · 베리타스 온라인운영팀</span>
+        <button class="mini" onclick="adminLogout()">나가기</button>
+      </div>
+    </div>
+
+    <div class="akpis">
+      <div class="akpi"><b id="akTotal">0</b><span>총 수강생</span></div>
+      <div class="akpi"><b>19</b><span>오늘 활동</span></div>
+      <div class="akpi warn2"><b>3</b><span>기한 주의</span></div>
+      <div class="akpi alert2"><b>2</b><span>상담 개입 대기</span></div>
+      <div class="akpi gold2"><b id="akLink">0</b><span>오프라인 연계(5%)</span></div>
+    </div>
+
+    <div class="panel" style="margin-bottom:22px">
+      <h3>실등록 학생 · 신청 승인 관리</h3>
+      <div class="sub">회원가입한 실제 학생입니다 · 입금 확인 후 [승인]을 누르면 그 학생의 종합반/단과반이 즉시 열립니다 · ⚠ = 같은 로스쿨·학년·이름이 둘 이상(동명이인 또는 중복 가입)</div>
+      <div id="approveList" style="font-size:.85rem"></div>
+    </div>
+    <div class="agrid">
+      <div class="panel">
+        <h3>수요 지도 — 로스쿨별 가입 분포</h3>
+        <div class="sub">가입 데이터가 곧 지방 시장 정보입니다 · 수도권 외 로스쿨 비중 <b style="color:var(--gold)" id="akLocal">0%</b></div>
+        <div class="bars" id="schoolBars"></div>
+      </div>
+      <div class="panel">
+        <h3>이탈 신호 — 안전망 작동</h3>
+        <div class="sub">과업 정체를 데이터로 감지, 사람이 개입합니다</div>
+        <div class="alertrow"><span class="pc warn">주의</span><span class="alname">이OO · 전북대 3학년</span><span class="aldesc">민법 제12강 정체 3일 · 기한 8/8</span><button class="mini" onclick="toast('1:1 상담 슬롯 제안을 발송했습니다')">상담 제안</button></div>
+        <div class="alertrow"><span class="pc warn">주의</span><span class="alname">박OO · 제주대 졸업생</span><span class="aldesc">행정법 해소율 41% · 로드맵 이탈 위험</span><button class="mini" onclick="toast('1:1 상담 슬롯 제안을 발송했습니다')">상담 제안</button></div>
+        <div class="alertrow"><span class="pc ok">회복</span><span class="alname">김OO · 경북대 3학년</span><span class="aldesc">상담 후 5일 연속 과업 이행 — 정상 궤도</span><span class="mini" style="opacity:.4">완료</span></div>
+        <div class="empty-log" style="margin-top:14px">주간 재조정(매주 토 자동 실행) 시 위 신호가 로드맵 수정에 함께 반영됩니다.</div>
+      </div>
+    </div>
+
+    <div class="agrid" style="margin-top:22px">
+      <div class="panel">
+        <h3>전체 수준 종합 — 단계 분포</h3>
+        <div class="sub">전체 수강생 × 7법 = <span id="agTotalCells"></span>개 칸의 현재 단계 분포 · 학원 전체가 지금 어느 국면인지</div>
+        <div class="bars" id="stageDist"></div>
+      </div>
+      <div class="panel">
+        <h3>전체 수준 종합 — 과목별 평균 정답률</h3>
+        <div class="sub">최근 2주 선택형 집계 · 65% 미만은 전사적 보강 후보</div>
+        <div class="bars" id="avgRates"></div>
+      </div>
+    </div>
+
+    <div class="agrid" style="margin-top:22px">
+      <div class="panel">
+        <h3>학교별 분석</h3>
+        <div class="sub">로스쿨 단위의 인원·진도·성취 — 지방 거점별 관리의 기초 자료</div>
+        <div class="atable" id="bySchool"></div>
+      </div>
+      <div class="panel">
+        <h3>학년별 분석</h3>
+        <div class="sub">학년(초시·재시 성격) 단위의 진도·성취 비교</div>
+        <div class="atable" id="byYear"></div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:22px">
+      <h3>전체 진단 한눈판 — 수강생 × 7법 히트맵</h3>
+      <div class="sub">칸 색 = 현재 단계 (<span style="color:#7a8db0">집중</span> → <span style="color:#5aa8e8">심화</span> → <span style="color:#e8b93c">전범위</span> → <span style="color:#5ec98f">최종</span>) · <span style="color:#e86a5a">붉은 테두리 = 취약 신호</span> · 행 클릭 시 학생 상세</div>
+      <div class="heat" id="heatmap"></div>
+    </div>
+
+    <div class="panel" style="margin-top:22px">
+      <h3>수강생 명부</h3>
+      <div class="sub">행을 클릭하면 그 학생의 학습 위치·해소 현황·정답률이 열립니다 — AS의 출발점</div>
+      <div class="atable" id="roster"></div>
+    </div>
+  </div>
+
+  <!-- 학생 상세 -->
+  <div class="smodal" id="studentModal" onclick="if(event.target===this)closeStudent()">
+    <div class="scard">
+      <button class="sclose" onclick="closeStudent()">✕ 닫기</button>
+      <div id="studentBody"></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand" style="cursor:pointer" onclick="showHome()">베리타스 PASS:ON <small>변시 합격의 24h 동반자 · 나의 학습 일정 관리</small></div>
+    <div class="engmenu"><button class="mini" onclick="openEngine('schedule')">🧭 자가진단</button><span class="fa">→</span><button class="mini" onclick="openEngine('match')">🎯 강의 선택</button><span class="fa">→</span><button class="mini" onclick="showRoadmap()">🗺️ 학습 로드맵</button><span class="fa">→</span><button class="mini" onclick="openEngine('mission')">✅ 에브리데이 학습미션</button><span class="fa">→</span><button class="mini" onclick="pickSelType()">🔘 선택형</button><button class="mini" onclick="pickCaseType()">📝 사례형·진도별 자동첨삭</button><span class="fa">→</span><button class="mini" onclick="openEngine('score')">📊 실전문제·답안피드백</button>
+<span class="fa">→</span><button class="mini" onclick="openEngine('exam')">🏛 베리타스 모의고사</button>
+<button class="mini" onclick="pickTeukgang()">🎓 특강</button>
+<span class="fa div">|</span><button class="mini" onclick="openEngine('admin')">🏃 베리타스 페이스메이커</button></div>
+    <div class="userchip" id="userchip" style="display:none">
+      <span id="uinfo"></span>
+      <span class="ubadge">오프라인 연계 5% 추가할인 대상</span>
+      <button class="mini" onclick="logout()">로그아웃</button>
+    </div>
+    <div class="top-stats">
+      <div class="tstat"><div class="v">D-<em id="dday">164</em></div><div class="l">2027 변시</div></div>
+      <div class="tstat"><div class="v"><em id="cellsDone">6</em>/28</div><div class="l">통과 칸</div></div>
+      <div class="tstat"><div class="v"><em id="pace">5.9</em>일</div><div class="l">남은 일수÷남은 칸</div></div>
+    </div>
+  </div>
+
+  <div id="homeHero">
+  <div class="hero-inner">
+    <div class="hero-logo">PASS:ON</div>
+    <h1 class="hero-tag">변시 합격의<br><span class="hero-accent">믿음직한 동반자</span></h1>
+    <div class="vroom">
+      <div class="vroom-head">베리타스 온라인 변시 종합반 · 가상 강의실 <span class="live">● LIVE</span></div>
+      <div class="vcount"><span class="n" id="vN">847</span><span class="t">명이 지금 함께 공부 중</span></div>
+      <div class="vgrid"><div class="vseat"></div><div class="vseat on">이O진</div><div class="vseat"></div><div class="vseat on">한O서</div><div class="vseat on">김O민</div><div class="vseat"></div><div class="vseat on">박O호</div><div class="vseat"></div><div class="vseat on">오O민</div><div class="vseat"></div><div class="vseat"></div><div class="vseat on">조O연</div><div class="vseat on">김O린</div><div class="vseat"></div><div class="vseat me">★ 종정학</div><div class="vseat"></div><div class="vseat on">최O원</div><div class="vseat"></div><div class="vseat"></div><div class="vseat on">정O우</div><div class="vseat"></div><div class="vseat on">서O아</div><div class="vseat"></div><div class="vseat on">윤O성</div></div>
+      <div class="vroom-foot">내 옆자리에서 공부 중 <b>23명</b> · …외 <b>823명</b>이 각자의 자리에서 · 내 자리 <b>★</b></div>
+    </div>
+    <p class="hero-sub">위 메뉴에서 오늘 할 일을 시작하세요. 무엇부터 할지 모르겠다면 <button class="hero-hint" onclick="openEngine('schedule')">🧭 자가진단</button>부터.</p>
+  </div>
+</div>
+<div id="dashSections" style="display:none">
+<button class="homebtn" onclick="showHome()">← 홈으로</button>
+
+
+  <!-- ① -->
+  <section id="s1">
+    <hr class="secline">
+    <div class="passbar" id="passbar">
+      <div class="pbleft">
+        <div class="pbk" id="pbRound">베리타스 모의고사</div>
+        <div class="pbnum"><b id="pbTotal">822</b><span>/ 1,660점</span>
+          <span class="pbv" id="pbVerdict">합격선 미달</span></div>
+      </div>
+      <div class="pbbar"><i id="pbFill" style="width:0%"></i>
+        <span class="pbmark" style="left:60.2%"><em>합격 1,000</em></span></div>
+      <div class="pbmsg" id="pbMsg">합격선까지 178점 남았습니다</div>
+    </div>
+    <div class="profiles">
+      <div class="pcard on">
+        <h3>종정학 · 전남대 3학년 · 초시</h3>
+        <p>헌법 집중 단계를 진행 중입니다. 나머지 과목은 강의를 선택하면 로드맵에 더해집니다.</p>
+        <div class="diag">진단 결과 — <b>헌법 집중</b> 진행 중 · 나머지 6법은 아직 선택하지 않았습니다 · 강의 선택한 지점까지만 로드맵에 반영됩니다</div>
+      </div>
+    </div>
+    <a class="realbtn" href="#" onclick="openEngine('match');return false">🎯 강의 선택 다시 하기</a> <a class="realbtn" href="#" onclick="openEngine('schedule');return false">🧭 자가진단 다시 하기</a>
+  </section>
+
+  <!-- ② -->
+  <section id="s2">
+    <hr class="secline">
+    <div class="matrix-head">
+      <div>
+        
+      </div>
+      <div class="legend">
+        <span><span class="chip c-done"></span>통과</span>
+        <span><span class="chip c-now"></span>진행 중 (오늘 8/1)</span>
+        <span><span class="chip c-todo"></span>예정</span>
+        <span><span class="chip c-skip"></span>진단 면제</span>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="detail" id="detail"></div>
+
+    <a class="realbtn" href="#" onclick="openEngine('roadmap');return false">🗺️ 수강완료 로드맵 계산기 열기</a>
+  </section>
+
+  <!-- ③ -->
+  <section id="s3">
+    <hr class="secline">
+    
+    <div class="today">
+      <div class="panel">
+        <h3 id="todayTitle">자율수강 중인 강의</h3>
+        <div id="lectures"></div>
+        <div class="mini-rate">오늘 소화 <b id="todayDigest">0문 · 답안 0</b><span class="mini-note">· 기한 대비 정체 시 신호 → 3일 지속 시 1:1 상담 자동 제안(안전망)</span></div>
+      </div>
+      <div class="panel">
+        <h3>과목별 누적수강현황</h3>
+        <div class="sub" id="accumSub">개강(2/2) 이후 누적 — 선택형 문항 · 사례형 답안 · 기록형 세트</div>
+        <div id="accum"></div>
+        <div class="accum-total">7법 합계 <b id="accumTotal">0</b>문 <span id="todayAdd"></span></div>
+      </div>
+    </div>
+    <div class="pairlabel">일일 과업을 실행하는 두 학습엔진 — 심화과 사례는 한 세트</div>
+    <div class="pairrow">
+      <a class="realbtn" href="#" onclick="openEngine('mission');return false">✅ 에브리데이 학습미션 — 오늘의 학습 체크</a> <a class="realbtn" href="#" onclick="launchEngine('sel');return false">🔘 선택형 — 객관식 학습엔진</a>
+      <a class="realbtn" href="#" onclick="launchEngine('case');return false">📝 사례형 진도별 — 답안 학습엔진</a> <a class="realbtn" href="#" onclick="openEngine('score');return false">📊 실전문제·답안피드백</a>
+    </div>
+  </section>
+
+  <!-- ⑤⑥ -->
+  <section id="s4">
+    <hr class="secline">
+    
+    <div class="datazone">
+      <div class="panel">
+        <h3>주간 데이터 — 과목별 선택형 정답률</h3>
+        <div class="sub">7/25 ~ 7/31 · 선택형 학습 집계</div>
+        <div class="bars" id="bars"></div>
+      </div>
+      <div class="panel">
+        <h3>재조정 결정</h3>
+        <div class="sub">쌓인 학습 데이터로 로드맵을 다시 맞춥니다</div>
+        <button class="btn" id="rebtn" onclick="rebalance()">⟲ 주간 데이터 반영 — 로드맵 재조정</button>
+        <div class="log" id="log"></div>
+        <div class="empty-log" id="logEmpty">아직 이번 주 데이터가 반영되지 않았습니다. 버튼을 눌러 순환을 완성하세요.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    교재는 <b>북라인</b>, 강의 영상은 <b>고시닷컴</b>에서 제공됩니다.<br>
+    베리타스 PASS:ON · 온라인 변시 종합반
+  </footer>
+</div>
+
+<!-- ===== Supabase 연결 ===== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL="https://swhkdtjishfigulgpbbj.supabase.co";
+const SB_KEY="sb_publishable_bL6M3894ms5qEdkrIx11EQ_1Fe7EkiU";
+const sb=window.supabase.createClient(SB_URL,SB_KEY);
+const ADMIN_EMAIL="gift0508@gmail.com"; // 관리자 계정 이메일 (RLS 정책과 동일해야 함)
+function adminProfile(email){ return {admin:1,name:"관리자",school:"베리타스",year:"운영팀",plan:"full",subj:null,subjs:null,email}; }
+</script>
+<script>
+const laws=["헌법","민법","형법","행정법","민소법","형소법","상법"];
+const stages=["집중","심화","전범위","최종"];
+// 유형 레이어 배치: 단계 인덱스별 [선택형, 사례형, 기록형]
+const typeMap=[[1,1,0],[1,1,1],[1,1,1],[1,1,1]];
+const engines={
+  sel:["OX 단계별 (오답 자동 반복)","실전 5지택일","선다박스 혼합형","전범위 선택형 모의"],
+  cas:["목차·쟁점 구조 훈련","답안 현출 훈련 + 체크리스트","매칭첨삭스코어 정밀첨삭","실전 첨삭 모의"],
+  rec:["—","쟁점 추출 훈련 (기록 독해)","CBT 서면 작성 트레이너","CBT 실전 모의 (실전 동일 환경)"]
+};
+// 프로필별 로드맵: 각 칸 {p:기간, s:상태 done/now/todo/skip}
+let STAGEMAP={"헌법":0,"민법":-1,"형법":-1,"행정법":-1,"민소법":-1,"형소법":-1,"상법":-1};
+let CREDITMAP={};
+const STAGEPER=["2/2–6/14","7/6–9/27","10/5–11/22","11/30–1/8"];
+function buildCellsA(){return laws.map(l=>{const n=STAGEMAP[l],cr=CREDITMAP[l]||0;if(n<0)return [0,1,2,3].map(k=>({p:STAGEPER[k],s:"none"}));return [0,1,2,3].map(k=>({p:STAGEPER[k],s:k<cr?"credit":(k<n?"done":(k===n?"now":"todo"))}));});}
+const P={
+A:{name:"종정학 · 3학년 초시", done:0, pace:"–", cells:buildCellsA()},
+B:{name:"박정호 · 재시", done:9, pace:"4.4",
+  cells:laws.map((l,i)=>{
+    const weak=(l==="행정법"||l==="상법");
+    return weak?[
+      {p:"2/2–4/12 압축",s:"done"},
+      {p:"4/20–8/23",s:"now"},
+      {p:"8/31–11/1",s:"todo"},
+      {p:"11/9–1/8",s:"todo"}
+    ]:[
+      {p:"진단 통과",s:"skip"},
+      {p:"3/2–7/26",s:"done"},
+      {p:"8/3–10/25",s:"now"},
+      {p:"11/2–1/8",s:"todo"}
+    ];
+  })}
+};
+let cur="A", rebalanced=false;
+
+function grid(){
+  const g=document.getElementById("grid");
+  let h='<div class="gh"></div>'+stages.map(s=>`<div class="gh">${s}</div>`).join("");
+  P[cur].cells.forEach((row,li)=>{
+    h+=`<div class="gl">${laws[li]}</div>`;
+    row.forEach((c,si)=>{
+      const dots=typeMap[si].map((on,t)=>on?`<span class="dot ${["d-sel","d-case","d-rec"][t]}"></span>`:"").join("");
+      const stTxt={done:"통과",now:"진행 중",todo:"예정",skip:"면제",credit:"선행 이수",none:"미진입"}[c.s];
+      h+=`<div class="cell ${c.s}" id="c-${li}-${si}" onclick="openCell(${li},${si})">
+        <div class="dots">${dots}</div>
+        <div class="period">${c.p}</div><div class="st">${stTxt}</div>
+        <div class="ext">▲ 재조정 반영</div></div>`;
+    });
+  });
+  g.innerHTML=h;
+}
+function openCell(li,si){
+  const d=document.getElementById("detail");
+  const c=P[cur].cells[li][si];
+  const [hasSel,hasCase,hasRec]=typeMap[si];
+  d.innerHTML=`
+   <h3>${laws[li]} <span>· ${stages[si]}</span></h3>
+   <div class="meta">${c.p} · 상태: ${{done:"통과",now:"진행 중",todo:"예정",skip:"진단 면제 (직행)",credit:"선행 이수 — 진단으로 확인·면제 (원하면 이 강의도 들을 수 있습니다)",none:"미진입 — 아직 시작하지 않은 과목 · 강의 선택에서 강의를 신청하면 집중으로 진입합니다"}[c.s]} · 이 칸의 일일 과업은 매일 아침 자동 발행됩니다</div>
+   <div class="layers">
+     <div class="layer sel ${hasSel?"":"off"}"><div class="tag">선택형</div><div class="eng">${engines.sel[si]}</div><p>정답률·오답 단계 분포가 ⑤데이터로 축적됩니다.</p></div>
+     <div class="layer case ${hasCase?"":"off"}"><div class="tag">사례형</div><div class="eng">${engines.cas[si]}</div><p>단계별 답안분석 프레임(배점→채점포인트→현출 체크리스트) 기반.</p></div>
+     <div class="layer rec ${hasRec?"":"off"}"><div class="tag">기출연습 기록형 · CBT</div><div class="eng">${engines.rec[si]}</div><p>실전과 동일한 화면·타이핑 환경. 온라인만이 제공하는 실전성입니다.</p></div>
+   </div>
+   <button class="cellmatch" onclick="goMatch('${laws[li]}','${stages[si]}')">🎓 ${laws[li]} · ${stages[si]} 강의 선택 → 강의 담기</button>`;
+  d.classList.add("open");
+  d.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+/* 선택형=3분류(공법/형사법/민사법) · 사례형=7법 · 데모 있는 것만 열림 */
+var SEL_CATS=[
+  {name:"공법", sub:"헌법 · 행정법", ready:false},
+  {name:"형사법", sub:"형법 · 형사소송법", ready:false},
+  {name:"민사법", sub:"민법 · 민사소송법 · 상법", ready:false},
+];
+var CASE_CATS=[
+  {name:"헌법",ready:false},{name:"행정법",ready:false},{name:"형법",ready:false},
+  {name:"형사소송법",ready:false},{name:"민법",ready:false},{name:"민사소송법",ready:false},{name:"상법",ready:false},
+];
+var TEUK_CATS=[{name:"예비특강",d:"과목별 기초 개념 정리"},{name:"최신판례특강",d:"최근 판례 집중 정리"},{name:"위크포인트특강",d:"취약 쟁점 집중 보강"},{name:"답안작성특강",d:"현출·논증·배점 훈련"}];
+function pickTeukgang(){
+  document.getElementById("ecKicker").textContent="특강 · 선택 상품";
+  document.getElementById("ecTitle").textContent="특강을 고르세요";
+  var banner=document.getElementById("ecBanner");
+  if(banner) banner.innerHTML='특강은 정규 과정과 별개의 <b style="color:#fff">선택 상품</b>입니다. <b style="color:#C9A227">종합반은 할인가</b>로 이용합니다.';
+  document.getElementById("ecGrid").innerHTML=TEUK_CATS.map(function(c){
+    return '<button class="eccard blank" onclick="teukPick(\''+c.name+'\')"><span class="ecnm">'+c.name+'</span><span class="ecsub">'+c.d+'</span><span class="ecwait">단과 미정 · 종합 할인가 미정</span></button>';
+  }).join("");
+  document.getElementById("engChooser").classList.add("open");
+}
+function teukPick(nm){ if(window.toast)toast(nm+" 신청 화면으로 이동합니다."); else alert(nm+" 신청 화면으로 이동합니다."); }
+function pickSelType(){ openChooser("sel","선택형 학습엔진","학습엔진 10개 (공법 · 형사법 · 민사법)", SEL_CATS); }
+function pickCaseType(){ openChooser("case","사례형 진도별 학습엔진","학습엔진 10개 (7법)", CASE_CATS); }
+function openChooser(k, kicker, title, cats){
+  var single=isSingle();
+  document.getElementById("ecKicker").textContent=kicker;
+  document.getElementById("ecTitle").textContent=title;
+  var banner=document.getElementById("ecBanner");
+  if(banner) banner.innerHTML = single
+    ? '<b style="color:#C9A227">단과반</b> — 학습엔진은 <b>하나 열 때마다 10만 원</b>씩 결제합니다.'
+    : '<b style="color:#5ec98f">종합반</b> — 모든 학습엔진을 <b>무료</b>로 이용합니다.';
+  document.getElementById("ecGrid").innerHTML=cats.map(function(c){
+    var sub=c.sub?('<span class="ecsub">'+c.sub+'</span>'):'';
+    var price = single ? '<span class="ecprice pay">10만 원</span>' : '<span class="ecprice free">종합반 무료</span>';
+    if(c.ready) return '<button class="eccard ready" onclick="openEngWithCat(\''+k+'\',\''+c.name+'\')"><span class="ecnm">'+c.name+'</span>'+sub+price+'<span class="ecgo">'+(single?'결제하고 열기 →':'열기 →')+'</span></button>';
+    return '<button class="eccard blank" onclick="ecBlank(\''+c.name+'\')"><span class="ecnm">'+c.name+'</span>'+sub+price+'<span class="ecwait">미선택</span></button>';
+  }).join("");
+  document.getElementById("engChooser").classList.add("open");
+}
+function closeChooser(){ document.getElementById("engChooser").classList.remove("open"); }
+function openEngWithCat(k, cat){
+  if(isSingle()){ showEngPay(k, cat); return; }
+  doEngOpen(k, cat);
+}
+function doEngOpen(k, cat){
+  closeChooser(); openEngine(k);
+  document.getElementById("engtitle").textContent=(k==="sel"?"선택형":"사례형 진도별")+" · "+cat+(isSingle()?" · 단과 10만원":"");
+}
+var ENGPAY={k:null,cat:null};
+function showEngPay(k,cat){
+  ENGPAY={k:k,cat:cat};
+  var nm=(k==="sel"?"선택형":"사례형 진도별")+" 학습엔진";
+  document.getElementById("engPayTitle").textContent=cat+" · "+nm+" 결제";
+  document.getElementById("engPayGate").style.display="flex";
+}
+function engPayClose(){ document.getElementById("engPayGate").style.display="none"; }
+function engPayGo(){ engPayClose(); doEngOpen(ENGPAY.k, ENGPAY.cat); }
+function ecBlank(cat){ toast(cat+" — 아직 선택하지 않은 과목입니다"); }
+
+function goMatch(subj, stage){ window.matchSubject=subj; window.matchStage=stage; openEngine('match'); }
+function setProfile(k){
+  cur=k;
+  document.getElementById("pA").classList.toggle("on",k==="A");
+  document.getElementById("pB").classList.toggle("on",k==="B");
+  document.getElementById("cellsDone").textContent=P[k].done;
+  document.getElementById("pace").textContent=P[k].pace;
+  document.getElementById("todayTitle").textContent="자율수강 중인 강의";
+  document.getElementById("detail").classList.remove("open");
+  grid(); initBoard();
+}
+// 강의 = 해소 총량의 단위. obj/cas(/rec): [해소, 총량]. due: 로드맵상 해소 기한
+const lecData={
+A:[
+  {subj:"헌법",title:"집중 · 평등원칙 심사기준",obj:[14,20],cas:[9,18],due:"8/10",pace:"ok"},
+  {subj:"헌법",title:"집중 · 자유권 총론",obj:[11,24],cas:[4,15],due:"8/8",pace:"warn"},
+  {subj:"헌법",title:"집중 · 재판청구권",obj:[18,18],cas:[10,12],due:"8/12",pace:"near"}
+],
+B:[
+ {subj:"행정법",title:"취약 제4강 · 처분성과 원고적격",obj:[20,30],cas:[8,20],due:"8/9",pace:"warn"},
+ {subj:"상법",title:"취약 제6강 · 이사의 책임",obj:[15,22],cas:[6,12],due:"8/14",pace:"ok"},
+ {subj:"형법",title:"전범위 제3강 · 죄수론 종합",obj:[9,12],cas:[5,8],rec:[1,2],due:"8/16",pace:"ok"}
+]};
+let lec=[];
+function resetLec(){lec=JSON.parse(JSON.stringify(lecData[cur]));}
+let today={sel:0,cas:0,rec:0};
+function paceTag(p,doneAll){
+  if(doneAll)return `<span class="pc done">해소 완료 · 칸 진도 반영</span>`;
+  return {ok:`<span class="pc ok">기한 여유</span>`,
+          warn:`<span class="pc warn">주의 — 잔량 대비 기한 촉박</span>`,
+          near:`<span class="pc near">완료 임박</span>`}[p];
+}
+function lectures(){
+  const el=document.getElementById("lectures");
+  el.innerHTML=lec.map((L,i)=>{
+    const doneAll=L.obj[0]>=L.obj[1]&&L.cas[0]>=L.cas[1]&&(!L.rec||L.rec[0]>=L.rec[1]);
+    const recRow=L.rec?`
+      <div class="lrow"><span class="lt rec">기록형</span>
+        <div class="ltrack"><div class="lfill rec" style="width:${L.rec[0]/L.rec[1]*100}%"></div></div>
+        <span class="lnum">${L.rec[0]} / ${L.rec[1]}</span>
+        <button class="mini" onclick="consume(${i},'rec',1)" ${L.rec[0]>=L.rec[1]?"disabled":""}>+1 작성</button></div>`:"";
+    return `<div class="lcard ${doneAll?"lc-done":""}" id="lc${i}">
+      <div class="lhead"><b>${L.subj}</b> <span class="ltitle">${L.title}</span>
+        <span class="ldue">해소 기한 ${L.due}</span>${paceTag(L.pace,doneAll)}</div>
+      <div class="lrow"><span class="lt sel">객관식</span>
+        <div class="ltrack"><div class="lfill sel" style="width:${L.obj[0]/L.obj[1]*100}%"></div></div>
+        <span class="lnum">${L.obj[0]} / ${L.obj[1]}문</span>
+        <button class="mini" onclick="consume(${i},'obj',5)" ${L.obj[0]>=L.obj[1]?"disabled":""}>+5문</button>
+        <button class="mini" onclick="consume(${i},'obj',1)" ${L.obj[0]>=L.obj[1]?"disabled":""}>+1문</button>
+        <button class="mini engbtn" onclick="launchEngine('sel')" title="선택형 학습엔진">⚙️ 선택형</button></div>
+      <div class="lrow"><span class="lt case">사례</span>
+        <div class="ltrack"><div class="lfill case" style="width:${L.cas[0]/L.cas[1]*100}%"></div></div>
+        <span class="lnum">${L.cas[0]} / ${L.cas[1]}문</span>
+        <button class="mini" onclick="consume(${i},'cas',1)" ${L.cas[0]>=L.cas[1]?"disabled":""}>+1 현출</button>
+        <button class="mini engbtn" onclick="launchEngine('case')" title="사례형 전용 학습엔진">📝 사례학습엔진</button></div>
+      ${recRow}
+      <div class="lext">
+        <button class="extbtn" onclick="ext('고시닷컴','강의 영상')">▶ 강의 보기 · 고시닷컴</button>
+        <button class="extbtn" onclick="ext('북라인','교재 결제')">📕 교재 · 북라인</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+function consume(i,kind,n){
+  const L=lec[i],l=L.subj;
+  const slot=kind==="obj"?L.obj:(kind==="cas"?L.cas:L.rec);
+  const real=Math.min(n,slot[1]-slot[0]);
+  if(real<=0)return;
+  slot[0]+=real;
+  const before=accum[l][0],beforeTotal=laws.reduce((a,k)=>a+accum[k][0],0);
+  if(kind==="obj"){accum[l][0]+=real;today.sel+=real;}
+  else if(kind==="cas"){accum[l][1]+=real;today.cas+=real;}
+  else{accum[l][2]+=real;today.rec+=real;}
+  lectures();
+  // 누적탑 갱신
+  const max=Math.max(...laws.map(k=>accum[k][0]));
+  laws.forEach(k=>{document.getElementById("fill-"+k).style.width=(accum[k][0]/max*100).toFixed(1)+"%";});
+  countUp(document.getElementById("cnt-"+l),before,accum[l][0]);
+  document.getElementById("cc-"+l).textContent=accum[l][1];
+  document.getElementById("rc-"+l).textContent=accum[l][2];
+  const row=document.getElementById("ar-"+l),plus=document.getElementById("plus-"+l);
+  const g=todayGainStr(l);
+  plus.textContent=g?("오늘 "+g):""; row.classList.toggle("gain",!!g);
+  countUp(document.getElementById("accumTotal"),beforeTotal,laws.reduce((a,k)=>a+accum[k][0],0));
+  document.getElementById("todayDigest").textContent=today.sel+"문 · 답안 "+today.cas+(today.rec?(" · 기록 "+today.rec):"");
+  const parts=[];
+  if(today.sel)parts.push("+"+today.sel+"문");if(today.cas)parts.push("답안 +"+today.cas);if(today.rec)parts.push("기록 +"+today.rec);
+  document.getElementById("todayAdd").textContent=parts.length?("▲ 오늘 "+parts.join(" · ")+" 적립"):"";
+}
+const todayBySubj={};
+function todayGainStr(l){
+  // 오늘 소화분을 강의 데이터와 시드의 차로 계산
+  let sel=0,cas=0,rec=0;
+  lec.forEach((L,i)=>{
+    if(L.subj!==l)return;
+    const S=lecData[cur][i];
+    sel+=L.obj[0]-S.obj[0];cas+=L.cas[0]-S.cas[0];
+    if(L.rec)rec+=L.rec[0]-S.rec[0];
+  });
+  const parts=[];
+  if(sel)parts.push("+"+sel+"문");if(cas)parts.push("답안 +"+cas);if(rec)parts.push("기록 +"+rec);
+  return parts.join(" · ");
+}
+// 개강(2/2) 이후 과목별 누적 시드: [선택형 문항, 사례형 답안, 기록형 세트]
+const accumSeed={
+A:{헌법:[186,4,0],민법:[0,0,0],형법:[0,0,0],행정법:[0,0,0],민소법:[0,0,0],형소법:[0,0,0],상법:[0,0,0]},
+B:{헌법:[1420,26,6],민법:[1655,31,8],형법:[1508,28,7],행정법:[1102,19,4],민소법:[1237,22,6],형소법:[1284,23,6],상법:[918,15,3]}
+};
+let accum={};
+function resetAccum(){accum=JSON.parse(JSON.stringify(accumSeed[cur]));}
+function fmt(n){return n.toLocaleString("ko-KR");}
+function countUp(el,from,to){
+  const dur=550,t0=performance.now();
+  function step(t){
+    const k=Math.min(1,(t-t0)/dur);
+    el.textContent=fmt(Math.round(from+(to-from)*(1-Math.pow(1-k,3))));
+    if(k<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+function renderAccum(anim){
+  const el=document.getElementById("accum");
+  const max=Math.max(...laws.map(l=>accum[l][0]));
+  let total=0;
+  el.innerHTML=laws.map(l=>{
+    const [s,c,r]=accum[l]; total+=s;
+    return `<div class="arow" id="ar-${l}">
+      <div class="top"><span class="nm">${l}</span>
+        <span class="cnt"><span id="cnt-${l}">${fmt(s)}</span><small>문</small></span>
+        <span class="plus" id="plus-${l}"></span></div>
+      <div class="track2"><div class="fill2" id="fill-${l}" style="width:${(s/max*100).toFixed(1)}%"></div></div>
+      <div class="subcnt">사례형 답안 <b id="cc-${l}">${c}</b> · 기록형 <b id="rc-${l}">${r}</b>세트</div>
+    </div>`;
+  }).join("");
+  document.getElementById("accumTotal").textContent=fmt(total);
+}
+function initBoard(){
+  resetAccum();resetLec();
+  today={sel:0,cas:0,rec:0};
+  lectures();renderAccum();
+  document.getElementById("todayDigest").textContent="0문 · 답안 0";
+  document.getElementById("todayAdd").textContent="";
+}
+const weekData=[["헌법",78]];
+function bars(){
+  document.getElementById("bars").innerHTML=weekData.map(w=>`
+   <div class="bar ${w[2]?"weak":""}"><span class="bl">${w[0]}</span>
+   <div class="track"><div class="fill" style="width:0" data-w="${w[1]}"></div></div>
+   <span class="bv">${w[1]}%</span></div>`).join("");
+  setTimeout(()=>document.querySelectorAll(".fill").forEach(f=>f.style.width=f.dataset.w+"%"),150);
+}
+function rebalance(){
+  if(isSingle()){upsell("로드맵 자동 재조정");return;}
+  if(rebalanced)return;
+  rebalanced=true;
+  document.getElementById("rebtn").disabled=true;
+  document.getElementById("logEmpty").style.display="none";
+  const li=laws.indexOf("행정법"), fi=laws.indexOf("형법"), si2=laws.indexOf("상법");
+  const hi=laws.indexOf("헌법");
+  const A=P[cur].cells;
+  if(cur==="A"){
+    A[hi][0].p="2/2–6/28 (+2주)"; A[hi][1].p="7/13–10/4";
+  }else{
+    A[li][2].p="4/20–9/6 (+2주)"; A[li][3].p="9/14–11/8";
+    A[fi][3].p="8/3–10/11 압축"; A[si2][2].p="4/20–9/6 (+2주)";
+  }
+  grid();
+  (cur==="A"?["c-"+hi+"-0","c-"+hi+"-1"]:["c-"+li+"-2","c-"+li+"-3","c-"+fi+"-3","c-"+si2+"-2"]).forEach(id=>{
+    const el=document.getElementById(id); if(el){el.classList.add("pulse","extended");}
+  });
+  const logs=(cur==="A")?[
+    `<b>헌법</b> 정답률 78% → 통과 기준 85%까지 <b>집중 칸 +2주 연장</b>. 일일 과업에 선택형 +10문 증량.`,
+    `<b>헌법</b> 취약 목차(자유권 총론) → 사례형 답안 작성 주기 2주→1주로 단축.`,
+    `안전망 점검 — 과업 이행률 정상 범위. <b>상담 개입 불필요</b>. 다음 재조정: 8/8(토) 자동 실행.`
+  ]:[
+    `<b>행정법</b> 정답률 54% → 심화 칸 <b>+2주 연장</b>, 전범위 진입 순연. 일일 과업에 5지택일 +10문 증량.`,
+    `<b>상법</b> 정답률 61% → 심화 칸 +1주 연장, 사례형 첨삭 주기 2주→1주로 단축.`,
+    `<b>형법</b> 정답률 88% → 전범위 <b>조기 진입</b>. 확보된 시간을 행정법에 재배정.`,
+    `안전망 점검 — 과업 이행률 정상 범위. <b>상담 개입 불필요</b>. 다음 재조정: 8/8(토) 자동 실행.`
+  ];
+  const lg=document.getElementById("log");
+  logs.forEach((t,i)=>{
+    const d=document.createElement("div");
+    d.className="li"+(i===logs.length-1?" safety":""); d.innerHTML=t; lg.appendChild(d);
+    setTimeout(()=>d.classList.add("show"),300+i*450);
+  });
+  document.getElementById("grid").scrollIntoView({behavior:"smooth",block:"center"});
+}
+// ---------- 로그인 · 저장 · 외부 연결 ----------
+let user=null;
+async function authUser(){
+  try{ const {data}=await sb.auth.getUser(); return data&&data.user?data.user:null; }catch(e){ return null; }
+}
+async function saveUser(u){
+  // 데모(둘러보기) 사용자는 로컬에만 저장, 실사용자는 Supabase students 테이블에 저장
+  if(!u.demo&&!u.admin){
+    const au=await authUser();
+    if(au){
+      const row={user_id:au.id,email:au.email,school:u.school,year:u.year,name:u.name,phone:u.phone||null,
+        applied_plan:u.applied_plan||null,applied_subjs:u.applied_subjs||null,applied_at:u.applied_at||null};
+      try{
+        const {data,error}=await sb.from('students').upsert(row,{onConflict:'user_id'}).select().single();
+        if(error)throw error;
+        if(data){ u.id=data.id; u.plan=data.plan; u.subj=data.subj; u.subjs=data.subjs; u.approved_at=data.approved_at; } // plan은 서버(관리자 승인)가 결정
+      }catch(e){ console.error("[supabase] saveUser",e); toast("서버 저장 실패: "+e.message); }
+    }
+  }
+  try{ localStorage.setItem('hapgyeok_os_user',JSON.stringify(u)); }catch(e){}
+}
+async function fetchProfile(au){
+  const {data,error}=await sb.from('students').select('*').eq('user_id',au.id).maybeSingle();
+  if(error){ console.error("[supabase] fetchProfile",error); return null; }
+  if(!data) return null;
+  return {id:data.id,school:data.school,year:data.year,name:data.name,plan:data.plan||"none",subj:data.subj,subjs:data.subjs,joined:data.joined,email:au.email,
+    phone:data.phone,applied_plan:data.applied_plan,applied_subjs:data.applied_subjs,applied_at:data.applied_at,approved_at:data.approved_at};
+}
+async function loadUser(){
+  const au=await authUser();
+  if(au){ if(au.email===ADMIN_EMAIL) return adminProfile(au.email); const p=await fetchProfile(au); if(p) return p; return null; }
+  try{ const r=localStorage.getItem('hapgyeok_os_user'); const u=r?JSON.parse(r):null; return (u&&u.demo)?u:null; }catch(e){ return null; }
+}
+async function clearUser(){
+  try{ await sb.auth.signOut(); }catch(e){}
+  try{ localStorage.removeItem('hapgyeok_os_user'); }catch(e){}
+}
+function applyUser(u){
+  user=u; window.userSchool=u.school; window.userName=u.name; window.userPlan=u.plan; window.userSubj=u.subj||null; window.userSubjs=u.subjs||(u.subj?[u.subj]:[]);
+  document.getElementById("gate").classList.add("hidden");
+  setTimeout(function(){ if(typeof showHome==='function') showHome(); }, 30);
+  const chip=document.getElementById("userchip");
+  chip.style.display="flex";
+  document.getElementById("uinfo").innerHTML=`<b>${u.name}</b> · ${u.school} ${u.year}`;
+  document.querySelectorAll(".vseat").forEach(s=>{ if(s.textContent.indexOf("★")>=0) s.textContent="★ "+u.name; });
+  const badge=chip.querySelector(".ubadge");
+  if(u.plan==="single"){badge.textContent="단과반 · "+(u.subjs&&u.subjs.length?u.subjs.join("·"):u.subj)+" 한정";badge.classList.add("single");}
+  else if(u.admin){badge.textContent="👑 관리자 · 모든 화면 열람";badge.classList.remove("single");}
+  else if(u.plan==="full"){badge.textContent="종합반 · 오프라인 연계 5% 할인 대상";badge.classList.remove("single");}
+  else{badge.textContent=u.applied_at?"신청 접수 · 입금 확인 후 승인 대기":"미결제 · 둘러보기 — 종합반/단과반 신청 후 이용";badge.classList.add("single");}
+  let ab=document.getElementById("admTop");
+  if(u.admin){
+    if(!ab){ab=document.createElement("button");ab.id="admTop";ab.className="upgbtn";ab.textContent="👑 관리자 대시보드";
+      ab.onclick=()=>openAdminView();chip.insertBefore(ab,chip.querySelector(".mini"));}
+  }else if(ab){ab.remove();}
+  let ub=document.getElementById("upgTop");
+  if(u.plan!=="full"){
+    if(!ub){ub=document.createElement("button");ub.id="upgTop";ub.className="upgbtn";ub.textContent=u.plan==="single"?"⭐ 종합반 신청":(u.applied_at?"⏳ 승인 상태 확인":"⭐ 종합반/단과반 신청");
+      ub.onclick=()=>openUpgrade();chip.insertBefore(ub,chip.querySelector(".mini"));}
+  }else if(ub){ub.remove();}
+  applyPlanLocks();
+  if(typeof paintExam==="function") paintExam();
+}
+function readProfileFields(){
+  const school=document.getElementById("fSchool").value;
+  const year=document.getElementById("fYear").value;
+  const name=document.getElementById("fName").value.trim();
+  if(!school||!year||!name) return null;
+  return {school,year,name,plan:"none",subj:null};
+}
+function readCred(){
+  const email=document.getElementById("fEmail").value.trim();
+  const pw=document.getElementById("fPw").value;
+  return {email,pw};
+}
+async function login(){
+  const err=document.getElementById("gerr"); err.textContent="";
+  const {email,pw}=readCred();
+  if(!email||!pw){err.textContent="이메일과 비밀번호를 입력해 주세요";return;}
+  const {data,error}=await sb.auth.signInWithPassword({email,password:pw});
+  if(error){
+    err.textContent=/Invalid login/i.test(error.message)?"이메일 또는 비밀번호가 올바르지 않습니다":(/not confirmed/i.test(error.message)?"이메일 확인이 아직 안 됐습니다. 받은 메일의 링크를 눌러 주세요":"로그인 실패: "+error.message);
+    return;
+  }
+  const au=data.user;
+  if(au.email===ADMIN_EMAIL){ enterAsAdmin(au.email); return; }
+  let p=await fetchProfile(au);
+  if(!p){
+    // 첫 로그인: 가입 때 넣은 정보(metadata) 또는 지금 화면의 프로필 입력값으로 생성
+    const m=au.user_metadata||{};
+    const pf=readProfileFields()||((m.school&&m.year&&m.name)?{school:m.school,year:m.year,name:m.name,plan:m.plan||"full",subj:m.subj||null}:null);
+    if(!pf){err.textContent="첫 로그인입니다. 로스쿨·학년·성명을 입력한 뒤 다시 [로그인]을 눌러 주세요";return;}
+    const u={...pf,email:au.email,joined:new Date().toISOString().slice(0,10)};
+    await saveUser(u); p=u;
+  }
+  applyUser(p);
+  toast(p.name+"님, 오늘의 해소를 시작하세요");
+}
+let dupWarned=null;
+async function signup(){
+  const err=document.getElementById("gerr"); err.textContent="";
+  const {email,pw}=readCred();
+  if(!email||!pw){err.textContent="이메일과 비밀번호를 입력해 주세요";return;}
+  if(pw.length<6){err.textContent="비밀번호는 6자 이상이어야 합니다";return;}
+  if(email===ADMIN_EMAIL){
+    const {data:ad,error:ae}=await sb.auth.signUp({email,password:pw});
+    if(ae){err.textContent=/already registered/i.test(ae.message)?"이미 가입된 관리자 계정입니다. [로그인]을 눌러 주세요":"가입 실패: "+ae.message;return;}
+    if(ad.session){ enterAsAdmin(email); }
+    else { err.style.color="var(--gold)"; err.textContent="관리자 계정 생성 완료. 확인 메일의 링크를 누른 뒤 [로그인]하세요"; }
+    return;
+  }
+  const pf=readProfileFields();
+  if(!pf){err.textContent="로스쿨·학년·성명을 모두 입력해 주세요";return;}
+  const dupKey=pf.school+"|"+pf.year+"|"+pf.name;
+  if(dupWarned!==dupKey){
+    try{
+      const {data:cnt}=await sb.rpc('count_same_profile',{p_school:pf.school,p_year:pf.year,p_name:pf.name});
+      if(cnt>0){
+        dupWarned=dupKey;
+        err.style.color="var(--gold)";
+        err.innerHTML="⚠ 이미 같은 로스쿨·학년·이름으로 가입된 계정이 있습니다.<br>본인이라면 [로그인] 또는 [비밀번호를 잊으셨나요?]를 이용하세요.<br>동명이인이라면 <b>[회원가입]을 한 번 더</b> 누르면 그대로 진행됩니다.";
+        return;
+      }
+    }catch(e){ console.warn("[supabase] dup check",e); }
+  }
+  err.style.color="";
+  const {data,error}=await sb.auth.signUp({email,password:pw,options:{data:pf}});
+  if(error){
+    err.textContent=/already registered/i.test(error.message)?"이미 가입된 이메일입니다. [로그인]을 눌러 주세요":"가입 실패: "+error.message;
+    return;
+  }
+  if(data.session){
+    const u={...pf,email,joined:new Date().toISOString().slice(0,10)};
+    await saveUser(u); applyUser(u);
+    toast(pf.name+"님, 가입을 환영합니다");
+  }else{
+    err.style.color="var(--gold)";
+    err.textContent="가입 완료. "+email+"로 보낸 확인 메일의 링크를 누른 뒤, 이메일·비밀번호로 [로그인]하세요";
+  }
+}
+async function resetPw(){
+  const err=document.getElementById("gerr"); err.textContent="";
+  const {email}=readCred();
+  if(!email){err.textContent="비밀번호를 재설정할 이메일을 먼저 입력해 주세요";return;}
+  const {error}=await sb.auth.resetPasswordForEmail(email);
+  if(error){err.textContent="메일 발송 실패: "+error.message;return;}
+  toast(email+"로 비밀번호 재설정 메일을 보냈습니다");
+}
+function getSingleSubjs(){return [].slice.call(document.querySelectorAll(".ssubj:checked")).map(function(c){return c.value;});}
+function toggleSinglePick(){var el=document.getElementById("singlePick");el.style.display=(el.style.display==="none"||!el.style.display)?"block":"none";}
+async function quickLogin(plan, subjs){
+  const u={demo:1,school:"전남대",year:"3학년",name:"종정학",plan:plan||"full",subj:plan==="single"?(((subjs&&subjs[0]))||"행정법"):null,subjs:plan==="single"?((subjs&&subjs.length)?subjs:["행정법","헌법"]):null,joined:new Date().toISOString().slice(0,10)};
+  await saveUser(u);
+  applyUser(u);
+  toast(plan==="single"?"종정학님 · 단과반("+(u.subjs?u.subjs.join("·"):"행정법")+")으로 입장했습니다 — 신청 과목만 이용됩니다":"종정학님, 오늘의 과업을 시작하세요");
+}
+let selPlan="full";
+function setPlan(p){
+  selPlan=p;
+  document.getElementById("poFull").classList.toggle("on",p==="full");
+  document.getElementById("poSingle").classList.toggle("on",p==="single");
+  document.getElementById("fSubj").style.display=p==="single"?"block":"none";
+}
+function isSingle(){return !!user&&user.plan!=="full";} // single 또는 none(미결제) → 종합반 전용 기능 잠금
+function upsell(feat){
+  openUpgrade(feat);
+}
+const UPG_PW="vos2027"; // 시연용 발급 비밀번호
+let upgApplied=false;
+const SUBJ7=["헌법","민법","형법","행정법","민소법","형소법","상법"];
+function openUpgrade(feat){
+  const u=user||{};
+  const fmsg=feat?('🔒 <b class="upfeat">'+feat+'</b>은(는) 종합반 전용 기능입니다.<br>'):'';
+  if(u&&!u.demo){ document.getElementById("upBody").innerHTML=(u.applied_at&&u.plan!=="full")?realWaitView():realApplyView(fmsg); document.getElementById("upmodal").classList.add("open"); return; }
+  document.getElementById("upBody").innerHTML=upgApplied?upgDoneView():`
+    <h3>종합반 신청</h3>
+    <div class="upsub">${fmsg}
+    신청서 제출 → 종합반 비용 입금 → 입금 확인 후 <b style="color:var(--gold)">비밀번호가 발급</b>되며, 이후 종합반으로 이용합니다.</div>
+    <label>로스쿨</label>
+    <select id="upSchool">
+      <option ${u.school==="강원대"?"selected":""}>강원대</option><option ${u.school==="건국대"?"selected":""}>건국대</option><option ${u.school==="경북대"?"selected":""}>경북대</option><option ${u.school==="경희대"?"selected":""}>경희대</option>
+      <option ${u.school==="고려대"?"selected":""}>고려대</option><option ${u.school==="동아대"?"selected":""}>동아대</option><option ${u.school==="부산대"?"selected":""}>부산대</option><option ${u.school==="서강대"?"selected":""}>서강대</option>
+      <option ${u.school==="서울대"?"selected":""}>서울대</option><option ${u.school==="서울시립대"?"selected":""}>서울시립대</option><option ${u.school==="성균관대"?"selected":""}>성균관대</option><option ${u.school==="아주대"?"selected":""}>아주대</option>
+      <option ${u.school==="연세대"?"selected":""}>연세대</option><option ${u.school==="영남대"?"selected":""}>영남대</option><option ${u.school==="원광대"?"selected":""}>원광대</option><option ${u.school==="이화여대"?"selected":""}>이화여대</option>
+      <option ${u.school==="인하대"?"selected":""}>인하대</option><option ${u.school==="전남대"?"selected":""}>전남대</option><option ${u.school==="전북대"?"selected":""}>전북대</option><option ${u.school==="제주대"?"selected":""}>제주대</option>
+      <option ${u.school==="중앙대"?"selected":""}>중앙대</option><option ${u.school==="충남대"?"selected":""}>충남대</option><option ${u.school==="충북대"?"selected":""}>충북대</option><option ${u.school==="한국외대"?"selected":""}>한국외대</option><option ${u.school==="한양대"?"selected":""}>한양대</option>
+    </select>
+    <label>학년</label>
+    <select id="upYear"><option ${u.year==="1학년"?"selected":""}>1학년</option><option ${u.year==="2학년"?"selected":""}>2학년</option><option ${u.year==="3학년"?"selected":""}>3학년</option><option ${u.year==="졸업생"?"selected":""}>졸업생</option></select>
+    <label>성명</label><input id="upName" type="text" maxlength="10" value="${u.name||""}">
+    <label>전화번호</label><input id="upPhone" type="tel" placeholder="010-0000-0000" maxlength="13">
+    <label>사용할 아이디</label><input id="upId" type="text" placeholder="영문·숫자 4~12자" maxlength="12">
+    <div class="uperr" id="uperr"></div>
+    <button class="btn gbtn" onclick="submitUpgrade()">종합반 신청하기 →</button>
+    <div class="upsub" style="margin:12px 0 0;text-align:center">종합반 비용은 <b class="upfeat">오프라인 종합반 대비 할인가</b>로 산정되며,<br>기수강 <b class="upfeat">단과 수강료 일부가 공제</b>됩니다 · 입금 확인 시 비밀번호가 발급됩니다</div>`;
+  document.getElementById("upmodal").classList.add("open");
+}
+function realApplyView(fmsg){
+  const u=user||{};
+  const single=u.plan==="single";
+  return `
+    <h3>${single?"종합반 전환 신청":"종합반 / 단과반 신청"}</h3>
+    <div class="upsub">${fmsg}신청서 제출 → 안내된 금액 입금 → 관리자가 입금을 확인하고 <b style="color:var(--gold)">승인</b>하면 즉시 전환됩니다.</div>
+    <label>신청 상품</label>
+    <div class="planrow">
+      <label class="planopt on" id="rpFull" onclick="rpPick('full')">종합반 <small>7법 전체</small></label>
+      ${single?"":'<label class="planopt" id="rpSingle" onclick="rpPick(\'single\')">단과반 <small>과목 선택</small></label>'}
+    </div>
+    <div id="rpSubjs" style="display:none;margin:8px 0 4px;flex-wrap:wrap;gap:6px 12px">
+      ${SUBJ7.map(s=>`<label style="font-size:12.5px;display:inline-flex;align-items:center;gap:4px;margin-right:10px"><input type="checkbox" class="rpsubj" value="${s}">${s}</label>`).join("")}
+    </div>
+    <label>성명</label><input id="upName" type="text" maxlength="10" value="${u.name||""}" readonly style="opacity:.7">
+    <label>전화번호 <small style="color:#9aa6bd">(입금 안내·확인 연락용)</small></label><input id="upPhone" type="tel" placeholder="010-0000-0000" maxlength="13" value="${u.phone||""}">
+    <div class="uperr" id="uperr"></div>
+    <button class="btn gbtn" onclick="submitRealApply()">신청하기 →</button>
+    <div class="upsub" style="margin:12px 0 0;text-align:center">종합반 비용은 <b class="upfeat">오프라인 종합반 대비 할인가</b>로 산정되며,<br>기수강 <b class="upfeat">단과 수강료 일부가 공제</b>됩니다</div>`;
+}
+let rpPlan="full";
+function rpPick(p){ rpPlan=p; const a=document.getElementById("rpFull"),b=document.getElementById("rpSingle"),s=document.getElementById("rpSubjs");
+  if(a)a.classList.toggle("on",p==="full"); if(b)b.classList.toggle("on",p==="single"); if(s)s.style.display=p==="single"?"flex":"none"; }
+async function submitRealApply(){
+  const err=document.getElementById("uperr"); err.textContent="";
+  const ph=document.getElementById("upPhone").value.trim();
+  if(!ph){err.textContent="전화번호를 입력해 주세요";return;}
+  const subjs=rpPlan==="single"?[].slice.call(document.querySelectorAll(".rpsubj:checked")).map(c=>c.value):null;
+  if(rpPlan==="single"&&!subjs.length){err.textContent="단과반은 과목을 하나 이상 선택해 주세요";return;}
+  const u={...user,phone:ph,applied_plan:rpPlan,applied_subjs:subjs,applied_at:new Date().toISOString()};
+  await saveUser(u); applyUser(u);
+  document.getElementById("upBody").innerHTML=realWaitView();
+  toast("신청이 접수되었습니다 — 입금 확인 후 승인됩니다");
+}
+function realWaitView(){
+  const u=user||{};
+  const what=u.applied_plan==="single"?"단과반 ("+(u.applied_subjs||[]).join("·")+")":"종합반";
+  return `
+    <h3>신청이 접수되었습니다</h3>
+    <div class="upsub">신청 상품 <b style="color:var(--gold)">${what}</b> · 신청일 ${(u.applied_at||"").slice(0,10)}</div>
+    <div class="updone">
+      <b>다음 단계</b><br>
+      ① 관리자가 신청을 확인하고 <b>수강료를 산정</b>하여 ${u.phone||"등록된 번호"}로 안내합니다<br>
+      ② 안내된 금액을 입금하면, 관리자가 입금을 확인하고 <b>승인</b>합니다<br>
+      ③ 승인되면 아래 버튼을 누르거나 다시 로그인할 때 자동으로 전환됩니다
+    </div>
+    <div class="updiv"></div>
+    <button class="btn gbtn" style="margin-top:6px" onclick="refreshStatus()">승인 상태 확인 →</button>
+    <button class="quickbtn" onclick="cancelApply()">신청 내용 수정</button>`;
+}
+async function refreshStatus(){
+  const au=await authUser(); if(!au)return;
+  const p=await fetchProfile(au); if(!p)return;
+  applyUser(p);
+  if(p.plan==="full"){closeUpgrade();toast("🎉 "+p.name+"님, 종합반으로 전환되었습니다 — 모든 기능이 열렸습니다");}
+  else if(p.plan==="single"){closeUpgrade();toast("✅ 단과반("+(p.subjs||[]).join("·")+")으로 승인되었습니다");}
+  else toast("아직 승인 전입니다 — 입금 확인 후 승인됩니다");
+}
+async function cancelApply(){
+  const u={...user,applied_plan:null,applied_subjs:null,applied_at:null};
+  await saveUser(u); applyUser(u);
+  document.getElementById("upBody").innerHTML=realApplyView("");
+}
+function upgDoneView(){
+  return `
+    <h3>신청이 접수되었습니다</h3>
+    <div class="upsub">신청번호 <b style="color:var(--gold)">VOS-${String(Math.floor(1000+Math.random()*9000))}</b></div>
+    <div class="updone">
+      <b>다음 단계</b><br>
+      ① 관리자가 신청을 확인하고 <b>종합반 비용을 산정</b>하여 문자로 안내합니다<br>&nbsp;&nbsp;&nbsp;(오프라인 종합반 대비 할인가 + 기수강 단과료 일부 공제)<br>
+      ② 안내된 금액을 입금하면, 입금 확인 후 <b>비밀번호가 문자로 발송</b>됩니다<br>
+      ③ 아래 입력창에 비밀번호를 넣으면 즉시 종합반으로 전환됩니다<br>
+      
+    </div>
+    <div class="updiv"></div>
+    <input id="upPw" type="password" placeholder="발급받은 비밀번호 입력" onkeydown="if(event.key==='Enter')activateFull()">
+    <button class="btn gbtn" style="margin-top:10px" onclick="activateFull()">종합반으로 전환 →</button>`;
+}
+function submitUpgrade(){
+  const nm=document.getElementById("upName").value.trim();
+  const ph=document.getElementById("upPhone").value.trim();
+  const id=document.getElementById("upId").value.trim();
+  const err=document.getElementById("uperr");
+  if(!nm||!ph||!id){err.textContent="성명·전화번호·아이디를 모두 입력해 주세요.";return;}
+  upgApplied=true;
+  document.getElementById("upBody").innerHTML=upgDoneView();
+  toast("신청이 접수되었습니다 — 관리자 승인 대기");
+}
+async function activateFull(){
+  const pw=(document.getElementById("upPw")||{}).value||"";
+  if(pw.trim()!==UPG_PW){toast("비밀번호가 올바르지 않습니다 — 입금 확인 후 발송됩니다");return;}
+  const u={...user,plan:"full",subj:null};
+  await saveUser(u);applyUser(u);
+  closeUpgrade();
+  toast("🎉 "+u.name+"님, 종합반으로 전환되었습니다 — 모든 기능이 열렸습니다");
+}
+function closeUpgrade(){document.getElementById("upmodal").classList.remove("open");}
+function applyPlanLocks(){
+  const single=isSingle();
+  const rb=document.getElementById("rebtn");
+  if(rb&&!rebalanced){rb.innerHTML=single?"🔒 로드맵 재조정 — 종합반 전용":"⟲ 주간 데이터 반영 — 로드맵 재조정";}
+  const fab=document.getElementById("fab");
+  if(fab){fab.innerHTML=single?'🔒<span class="fabl">AI 조교 (종합반)</span>':'💬<span class="fabl">AI 조교</span>';}
+}
+async function logout(){
+  await clearUser();user=null;
+  document.getElementById("userchip").style.display="none";
+  document.getElementById("gate").classList.remove("hidden");
+}
+function ext(site,what){
+  toast("실서비스에서는 "+site+" "+what+" 페이지로 연결됩니다");
+}
+let toastTimer=null;
+function toast(msg){
+  let t=document.getElementById("toast");
+  if(!t){t=document.createElement("div");t.id="toast";t.className="toast";document.body.appendChild(t);}
+  t.textContent=msg;t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove("show"),2400);
+}
+(async()=>{
+  const u=await loadUser();
+  if(u) applyUser(u);
+})();
+// ---------- 관리자 ----------
+const rosterSeed=[
+ {n:"이O진",s:"전북대",y:"3학년",cells:"9/28",acc:"6,214",st:"warn",lk:1,
+  pos:[1,1,1,1,2,1,1],weak:["민법"],rates:[78,52,81,74,69,76,71],
+  lecs:[{t:"민법 제12강 · 물권변동",o:[6,24],c:[2,15],due:"8/8",p:"warn"},{t:"행정법 제8강 · 집행정지",o:[17,22],c:[11,16],due:"8/12",p:"ok"}],
+  last:"3일 전 (정체)",feed:"사례 답안 2건 첨삭 대기"},
+ {n:"박O호",s:"제주대",y:"졸업생",cells:"11/28",acc:"9,102",st:"warn",lk:0,
+  pos:[2,2,2,1,2,2,1],weak:["행정법","상법"],rates:[84,79,88,54,77,80,61],
+  lecs:[{t:"행정법 취약 제4강 · 처분성",o:[20,30],c:[8,20],due:"8/9",p:"warn"},{t:"형법 전범위 제3강 · 죄수론",o:[9,12],c:[5,8],due:"8/16",p:"ok"}],
+  last:"오늘 09:12",feed:"CBT 서면 1건 첨삭 반환 완료"},
+ {n:"김O린",s:"경북대",y:"3학년",cells:"8/28",acc:"5,830",st:"ok",lk:1,
+  pos:[1,1,1,1,1,1,1],weak:[],rates:[80,76,79,72,74,78,70],
+  lecs:[{t:"헌법 제9강 · 기본권 경합",o:[15,20],c:[9,14],due:"8/13",p:"ok"},{t:"민소법 제7강 · 기판력",o:[12,18],c:[7,12],due:"8/15",p:"ok"}],
+  last:"오늘 07:41",feed:"상담 후 5일 연속 이행 — 정상 궤도"},
+ {n:"최O원",s:"전남대",y:"3학년",cells:"7/28",acc:"5,488",st:"ok",lk:1,
+  pos:[1,1,1,1,1,1,1],weak:["형소법"],rates:[75,73,77,70,72,58,69],
+  lecs:[{t:"형소법 제6강 · 위법수집증거",o:[10,20],c:[5,14],due:"8/14",p:"ok"},{t:"민법 제11강 · 채권자대위",o:[19,24],c:[12,15],due:"8/11",p:"ok"}],
+  last:"어제 22:30",feed:"사례 답안 1건 첨삭 대기"},
+ {n:"정O우",s:"강원대",y:"졸업생",cells:"10/28",acc:"8,455",st:"ok",lk:0,
+  pos:[2,1,2,1,1,2,1],weak:[],rates:[83,77,85,75,74,82,72],
+  lecs:[{t:"형법 전범위 제2강 · 부작위범",o:[8,12],c:[4,8],due:"8/17",p:"ok"},{t:"헌법 전범위 제1강 · 위헌심사",o:[6,14],c:[3,10],due:"8/19",p:"ok"}],
+  last:"오늘 10:05",feed:"첨삭 이력 12건 · 평균 스코어 상승 추세"},
+ {n:"한O서",s:"충남대",y:"3학년",cells:"6/28",acc:"5,102",st:"ok",lk:0,
+  pos:[1,1,1,1,1,1,0],weak:["상법"],rates:[74,71,76,69,70,73,55],
+  lecs:[{t:"상법 집중 보강 제3강 · 회사법 총론",o:[9,18],c:[4,12],due:"8/16",p:"ok"},{t:"민법 제12강 · 물권변동",o:[14,24],c:[8,15],due:"8/13",p:"ok"}],
+  last:"오늘 08:55",feed:"상법 집중 재배치 — 지난주 재조정 반영"},
+ {n:"오O민",s:"부산대",y:"2학년",cells:"4/28",acc:"3,247",st:"ok",lk:1,
+  pos:[1,0,1,0,0,1,0],weak:[],rates:[72,68,73,66,65,70,63],
+  lecs:[{t:"민법 집중 제18강 · 법률행위",o:[11,22],c:[5,12],due:"8/18",p:"ok"},{t:"헌법 심화 제2강 · 통치구조",o:[8,20],c:[4,14],due:"8/20",p:"ok"}],
+  last:"어제 21:14",feed:"2학년 선행 트랙 — 집중 단계 중심"},
+ {n:"장O희",s:"원광대",y:"3학년",cells:"8/28",acc:"5,914",st:"ok",lk:0,
+  pos:[1,1,1,1,1,1,1],weak:["민소법"],rates:[77,74,78,72,59,75,70],
+  lecs:[{t:"민소법 제8강 · 소송요건",o:[13,20],c:[6,14],due:"8/12",p:"ok"},{t:"형법 제10강 · 재산죄",o:[16,18],c:[9,12],due:"8/13",p:"near"}],
+  last:"오늘 06:58",feed:"사례 답안 3건 첨삭 대기 (우선 배정 후보)"},
+ {n:"윤O성",s:"동아대",y:"졸업생",cells:"12/28",acc:"9,873",st:"ok",lk:1,
+  pos:[2,2,2,2,2,2,1],weak:[],rates:[86,82,87,80,79,84,74],
+  lecs:[{t:"행정법 전범위 제4강 · 국가배상",o:[10,14],c:[6,10],due:"8/15",p:"ok"},{t:"상법 심화 제9강 · 어음수표",o:[15,22],c:[8,12],due:"8/14",p:"ok"}],
+  last:"오늘 09:47",feed:"최상위 페이스 — 최종 조기 진입 검토 대상"},
+ {n:"서O아",s:"충북대",y:"3학년",cells:"7/28",acc:"5,340",st:"ok",lk:0,
+  pos:[1,1,1,1,1,1,1],weak:["헌법"],rates:[57,73,76,71,70,74,68],
+  lecs:[{t:"헌법 제8강 · 기본권 총론 보강",o:[7,20],c:[3,12],due:"8/13",p:"ok"},{t:"민법 제12강 · 물권변동",o:[16,24],c:[9,15],due:"8/12",p:"ok"}],
+  last:"오늘 08:20",feed:"헌법 심화 +1주 연장 — 지난주 재조정 반영"}
+];
+const metro=["서울대","고려대","연세대","성균관대","한양대","이화여대","중앙대","경희대","서강대","한국외대","서울시립대","건국대","인하대","아주대"];
+function toggleAdminForm(){
+  const f=document.getElementById("adminForm");
+  f.style.display=f.style.display==="none"?"block":"none";
+}
+async function adminLogin(){
+  const code=document.getElementById("fAdmin").value.trim();
+  if(code!=="veritas"){toast("관리자 코드가 올바르지 않습니다");return;}
+  let au=await authUser();
+  if(!au){
+    const {email,pw}=readCred();
+    if(!email||!pw){toast("관리자 이메일·비밀번호를 위 칸에 입력한 뒤 다시 눌러 주세요");return;}
+    const {data,error}=await sb.auth.signInWithPassword({email,password:pw});
+    if(error){toast("관리자 로그인 실패: "+error.message);return;}
+    au=data.user;
+  }
+  if(au.email!==ADMIN_EMAIL){toast("관리자 계정("+ADMIN_EMAIL+")으로만 열 수 있습니다");return;}
+  openAdminView();
+}
+function enterAsAdmin(email){
+  applyUser(adminProfile(email));
+  openAdminView();
+  toast("관리자로 입장했습니다 — 모든 화면이 열려 있습니다");
+}
+function openAdminView(){
+  renderAdmin();
+  var g=document.querySelector(".gate"); if(g)g.classList.add("hidden");
+  const av=document.getElementById("adminView");
+  av.classList.add("open");
+  av.scrollTop=0;
+  window.scrollTo(0,0);
+}
+function adminLogout(){
+  document.getElementById("adminView").classList.remove("open");
+  if(!user){ var g2=document.querySelector(".gate"); if(g2)g2.classList.remove("hidden"); }
+}
+let realRows=[];
+function planLabel(s){ return s.plan==="full"?"종합반":(s.plan==="single"?"단과반("+(s.subjs||[s.subj]).filter(Boolean).join("·")+")":"미결제"); }
+function renderApproveList(){
+  const el=document.getElementById("approveList"); if(!el)return;
+  if(!realRows.length){el.innerHTML='<div class="empty-log">아직 가입한 학생이 없습니다.</div>';return;}
+  const head='<div style="display:grid;grid-template-columns:1.3fr 1fr .7fr 1.6fr 1fr 1.4fr 2.2fr;gap:8px;padding:8px 4px;font-size:.68rem;color:var(--mute);letter-spacing:.08em">'+
+    '<span>성명</span><span>로스쿨</span><span>학년</span><span>이메일 / 전화</span><span>현재</span><span>신청</span><span>처리</span></div>';
+  el.innerHTML=head+realRows.map((s,i)=>{
+    const cur=planLabel(s);
+    const app=s.applied_at?(s.applied_plan==="single"?"단과반("+(s.applied_subjs||[]).join("·")+")":"종합반")+'<br><small style="color:var(--mute)">'+s.applied_at.slice(0,10)+'</small>':'<span style="color:var(--mute)">—</span>';
+    const pending=s.applied_at&&!(s.plan===s.applied_plan&&(s.plan!=="single"||JSON.stringify(s.subjs||[])===JSON.stringify(s.applied_subjs||[])));
+    const btns=(pending?'<button class="mini" style="background:var(--gold);color:#1a1f2e;font-weight:700" onclick="approve(\''+s.id+'\',\'applied\')">✔ 신청대로 승인</button> ':'')+
+      '<button class="mini" onclick="approve(\''+s.id+'\',\'full\')">종합반</button> '+
+      '<button class="mini" onclick="approveSingle(\''+s.id+'\')">단과반…</button> '+
+      (s.plan!=="none"?'<button class="mini" style="opacity:.6" onclick="approve(\''+s.id+'\',\'none\')">미결제로</button>':'');
+    return '<div style="display:grid;grid-template-columns:1.3fr 1fr .7fr 1.6fr 1fr 1.4fr 2.2fr;gap:8px;padding:9px 4px;border-top:1px solid rgba(255,255,255,.06);align-items:center'+(pending?';background:rgba(201,162,39,.08)':'')+'">'+
+      '<span><b>'+s.name+'</b>'+(s.dup?' <span title="같은 로스쿨·학년·이름이 둘 이상">⚠</span>':'')+'</span><span>'+s.school+'</span><span>'+s.year+'</span>'+
+      '<span style="font-size:.78rem;word-break:break-all">'+(s.email||"")+'<br>'+(s.phone||'<span style="color:var(--mute)">전화 미입력</span>')+'</span>'+
+      '<span style="color:'+(s.plan==="none"?"var(--mute)":"var(--gold)")+'">'+cur+'</span><span>'+app+'</span><span>'+btns+'</span></div>';
+  }).join("");
+}
+async function approve(id,mode){
+  const s=realRows.find(x=>x.id===id); if(!s)return;
+  let patch;
+  if(mode==="applied"){ patch={plan:s.applied_plan||"full",subj:null,subjs:s.applied_plan==="single"?(s.applied_subjs||[]):null,approved_at:new Date().toISOString()}; }
+  else if(mode==="full"){ patch={plan:"full",subj:null,subjs:null,approved_at:new Date().toISOString()}; }
+  else { patch={plan:"none",subj:null,subjs:null,approved_at:null}; }
+  const {error}=await sb.from('students').update(patch).eq('id',id);
+  if(error){toast("승인 실패: "+error.message);console.error(error);return;}
+  toast(s.name+" → "+(patch.plan==="full"?"종합반":(patch.plan==="single"?"단과반("+patch.subjs.join("·")+")":"미결제"))+" 처리 완료");
+  renderAdmin();
+}
+async function approveSingle(id){
+  const s=realRows.find(x=>x.id===id); if(!s)return;
+  const def=(s.applied_plan==="single"&&s.applied_subjs&&s.applied_subjs.length)?s.applied_subjs.join(","):(s.subjs||[]).join(",");
+  const ans=prompt(s.name+" · 단과반 과목을 쉼표로 입력하세요\n(헌법,민법,형법,행정법,민소법,형소법,상법)",def);
+  if(ans===null)return;
+  const subjs=ans.split(/[,\s·]+/).map(x=>x.trim()).filter(x=>SUBJ7.includes(x));
+  if(!subjs.length){toast("과목명을 확인해 주세요");return;}
+  const {error}=await sb.from('students').update({plan:"single",subj:subjs[0],subjs,approved_at:new Date().toISOString()}).eq('id',id);
+  if(error){toast("승인 실패: "+error.message);return;}
+  toast(s.name+" → 단과반("+subjs.join("·")+") 승인 완료");
+  renderAdmin();
+}
+async function renderAdmin(){
+  // ---- Supabase students 테이블(실등록) + 시연용 rosterSeed ----
+  let real=[];
+  try{
+    const {data,error}=await sb.from('students').select('*').order('created_at',{ascending:false});
+    if(error)throw error;
+    const keyCnt={}; (data||[]).forEach(s=>{const k=s.school+"|"+s.year+"|"+s.name;keyCnt[k]=(keyCnt[k]||0)+1;});
+    realRows=(data||[]).filter(s=>s.email!==ADMIN_EMAIL).map(s=>({...s,dup:keyCnt[s.school+"|"+s.year+"|"+s.name]>1}));
+    real=realRows.map(s=>({n:s.name+(s.dup?" ⚠":""),s:s.school,y:s.year,cells:"0/28",acc:"0",st:"ok",lk:0,real:1,
+      me:(user&&user.id&&user.id===s.id)?1:0,
+      pos:laws.map(l=>(s.plan==="full"||(s.plan==="single"&&(s.subjs||[s.subj]).includes(l)))?0:-1),
+      weak:[],rates:[0,0,0,0,0,0,0],lecs:[],last:(s.created_at||"").slice(0,10),feed:"실등록 · "+planLabel(s)}));
+  }catch(e){ console.error("[supabase] renderAdmin",e); }
+  renderApproveList();
+  const list=[...real,...rosterSeed];
+  if(user&&!real.some(x=>x.me))list.unshift({n:user.name,s:user.school,y:user.year,cells:"1/28",acc:"186",st:"ok",lk:1,me:1});
+  // KPI
+  document.getElementById("akTotal").textContent=list.length;
+  document.getElementById("akLink").textContent=list.filter(x=>x.lk).length;
+  const localN=list.filter(x=>!metro.includes(x.s)).length;
+  document.getElementById("akLocal").textContent=Math.round(localN/list.length*100)+"%";
+  // 로스쿨 분포
+  const cnt={};list.forEach(x=>cnt[x.s]=(cnt[x.s]||0)+1);
+  const entries=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
+  const mx=entries[0][1];
+  document.getElementById("schoolBars").innerHTML=entries.map(([s,c])=>`
+   <div class="bar"><span class="bl">${s}</span>
+   <div class="track"><div class="fill" style="width:${c/mx*100}%"></div></div>
+   <span class="bv">${c}명</span></div>`).join("");
+  // ===== 종합 분석 =====
+  const stName=["집중","심화","전범위","최종"];
+  const posOfA=x=>x.me?[0,-1,-1,-1,-1,-1,-1]:x.pos;
+  const ratesOfA=x=>x.me?[78,0,0,0,0,0,0]:x.rates;
+  const cellsNum=x=>parseInt(x.cells);
+  // 단계 분포
+  const dist=[0,0,0,0];
+  list.forEach(x=>posOfA(x).forEach(p=>dist[Math.min(p,3)]++));
+  const totalCells=dist.reduce((a,b)=>a+b,0);
+  document.getElementById("agTotalCells").textContent=totalCells;
+  const stColor=["#3a4a6d","#3d6cb8","#c9a227","#3e9c6d"];
+  document.getElementById("stageDist").innerHTML=stName.map((n,i)=>`
+   <div class="bar"><span class="bl">${n}</span>
+   <div class="track"><div class="fill" style="width:${(dist[i]/totalCells*100).toFixed(1)}%;background:${stColor[i]}"></div></div>
+   <span class="bv">${Math.round(dist[i]/totalCells*100)}%</span></div>`).join("");
+  // 과목별 평균 정답률
+  const avg=laws.map((l,li)=>Math.round(list.reduce((a,x)=>a+ratesOfA(x)[li],0)/list.length));
+  document.getElementById("avgRates").innerHTML=laws.map((l,li)=>`
+   <div class="bar ${avg[li]<65?"weak":""}"><span class="bl">${l}</span>
+   <div class="track"><div class="fill" style="width:${avg[li]}%"></div></div>
+   <span class="bv">${avg[li]}%</span></div>`).join("");
+  // 학교별 / 학년별 집계
+  function groupTable(keyFn, elId){
+    const g={};
+    list.forEach(x=>{const k=keyFn(x);if(!g[k])g[k]={n:0,cells:0,rate:0,warn:0};
+      g[k].n++;g[k].cells+=cellsNum(x);
+      g[k].rate+=ratesOfA(x).reduce((a,b)=>a+b,0)/7;
+      if(x.st==="warn")g[k].warn++;});
+    const rows=Object.entries(g).sort((a,b)=>b[1].n-a[1].n);
+    document.getElementById(elId).innerHTML=
+     `<div class="grow head"><span>구분</span><span>인원</span><span>평균 통과 칸</span><span>평균 정답률</span><span>주의</span></div>`+
+     rows.map(([k,v])=>`<div class="grow"><span class="gn">${k}</span><span>${v.n}명</span>
+       <span>${(v.cells/v.n).toFixed(1)} / 28</span><span>${Math.round(v.rate/v.n)}%</span>
+       <span class="${v.warn?"gwarn":"gok"}">${v.warn?v.warn+"명":"—"}</span></div>`).join("");
+  }
+  groupTable(x=>x.s,"bySchool");
+  groupTable(x=>x.y,"byYear");
+  const posOf=posOfA;
+  const weakOf=x=>x.me?[]:x.weak;
+  document.getElementById("heatmap").innerHTML=
+   `<div class="hrow hh"><span></span>${laws.map(l=>`<span style="text-align:center">${l}</span>`).join("")}<span style="text-align:center">페이스</span></div>`+
+   list.map((x,i)=>{
+     const pos=posOf(x),wk=weakOf(x);
+     const cells=laws.map((l,li)=>{
+       const p=Math.min(pos[li],3);
+       if(p<0) return `<span class="hcell hsnone">미선택</span>`;
+       return `<span class="hcell hs${p} ${wk.includes(l)?"hw":""}">${stName[p]}</span>`;
+     }).join("");
+     const st=x.st==="warn"?'<span class="hstat warn">주의</span>':'<span class="hstat ok">정상</span>';
+     return `<div class="hrow" onclick="openStudent(${i})"><span class="hname">${x.n}${x.me?" ★":""}<small>${x.s}</small></span>${cells}${st}</div>`;
+   }).join("");
+  // 명부
+  document.getElementById("roster").innerHTML=
+   `<div class="arow2 head"><span>성명</span><span>로스쿨</span><span>학년</span><span>통과 칸</span><span>누적 문항</span><span>연계할인</span></div>`+
+   list.map((x,i)=>`<div class="arow2 ${x.me?"me":""} click" onclick="openStudent(${i})">
+     <span class="nm2">${x.n}${x.me?" ★":""}</span><span>${x.s}</span><span>${x.y}</span>
+     <span>${x.cells}</span><span>${x.acc}문</span>
+     ${x.lk?'<span class="lk">5% 적용</span>':'<span class="nolk">미연계</span>'}
+   </div>`).join("");
+  adminList=list;
+}
+let adminList=[];
+function openStudent(i){
+  const x=adminList[i];
+  const d=x.me?{...x,pos:[1,1,1,1,1,1,1],weak:["행정법"],rates:[82,76,88,54,71,79,61],
+    lecs:[{t:"행정법 제7강 · 거부처분과 취소소송",o:[14,20],c:[9,18],due:"8/10",p:"ok"},{t:"민법 제12강 · 물권변동",o:[11,24],c:[4,15],due:"8/8",p:"warn"}],
+    last:"지금 접속 중",feed:"본인 계정"}:x;
+  const stName=["집중","심화","전범위","최종"];
+  const mini=laws.map((l,li)=>{
+    const p=d.pos[li];
+    const cells=[0,1,2,3].map(si=>{
+      let cls="ms-todo";
+      if(si<p)cls="ms-done";else if(si===p)cls="ms-now";
+      return `<span class="ms ${cls}" title="${l} ${stName[si]}"></span>`;
+    }).join("");
+    return `<div class="mrow"><span class="ml ${d.weak.includes(l)?"weakl":""}">${l}</span>${cells}<span class="mstage">${stName[d.pos[li]]||"완료"}</span></div>`;
+  }).join("");
+  const rateBars=laws.map((l,li)=>`
+    <div class="bar ${d.rates[li]<65?"weak":""}"><span class="bl">${l}</span>
+    <div class="track"><div class="fill" style="width:${d.rates[li]}%"></div></div>
+    <span class="bv">${d.rates[li]}%</span></div>`).join("");
+  const lecRows=d.lecs.map(L=>`
+    <div class="slec">
+      <div class="lhead"><span class="ltitle" style="color:var(--ink)">${L.t}</span>
+        <span class="ldue">기한 ${L.due}</span>${L.p==="warn"?'<span class="pc warn">주의</span>':(L.p==="near"?'<span class="pc near">완료 임박</span>':'<span class="pc ok">여유</span>')}</div>
+      <div class="lrow"><span class="lt sel">객관식</span><div class="ltrack"><div class="lfill sel" style="width:${L.o[0]/L.o[1]*100}%"></div></div><span class="lnum">${L.o[0]}/${L.o[1]}문</span></div>
+      <div class="lrow"><span class="lt case">사례</span><div class="ltrack"><div class="lfill case" style="width:${L.c[0]/L.c[1]*100}%"></div></div><span class="lnum">${L.c[0]}/${L.c[1]}문</span></div>
+    </div>`).join("");
+  document.getElementById("studentBody").innerHTML=`
+    <div class="shead">
+      <h3>${d.n} <span style="color:var(--sub);font-weight:400;font-size:.85rem">· ${d.s} ${d.y} ${d.lk?'<span class="lk" style="margin-left:6px">5% 연계</span>':""}</span></h3>
+      <div class="smeta">통과 칸 <b>${d.cells}</b> · 누적 <b>${d.acc}문</b> · 최근 활동 <b>${d.last}</b></div>
+      <div class="sfeed">${d.feed}</div>
+    </div>
+    <div class="sgrid">
+      <div>
+        <div class="stt">28칸 학습 위치</div>
+        ${mini}
+        <div class="stt" style="margin-top:16px">진행 중 강의 해소</div>
+        ${lecRows}
+      </div>
+      <div>
+        <div class="stt">과목별 선택형 정답률 (최근 2주)</div>
+        ${rateBars}
+        <div class="stt" style="margin-top:16px">AS 액션</div>
+        <div class="sacts">
+          <button class="extbtn" onclick="toast('${d.n} 님에게 1:1 상담 슬롯을 제안했습니다')">1:1 상담 제안</button>
+          <button class="extbtn" onclick="toast('${d.n} 님 로드맵 수동 재조정 화면 (실서비스 연결 지점)')">로드맵 수동 조정</button>
+          <button class="extbtn" onclick="toast('${d.n} 님 첨삭을 우선 배정 대기열에 올렸습니다')">첨삭 우선 배정</button>
+          <button class="extbtn" onclick="toast('${d.n} 님에게 오프라인 특강 5% 연계 안내를 발송했습니다')">오프라인 연계 안내</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById("studentModal").classList.add("open");
+}
+function closeStudent(){document.getElementById("studentModal").classList.remove("open");}
+function launchEngine(k){
+  if(isSingle()&&(k==="six"||k==="case"||k==="sel"))toast("단과반: "+user.subj+" 과목만 등록·이용 가능합니다");
+  if(typeof openEngine==="function"){openEngine(k);return;}
+  const files={six:"변시_자율학습시스템.html",case:"변시_사례형엔진.html",schedule:"변시_schedule.html",roadmap:"변시_roadmap.html",admin:"변시_관리자.html"};
+  if(files[k])location.href=files[k];
+}
+window.advanceSubject=function(subj, fromIdx){
+  const li=laws.indexOf(subj);
+  if(li<0 || STAGEMAP[subj]!==fromIdx || fromIdx>=3) return false;
+  STAGEMAP[subj]=fromIdx+1;
+  P.A.cells=buildCellsA();
+  if(cur==="A"){
+    grid();
+    const el=document.getElementById("c-"+li+"-"+(fromIdx+1));
+    if(el){ el.classList.add("pulse"); el.scrollIntoView&&el.scrollIntoView({block:"nearest"}); }
+  }
+  return true;
+};
+window.getRoadmap=function(){
+  const names=["집중","심화","전범위","최종"];
+  const active=[], none=[];
+  laws.forEach(l=>{ const n=STAGEMAP[l]; if(n<0) none.push(l); else active.push({subj:l, stage:names[n]}); });
+  return {active:active, none:none};
+};
+window.enterSubject=function(subj){
+  const li=laws.indexOf(subj);
+  if(li<0 || STAGEMAP[subj]>=0) return false;
+  STAGEMAP[subj]=0; CREDITMAP[subj]=0;
+  P.A.cells=buildCellsA();
+  if(cur==="A"){ grid(); const el=document.getElementById("c-"+li+"-0"); if(el) el.classList.add("pulse"); }
+  return true;
+};
+window.setPlacement=function(subj, stageIdx, credit){
+  const li=laws.indexOf(subj);
+  if(li<0) return false;
+  STAGEMAP[subj]=stageIdx; CREDITMAP[subj]=credit;
+  P.A.cells=buildCellsA();
+  if(cur==="A"){
+    grid();
+    for(let k=0;k<=stageIdx;k++){ const el=document.getElementById("c-"+li+"-"+k); if(el) el.classList.add("pulse"); }
+  }
+  return true;
+};
+function showHome(){var h=document.getElementById('homeHero'),d=document.getElementById('dashSections'),t=document.querySelector('.wrap .top-stats'),f=document.getElementById('fab');if(h)h.style.display='flex';if(d)d.style.display='none';if(t)t.style.display='none';if(f)f.style.display='none';window.scrollTo(0,0);}
+function showRoadmap(){var h=document.getElementById('homeHero'),d=document.getElementById('dashSections'),t=document.querySelector('.wrap .top-stats'),f=document.getElementById('fab');if(h)h.style.display='none';if(d)d.style.display='block';if(t)t.style.display='flex';if(f)f.style.display='flex';window.scrollTo(0,0);}
+grid();initBoard();bars();renderFinal();
+if(document.querySelector('.wrap .top-stats')) document.querySelector('.wrap .top-stats').style.display='none';
+if(document.getElementById('fab')) document.getElementById('fab').style.display='none';
+function renderFinal(){
+  const el=document.getElementById("finallaws"); if(!el)return;
+  el.innerHTML=laws.map(l=>`<div class="flchip locked"><span class="fn">${l}</span><span class="fsel">전범위 완료 시 열림</span></div>`).join("");
+}
+// ---------- 순환 자동 시연 ----------
+let tourOn=false,tourTimers=[];
+function narr(step,text){
+  let n=document.getElementById("narrBox");
+  if(!n){n=document.createElement("div");n.id="narrBox";n.className="narr";
+    n.innerHTML='<div class="nstep" id="nstep"></div><div class="ntext" id="ntext"></div>';
+    document.body.appendChild(n);}
+  n.classList.add("show");
+  document.getElementById("nstep").textContent=step;
+  document.getElementById("ntext").innerHTML=text;
+}
+function narrHide(){const n=document.getElementById("narrBox");if(n)n.classList.remove("show");}
+function nodeOn(i){
+  for(let k=1;k<=6;k++)document.getElementById("cn"+k).classList.remove("active");
+  if(i)document.getElementById("cn"+i).classList.add("active");
+}
+function go(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:"smooth",block:"center"});}
+function hlOn(id){const el=document.getElementById(id);if(el)el.classList.add("hl");}
+function hlOff(id){const el=document.getElementById(id);if(el)el.classList.remove("hl");}
+function after(ms,fn){tourTimers.push(setTimeout(fn,ms));}
+function stopTour(){
+  tourOn=false;tourTimers.forEach(clearTimeout);tourTimers=[];
+  narrHide();nodeOn(0);
+  ["pB","s2","s3","s4"].forEach(hlOff);
+  const b=document.getElementById("tourbtn");b.textContent="▶ 학습 순환 미리보기";b.classList.remove("stop");
+}
+function startTour(){
+  if(tourOn){stopTour();return;}
+  tourOn=true;rebalanced=false;
+  const b=document.getElementById("tourbtn");b.textContent="■ 미리보기 중지";b.classList.add("stop");
+  let t=0;
+  // ① 자가진단
+  after(t+=200,()=>{nodeOn(1);go("s1");hlOn("pB");
+    narr("자가진단","재시생 <b>박정호</b>를 선택합니다. 진단 결과: 5개 과목 집중 면제, <b>행정법·상법 취약</b> — 이 진단이 다음 단계의 로드맵을 결정합니다.");});
+  after(t+=2800,()=>{setProfile('B');});
+  // ② 로드맵
+  after(t+=1400,()=>{hlOff("pB");nodeOn(2);go("grid");hlOn("s2");
+    narr("연간 로드맵","진단이 <b>28칸 지도를 재배열</b>했습니다. 면제 칸(빗금)과 취약 과목의 압축 재수강 칸이 생기고, 모든 칸에 날짜가 박힙니다. 로드맵은 이제 매일 아침 \u2018오늘\u2019을 낳습니다.");});
+  // ③ 일일 과업
+  after(t+=3600,()=>{hlOff("s2");nodeOn(3);go("s3");hlOn("s3");
+    narr("STEP ③ 강의별 해소","로드맵의 현재 칸이 <b>해소 총량</b>(객관식+사례)으로 내려왔습니다. 총량과 기한은 시스템이 지키고, 오늘 몇 문을 소화할지는 학생이 정합니다.");});
+  // ④ 학습엔진 실행 — 실제 소화 동작
+  after(t+=3200,()=>{nodeOn(4);
+    narr("STEP ④ 학습엔진 실행","이제 학생이 소화를 시작합니다 — <b>행정법 +5문씩</b>, 사례 <b>+1문 현출</b>. 오른쪽 <b>누적탑</b>이 실시간으로 자라는 것을 보세요.");});
+  after(t+=1200,()=>{consume(0,'obj',5);});
+  after(t+=900,()=>{consume(0,'obj',5);});
+  after(t+=900,()=>{consume(0,'cas',1);});
+  after(t+=900,()=>{consume(1,'obj',5);});
+  after(t+=900,()=>{consume(1,'cas',1);});
+  // ⑤ 데이터
+  after(t+=1600,()=>{hlOff("s3");nodeOn(5);go("s4");hlOn("s4");
+    narr("STEP ⑤ 데이터 축적","실행이 데이터가 됩니다. 주간 집계에서 <b>행정법 54%</b>·<b>상법 61%</b>가 빨간 신호 — 이 숫자가 다음 단계의 입력값입니다.");});
+  // ⑥ 재조정
+  after(t+=3600,()=>{nodeOn(6);
+    narr("STEP ⑥ 로드맵 재조정","데이터가 로드맵을 고칩니다 — 재조정을 실행합니다.");});
+  after(t+=1400,()=>{rebalance();});
+  after(t+=1200,()=>{
+    narr("⑥ → ② 되먹임 완성","위 매트릭스에서 <b>행정법 심화 +2주</b>, <b>형법 전범위 압축</b> 칸이 금색으로 바뀌었습니다. 수정된 로드맵이 내일 아침 다시 \u2018오늘의 과업\u2019을 낳습니다 — <b>순환이 닫혔습니다. 이것이 유기체입니다.</b>");});
+  after(t+=5200,()=>{hlOff("s4");stopTour();toast("순환 한 바퀴 완료 — 각 단계를 직접 눌러보세요");});
+}
+// ---------- AI 조교 (실제 API 호출) ----------
+let chatHist=[];
+function toggleChat(){
+  if(isSingle()){upsell("24시간 AI 조교");return;}
+  document.getElementById("chat").classList.toggle("open");
+  if(document.getElementById("chat").classList.contains("open"))document.getElementById("cq").focus();
+}
+function addMsg(role,text){
+  const b=document.getElementById("cbody");
+  const d=document.createElement("div");
+  d.className="cmsg "+role; d.textContent=text;
+  b.appendChild(d); b.scrollTop=b.scrollHeight;
+  return d;
+}
+async function askAI(){
+  const inp=document.getElementById("cq");
+  const q=inp.value.trim();
+  if(!q)return;
+  inp.value=""; addMsg("me",q);
+  chatHist.push({role:"user",content:q});
+  const btn=document.getElementById("csend");btn.disabled=true;
+  const t=addMsg("ai typing","답변을 작성하고 있습니다…");
+  const who=user?`${user.name}(${user.school} ${user.year})`:"수험생";
+  const prof=cur==="A"?"초시생, 현재 심화 단계":"재시생, 행정법·상법 취약, 전범위 단계";
+  const sys=`당신은 대한민국 변호사시험 온라인 종합반 '합격 OS'의 AI 학습 조교입니다. 상대는 ${who}, ${prof}입니다. 헌법·민법·형법·행정법·민사소송법·형사소송법·상법 7법의 개념·판례·답안 현출 방법을 정확하고 간결하게(400자 이내) 한국어로 답하세요. 사례형 질문에는 목차 잡는 법과 채점포인트 관점으로 답합니다. 학습 조언 요청 시 오늘의 해소 과업과 연결해 구체적으로 조언하세요. 확실하지 않은 판례 번호는 만들어내지 말고 쟁점 중심으로 설명하세요.`;
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,system:sys,
+        messages:chatHist.slice(-10)})
+    });
+    const data=await res.json();
+    const ans=(data.content||[]).filter(x=>x.type==="text").map(x=>x.text).join("\n").trim();
+    if(!ans)throw new Error("empty");
+    t.className="cmsg ai";t.textContent=ans;
+    chatHist.push({role:"assistant",content:ans});
+  }catch(e){
+    t.className="cmsg ai";
+    t.textContent="연결이 원활하지 않습니다. 잠시 후 다시 시도해 주세요. (실서비스에서는 전용 회선으로 안정 제공됩니다)";
+  }
+  btn.disabled=false;
+  const b=document.getElementById("cbody");b.scrollTop=b.scrollHeight;
+}
+</script>
+<!-- 종합반 신청 -->
+<div class="upmodal" id="upmodal" onclick="if(event.target===this)closeUpgrade()">
+  <div class="upcard">
+    <button class="upclose" onclick="closeUpgrade()">✕</button>
+    <div id="upBody"></div>
+  </div>
+</div>
+
+<!-- AI 조교 -->
+<button class="fab" id="fab" onclick="toggleChat()">💬<span class="fabl">AI 조교</span></button>
+<div class="chat" id="chat">
+  <div class="chead">
+    <div><b>AI 조교</b><span class="chsub">24시간 즉문즉답 · 새벽에도 답합니다</span></div>
+    <button class="mini" onclick="toggleChat()">닫기</button>
+  </div>
+  <div class="cbody" id="cbody">
+    <div class="cmsg ai">안녕하세요! 변시 학습 중 막히는 것을 무엇이든 물어보세요. 개념 질문, 판례, 답안 현출 방법, 오늘 과업에 대한 조언까지 — 지금 바로 답해드립니다.</div>
+  </div>
+  <div class="cinput">
+    <input id="cq" type="text" placeholder="예: 거부처분의 처분성 요건이 헷갈려요" onkeydown="if(event.key==='Enter')askAI()">
+    <button class="csend" id="csend" onclick="askAI()">전송</button>
+  </div>
+</div>
+
+
+</div>
+<div class="engchooser" id="engChooser">
+  <div class="ecbox">
+    <div class="eckicker" id="ecKicker">학습엔진 선택</div>
+    <h2 id="ecTitle">분류를 고르세요</h2>
+    <div class="ecbanner" id="ecBanner"></div>
+    <div class="ecgrid" id="ecGrid"></div>
+    <button class="ecclose" onclick="closeChooser()">닫기</button>
+  </div>
+</div>
+<div class="engview" id="engview">
+  <div class="enghead"><b>베리타스 PASS:ON</b><span class="et" id="engtitle"></span>
+    <button class="engback" onclick="closeEngine()">← 내 화면으로 돌아가기</button></div>
+  <iframe id="engframe" title="학습엔진"></iframe>
+</div>
+<script>
+const ENGINE_META={"tocplan": {"t": "목차 단위 신청 · 스스로 수강설계", "p": "engine/free/tocplan.html"}, "combodiag": {"t": "심화 → 전범위 관문 · 콤보 진단", "p": "engine/free/combodiag.html"}, "mcdiag": {"t": "집중 → 심화 관문 · 5지택1 진단", "p": "engine/free/mcdiag.html"}, "oxdiag": {"t": "자가진단 · 7법 OX 단계 배치", "p": "engine/free/oxdiag.html"}, "mission": {"t": "에브리데이 학습미션 · 오늘의 학습 체크", "p": "engine/paid/mission.html"}, "sel": {"t": "일일 과업 학습엔진 · 선택형 — 객관식 학습엔진", "p": "engine/paid/sel.html"}, "match": {"t": "강의 선택", "p": "engine/free/match.html"}, "score": {"t": "실전문제·답안피드백", "p": "engine/paid/score.html"}, "exam": {"t": "베리타스 모의고사 · 합격선 도달 진단", "p": "engine/paid/exam.html"}, "examsel": {"t": "모의고사 · 선택형", "p": "engine/paid/examsel.html"}, "examcase": {"t": "모의고사 · 사례형", "p": "engine/paid/examcase.html"}, "examrec": {"t": "모의고사 · 기록형", "p": "engine/paid/examrec.html"}, "schedule": {"t": "자가진단 · 학습 스케줄", "p": "engine/free/schedule.html"}, "roadmap": {"t": "연간 로드맵 계산기", "p": "engine/free/roadmap.html"}, "six": {"t": "일일 과업 학습엔진 · 선택형 — 단계별 자율학습", "p": "engine/paid/six.html"}, "case": {"t": "사례형 답안 학습엔진 · 정답 격자 매칭 자동채점", "p": "engine/paid/case.html"}, "admin": {"t": "🏃 베리타스 페이스메이커 — 학습 페이스 조율 (신청 승인·랭킹·조언 큐·리포트)", "p": "engine/admin/admin.html"}, "lecture": {"t": "강의 학습 틀 · 복습→선택형→사례형", "p": "engine/paid/lecture.html"}};
+function b64utf8(b){return decodeURIComponent(escape(atob(b)));}
+function paintExam(){
+  var E = window.OSEXAM;
+  var bar = document.getElementById('passbar');
+  if(!bar) return;
+  var total = E ? E.total : 822, pass = E ? E.pass : 1000;
+  var pr=document.getElementById('pbRound');
+  if(pr && E && E.round) pr.textContent='베리타스 모의고사 · '+E.round;
+  document.getElementById('pbTotal').textContent = total.toLocaleString();
+  document.getElementById('pbFill').style.width = Math.min(100, total/1660*100)+'%';
+  var v = document.getElementById('pbVerdict'), m = document.getElementById('pbMsg');
+  if(total>=1300){ v.className='pbv ok'; v.textContent='초안정권'; m.textContent='합격선을 '+(total-pass)+'점 넘었습니다.'; }
+  else if(total>=1200){ v.className='pbv ok'; v.textContent='매우 안정권'; m.textContent='합격선을 '+(total-pass)+'점 넘었습니다.'; }
+  else if(total>=1100){ v.className='pbv ok'; v.textContent='안정권'; m.textContent='합격선을 '+(total-pass)+'점 넘었습니다.'; }
+  else if(total>=pass){ v.className='pbv ok'; v.textContent='합격권'; m.textContent='안정권(1,100점)까지 '+(1100-total)+'점 남았습니다.'; }
+  else { v.className='pbv low'; v.textContent='합격선 미달'; m.textContent='합격선까지 '+(pass-total)+'점 남았습니다.'; }
+  if(E && E.unders && E.unders.length){
+    m.textContent += ' · 과락 위험: ' + E.unders.join(' · ');
+  }
+}
+
+window.OSFEED = window.OSFEED || [];
+window.addEventListener('message', function(ev){
+  var d = ev.data || {};
+  if(d.type === 'picks:set'){
+    window.OSPICKS = window.OSPICKS || {};
+    window.OSPICKS[(d.subj||'')+'|'+(d.stage||'')] = d.items || [];
+  }
+  else if(d.type === 'picks:req'){
+    var all=[]; var P=window.OSPICKS||{};
+    Object.keys(P).forEach(function(k){ all=all.concat(P[k]); });
+    try{ ev.source.postMessage({type:'picks:list', items: all}, '*'); }catch(e){}
+  }
+  if(d.type === 'exam:set'){
+    window.OSEXAM = { total:d.total, pass:d.pass, unders:d.unders||[], trend:d.trend||[], round:d.round||'' };
+    if(typeof paintExam==='function') paintExam();
+  }
+  else if(d.type === 'exam:score'){
+    window.OSEXAMPART = window.OSEXAMPART || [];
+    window.OSEXAMPART.push({kind:d.kind, subj:d.subj, score:d.score, full:d.full});
+  }
+  else if(d.type === 'exam:req'){
+    try{ ev.source.postMessage({type:'exam:list', data: window.OSEXAM||null}, '*'); }catch(e){}
+  }
+  if(d.type === 'osfeed:add'){ window.OSFEED.unshift(d.item); }
+  else if(d.type === 'osfeed:req'){ try{ ev.source.postMessage({type:'osfeed:list', items: window.OSFEED}, '*'); }catch(e){} }
+});
+/* ── 학습엔진 로더: Storage(contents 버킷)에서 로그인·승인 상태에 따라 내려받아 실행 ── */
+const ENGINE_CACHE={};
+async function loadEngineHtml(k){
+  const e=ENGINE_META[k]; if(!e) throw new Error('unknown engine '+k);
+  if(ENGINE_CACHE[k]) return ENGINE_CACHE[k];
+  const {data,error}=await sb.storage.from('contents').download(e.p);
+  if(error||!data) throw error||new Error('download failed');
+  const html=await data.text();
+  ENGINE_CACHE[k]=html; return html;
+}
+function engineErrorMsg(k,err){
+  const tierOf=(ENGINE_META[k]||{}).p||'';
+  if(tierOf.indexOf('engine/admin/')===0) return '관리자 계정으로만 열 수 있습니다';
+  if(tierOf.indexOf('engine/paid/')===0) return '수강 신청·승인 후 이용할 수 있습니다';
+  return '로그인 후 이용할 수 있습니다';
+}
+/* ── 엔진 데이터 선적재: sel/case는 열기 전에 문항·학생상태·관리자설정을 받아 엔진 안에 넣어줌 ── */
+const DATA_ENGINES={sel:'mcq', case:'case'};
+async function preloadEngineData(k){
+  const kind=DATA_ENGINES[k]; if(!kind) return null;
+  let uid=null; try{ const {data}=await sb.auth.getUser(); uid=data&&data.user?data.user.id:null; }catch(e){}
+  const out={engine:k, isAdmin:!!(user&&user.admin), userId:uid, subj:(window.matchSubject||window.userSubj||null),
+             user:{name:(user&&user.name)||'', plan:(user&&user.plan)||'none'}, items:[], state:{}, config:{}};
+  try{ const r=await sb.from('items').select('id,subj,kind,ord,content,free').eq('kind',kind).order('ord'); if(!r.error&&r.data) out.items=r.data; }catch(e){}
+  if(uid){ try{ const r=await sb.from('engine_state').select('state').eq('engine',k).eq('user_id',uid).maybeSingle(); if(!r.error&&r.data&&r.data.state) out.state=r.data.state; }catch(e){} }
+  try{ const r=await sb.from('engine_config').select('key,value').eq('engine',k); if(!r.error&&r.data) r.data.forEach(row=>{ out.config[row.key]=row.value; }); }catch(e){}
+  return out;
+}
+async function prepareEngine(k){
+  const html=await loadEngineHtml(k);
+  const data=await preloadEngineData(k); if(!data) return html;
+  const tag='<scr'+'ipt>window.__PASSON__='+JSON.stringify(data).replace(/<\//g,'<\\/')+';</scr'+'ipt>';
+  const i=html.indexOf('<head>'); return i>=0 ? html.slice(0,i+6)+tag+html.slice(i+6) : tag+html;
+}
+async function openEngine(k){
+  const e=ENGINE_META[k];if(!e)return;
+  document.getElementById("engtitle").textContent=e.t;
+  const fr=document.getElementById("engframe");
+  fr.srcdoc='<div style="font-family:sans-serif;color:#9db0cf;padding:40px;text-align:center">학습엔진을 불러오는 중…</div>';
+  document.getElementById("engview").classList.add("open");
+  try{ fr.srcdoc=await prepareEngine(k); }
+  catch(err){ document.getElementById("engview").classList.remove("open"); fr.srcdoc="";
+    if(typeof toast==="function") toast(engineErrorMsg(k,err)); else alert(engineErrorMsg(k,err)); }
+}
+function closeEngine(){
+  document.getElementById("engview").classList.remove("open");
+  document.getElementById("engframe").srcdoc="";
+}
+</script>
+<script>window.openLecture=async function(name){ var e=ENGINE_META['lecture']; if(!e){return;} document.getElementById('engtitle').textContent='강의 학습 · '+(name||'')+' · 복습 → 선택형 → 사례형'; var fr=document.getElementById('engframe'); document.getElementById('engview').classList.add('open'); try{ fr.srcdoc=await loadEngineHtml('lecture'); }catch(err){ document.getElementById('engview').classList.remove('open'); if(typeof toast==='function') toast(engineErrorMsg('lecture',err)); } };</script>
+<div id="engPayGate" style="position:fixed;inset:0;background:rgba(6,12,26,.86);z-index:10000;display:none;align-items:center;justify-content:center;padding:24px"><div style="max-width:440px;width:100%;background:#12233f;border:1px solid #2a3a5c;border-radius:16px;padding:26px;color:#fff"><div style="font-size:12px;font-weight:800;color:#C9A227;letter-spacing:1px;margin-bottom:6px">학습엔진 · 단과 이용</div><h2 id="engPayTitle" style="font-size:20px;margin:2px 0 8px">학습엔진 결제</h2><p style="font-size:12.5px;color:#c7cedc;line-height:1.6;margin:0 0 14px">단과반생은 학습엔진을 하나 열 때마다 이용료를 결제합니다. 종합반은 모든 학습엔진이 포함됩니다.</p><div style="background:#0a1730;border-radius:12px;padding:16px;display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="color:#9aa6bd;font-size:12.5px">학습엔진 1개</span><b style="font-size:26px;color:#C9A227;margin-left:auto">10만 원</b></div><button onclick="engPayGo()" style="width:100%;padding:13px;border:none;border-radius:11px;background:#C9A227;color:#0D1F3C;font-weight:800;font-size:14.5px;cursor:pointer">입금 후 열기 →</button><div style="margin-top:16px;background:#0a1730;border:1px solid #2a3a5c;border-radius:12px;padding:14px 16px"><div style="font-size:12px;font-weight:800;color:#C9A227;margin-bottom:6px">계좌이체 · 무통장입금</div><div style="font-size:13.5px;color:#fff;font-weight:700">베리타스 · <span style="color:#C9A227">○○은행 000-0000-0000-00</span> · 예금주 베리타스법학원</div><div style="font-size:11.5px;color:#9aa6bd;margin-top:6px">입금자명을 수험번호로 기재 · 입금 확인 후 처리됩니다 <span style="background:rgba(201,162,39,.16);color:#C9A227;padding:1px 7px;border-radius:9px;font-weight:700;margin-left:4px">계좌 확정 예정</span></div></div><button onclick="engPayClose()" style="width:100%;padding:10px;margin-top:8px;border:1px solid #2a3a5c;border-radius:10px;background:transparent;color:#c7cedc;font-weight:700;cursor:pointer">취소</button></div></div>
+</body>
+</html>
