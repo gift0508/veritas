@@ -1653,8 +1653,10 @@ function billingPanel(s){
      '<label>시작일 <input class="bi" data-k="start_date" type="date" value="'+(s.start_date||"")+'"></label>'+
      '<button class="mini" style="background:var(--gold);color:#1a1f2e;font-weight:700" onclick="saveBilling(\''+s.id+'\')">저장</button></div>';
   h+='<div style="margin-bottom:8px"><b style="color:var(--gold)">배부자료 공제</b> '+matRows+'</div>';
-  if(s.withdraw_requested_at||s.settlement){
-    h+='<div style="border-top:1px solid rgba(255,255,255,.08);padding-top:8px"><b style="color:#ff8a80">탈퇴 정산</b> (요청 '+(s.withdraw_requested_at||"").slice(0,16).replace("T"," ")+')<br>'+
+  if(s.plan==="single"&&(s.withdraw_requested_at||s.settlement)){
+    h+='<div style="border-top:1px solid rgba(255,255,255,.08);padding-top:8px"><b style="color:#ff8a80">탈퇴 정산</b> (요청 '+(s.withdraw_requested_at||"").slice(0,16).replace("T"," ")+')<br>단과는 목차 단위 결제이므로 목차별 시청률 50% 규칙으로 판정합니다 — 페이스메이커의 <b>환불 요청 처리 — 단과(목차별)</b> 패널에서 처리하세요. (고시닷컴 진도 연동 후 자동 판정)</div>';
+  }else if(s.withdraw_requested_at||s.settlement){
+    h+='<div style="border-top:1px solid rgba(255,255,255,.08);padding-top:8px"><b style="color:#ff8a80">탈퇴 정산 · 종합반 일할</b> (요청 '+(s.withdraw_requested_at||"").slice(0,16).replace("T"," ")+')<br>'+
        '정가 '+wonf(c.lp)+' ÷ '+c.term+'일 = 1일 '+wonf(c.daily)+' × 이용 '+c.used+'일(시작 '+(s.start_date||"미입력")+') = 공제 <b>'+wonf(c.usedFee)+'</b><br>'+
        '납부 '+wonf(c.paid)+' − 이용분 '+wonf(c.usedFee)+' − 자료 '+wonf(c.matSum)+(c.mats.length?' ('+c.mats.map(m=>m.name+' '+wonf(+m.amount||0)).join(', ')+')':'')+' = <b style="color:var(--gold);font-size:1rem">환급 '+wonf(c.refund)+'</b> '+
        '<button class="mini" onclick="printSettle(\''+s.id+'\')">정산서</button> '+
