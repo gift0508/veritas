@@ -557,6 +557,18 @@ border-radius:999px;padding:4px 12px;font-size:.7rem;cursor:pointer;font-family:
     <button class="quickbtn" onclick="document.getElementById('pwReset').style.display='none'">취소</button>
   </div>
 </div>
+<div id="suspended" style="display:none;position:fixed;inset:0;z-index:55;background:#07122b;align-items:center;justify-content:center">
+  <div class="gatecard" style="max-width:420px;background:#0f1f45;box-shadow:0 20px 60px rgba(0,0,0,.6)">
+    <div class="gbrand">베리타스 PASS:ON</div>
+    <div class="gsub">탈퇴 요청 접수 · 이용 정지</div>
+    <div style="font-size:13.5px;line-height:1.7;color:#c9d3e6;margin:14px 0">
+      <span id="susDate"></span>에 탈퇴 요청이 접수되어 이용이 정지되었습니다.<br>
+      관리자가 요청 시점까지의 이용 기간을 일할 계산하여 정산하고, 환급은 입금하신 계좌로 처리한 뒤 계정과 학습 기록을 삭제합니다.<br>
+      정산·환급에 관한 문의는 관리자에게 해주세요.
+    </div>
+    <button class="btn gbtn" onclick="logout();document.getElementById('suspended').style.display='none'">로그아웃</button>
+  </div>
+</div>
 <div class="gate" id="gate">
   <div class="gatecard">
     <div class="gbrand">베리타스 PASS:ON</div>
@@ -1201,6 +1213,7 @@ function applyUser(u){
   document.getElementById("gate").classList.add("hidden");
   setTimeout(function(){ if(typeof showHome==='function') showHome(); }, 30);
   renderWithdrawBtn();
+  if(u.withdraw_requested_at&&!u.admin) setTimeout(showSuspended,50);
   const chip=document.getElementById("userchip");
   chip.style.display="flex";
   document.getElementById("uinfo").innerHTML=`<b>${u.name}</b> · ${u.school} ${u.year}`;
@@ -1474,23 +1487,23 @@ async function savePw(){
 }
 try{ sb.auth.onAuthStateChange(function(ev){ if(ev==="PASSWORD_RECOVERY") showPwReset(); }); }catch(e){}
 if(/type=recovery/.test(location.hash||"")) setTimeout(showPwReset,300);
+function showSuspended(){ const d=document.getElementById("susDate"); if(d&&user&&user.withdraw_requested_at) d.textContent=user.withdraw_requested_at.slice(0,10); document.getElementById("suspended").style.display="flex"; }
 function renderWithdrawBtn(){
   const b=document.getElementById("wdBtn"); if(!b) return;
   if(!user||user.demo||user.admin){ b.style.display="none"; return; }
   b.style.display="";
-  if(user.withdraw_requested_at){ b.textContent="탈퇴 요청 접수 "+user.withdraw_requested_at.slice(5,10)+" · 취소"; b.title="정산·환급 후 관리자가 처리합니다"; }
-  else { b.textContent="탈퇴 요청"; b.title=""; }
+  if(user.withdraw_requested_at){ b.textContent="탈퇴 요청 접수 "+user.withdraw_requested_at.slice(5,10)+" · 이용 정지"; b.title="정산·환급 후 관리자가 처리합니다"; b.disabled=true; }
+  else { b.textContent="탈퇴 요청"; b.title=""; b.disabled=false; }
 }
 async function withdrawToggle(){
   if(!user||user.demo||user.admin) return;
   const au=await authUser(); if(!au){ toast("로그인 상태에서만 가능합니다"); return; }
-  const cancel=!!user.withdraw_requested_at;
-  if(!confirm(cancel?"탈퇴 요청을 취소할까요?":"탈퇴를 요청할까요?\n\n요청이 접수되면 관리자가 수강료 정산·환급(입금 계좌로)을 마친 뒤 계정과 학습 기록을 삭제합니다. 그 전까지는 계속 이용할 수 있습니다.")) return;
-  const val=cancel?null:new Date().toISOString();
+  if(user.withdraw_requested_at){ showSuspended(); return; }
+  if(!confirm("탈퇴를 요청할까요?\n\n요청 즉시 이용이 정지됩니다. 수강료는 요청 시점까지 일할 계산하여 정산하고(할인은 적용되지 않음), 환급은 입금하신 계좌로 이루어진 뒤 계정과 학습 기록이 삭제됩니다.\n\n요청 후에는 스스로 취소할 수 없습니다.")) return;
+  const val=new Date().toISOString();
   const {error}=await sb.from('students').update({withdraw_requested_at:val}).eq('user_id',au.id);
   if(error){ toast("처리 실패: "+error.message); return; }
-  user.withdraw_requested_at=val; renderWithdrawBtn();
-  toast(cancel?"탈퇴 요청을 취소했습니다":"탈퇴 요청이 접수되었습니다 — 정산 후 관리자가 처리합니다");
+  user.withdraw_requested_at=val; renderWithdrawBtn(); showSuspended();
 }
 async function logout(){
   await clearUser();user=null;
