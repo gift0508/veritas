@@ -1985,9 +1985,11 @@ const ENGINE_CACHE={};
 async function loadEngineHtml(k){
   const e=ENGINE_META[k]; if(!e) throw new Error('unknown engine '+k);
   if(ENGINE_CACHE[k]) return ENGINE_CACHE[k];
-  const {data,error}=await sb.storage.from('contents').download(e.p);
-  if(error||!data) throw error||new Error('download failed');
-  const html=await data.text();
+  const {data:su,error:se}=await sb.storage.from('contents').createSignedUrl(e.p, 300);
+  if(se||!su||!su.signedUrl) throw se||new Error('signed url failed');
+  const res=await fetch(su.signedUrl+'&v='+Date.now(),{cache:'no-store'});
+  if(!res.ok) throw new Error('download failed '+res.status);
+  const html=await res.text();
   ENGINE_CACHE[k]=html; return html;
 }
 function engineErrorMsg(k,err){
