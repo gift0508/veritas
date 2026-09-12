@@ -544,6 +544,19 @@ border-radius:999px;padding:4px 12px;font-size:.7rem;cursor:pointer;font-family:
 <body>
 
 <!-- 로그인 -->
+<div id="pwReset" style="display:none;position:fixed;inset:0;z-index:60;background:#07122b;align-items:center;justify-content:center">
+  <div class="gatecard" style="max-width:380px;background:#0f1f45;box-shadow:0 20px 60px rgba(0,0,0,.6)">
+    <div class="gbrand">베리타스 PASS:ON</div>
+    <div class="gsub">새 비밀번호 설정</div>
+    <label class="gl2">새 비밀번호 <small style="color:#9aa6bd;font-weight:400">(6자 이상)</small></label>
+    <input id="npw1" type="password" placeholder="새 비밀번호" autocomplete="new-password">
+    <label class="gl2">새 비밀번호 확인</label>
+    <input id="npw2" type="password" placeholder="한 번 더 입력" autocomplete="new-password" onkeydown="if(event.key==='Enter')savePw()">
+    <div class="gerr" id="npwErr"></div>
+    <button class="btn gbtn" onclick="savePw()">비밀번호 변경 →</button>
+    <button class="quickbtn" onclick="document.getElementById('pwReset').style.display='none'">취소</button>
+  </div>
+</div>
 <div class="gate" id="gate">
   <div class="gatecard">
     <div class="gbrand">베리타스 PASS:ON</div>
@@ -702,6 +715,7 @@ border-radius:999px;padding:4px 12px;font-size:.7rem;cursor:pointer;font-family:
     <div class="userchip" id="userchip" style="display:none">
       <span id="uinfo"></span>
       <span class="ubadge">오프라인 연계 5% 추가할인 대상</span>
+      <button class="mini" id="wdBtn" style="display:none" onclick="withdrawToggle()">탈퇴 요청</button>
       <button class="mini" onclick="logout()">로그아웃</button>
     </div>
     <div class="top-stats">
@@ -927,25 +941,24 @@ function openChooser(k, kicker, title, cats){
   document.getElementById("ecKicker").textContent=kicker;
   document.getElementById("ecTitle").textContent=title;
   var banner=document.getElementById("ecBanner");
-  if(banner) banner.innerHTML = single
-    ? '<b style="color:#C9A227">단과반</b> — 학습엔진은 <b>하나 열 때마다 10만 원</b>씩 결제합니다.'
-    : '<b style="color:#5ec98f">종합반</b> — 모든 학습엔진을 <b>무료</b>로 이용합니다.';
+  if(banner) banner.innerHTML = (user&&user.plan==="single")
+    ? '<b style="color:#C9A227">단과반</b> — 신청한 과목의 문항만 표시됩니다.'
+    : (user&&user.plan==="full")
+      ? '<b style="color:#5ec98f">종합반</b> — 모든 과목의 학습엔진을 이용합니다.'
+      : '<b style="color:#9aa6bd">둘러보기</b> — 수강 신청·승인 후 학습엔진이 열립니다.';
   document.getElementById("ecGrid").innerHTML=cats.map(function(c){
     var sub=c.sub?('<span class="ecsub">'+c.sub+'</span>'):'';
-    var price = single ? '<span class="ecprice pay">10만 원</span>' : '<span class="ecprice free">종합반 무료</span>';
-    if(c.ready || (window.user&&window.user.admin) || (typeof user!=='undefined'&&user&&user.admin)) return '<button class="eccard ready" onclick="openEngWithCat(\''+k+'\',\''+c.name+'\')"><span class="ecnm">'+c.name+'</span>'+sub+price+'<span class="ecgo">'+(single?'결제하고 열기 →':'열기 →')+'</span></button>';
+    var price = (user&&user.plan==="full") ? '<span class="ecprice free">종합반</span>' : ((user&&user.plan==="single") ? '<span class="ecprice free">신청 과목</span>' : '');
+    if(c.ready || (window.user&&window.user.admin) || (typeof user!=='undefined'&&user&&user.admin)) return '<button class="eccard ready" onclick="openEngWithCat(\''+k+'\',\''+c.name+'\')"><span class="ecnm">'+c.name+'</span>'+sub+price+'<span class="ecgo">열기 →</span></button>';
     return '<button class="eccard blank" onclick="ecBlank(\''+c.name+'\')"><span class="ecnm">'+c.name+'</span>'+sub+price+'<span class="ecwait">미선택</span></button>';
   }).join("");
   document.getElementById("engChooser").classList.add("open");
 }
 function closeChooser(){ document.getElementById("engChooser").classList.remove("open"); }
-function openEngWithCat(k, cat){
-  if(isSingle()){ showEngPay(k, cat); return; }
-  doEngOpen(k, cat);
-}
+function openEngWithCat(k, cat){ doEngOpen(k, cat); }
 function doEngOpen(k, cat){
   closeChooser(); openEngine(k);
-  document.getElementById("engtitle").textContent=(k==="sel"?"선택형":"사례형 진도별")+" · "+cat+(isSingle()?" · 단과 10만원":"");
+  document.getElementById("engtitle").textContent=(k==="sel"?"선택형":"사례형 진도별")+" · "+cat;
 }
 var ENGPAY={k:null,cat:null};
 function showEngPay(k,cat){
@@ -1172,7 +1185,7 @@ async function fetchProfile(au){
   if(error){ console.error("[supabase] fetchProfile",error); return null; }
   if(!data) return null;
   return {id:data.id,school:data.school,year:data.year,name:data.name,plan:data.plan||"none",subj:data.subj,subjs:data.subjs,joined:data.joined,email:au.email,
-    phone:data.phone,applied_plan:data.applied_plan,applied_subjs:data.applied_subjs,applied_at:data.applied_at,approved_at:data.approved_at};
+    phone:data.phone,applied_plan:data.applied_plan,applied_subjs:data.applied_subjs,applied_at:data.applied_at,approved_at:data.approved_at,withdraw_requested_at:data.withdraw_requested_at||null};
 }
 async function loadUser(){
   const au=await authUser();
@@ -1187,6 +1200,7 @@ function applyUser(u){
   user=u; window.userSchool=u.school; window.userName=u.name; window.userPlan=u.plan; window.userSubj=u.subj||null; window.userSubjs=u.subjs||(u.subj?[u.subj]:[]);
   document.getElementById("gate").classList.add("hidden");
   setTimeout(function(){ if(typeof showHome==='function') showHome(); }, 30);
+  renderWithdrawBtn();
   const chip=document.getElementById("userchip");
   chip.style.display="flex";
   document.getElementById("uinfo").innerHTML=`<b>${u.name}</b> · ${u.school} ${u.year}`;
@@ -1290,7 +1304,7 @@ async function resetPw(){
   const err=document.getElementById("gerr"); err.textContent="";
   const {email}=readCred();
   if(!email){err.textContent="비밀번호를 재설정할 이메일을 먼저 입력해 주세요";return;}
-  const {error}=await sb.auth.resetPasswordForEmail(email);
+  const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});
   if(error){err.textContent="메일 발송 실패: "+error.message;return;}
   toast(email+"로 비밀번호 재설정 메일을 보냈습니다");
 }
@@ -1447,6 +1461,37 @@ function applyPlanLocks(){
   const fab=document.getElementById("fab");
   if(fab){fab.innerHTML=single?'🔒<span class="fabl">AI 조교 (종합반)</span>':'💬<span class="fabl">AI 조교</span>';}
 }
+function showPwReset(){ const m=document.getElementById("pwReset"); m.style.display="flex"; setTimeout(()=>{ const e=document.getElementById("npw1"); if(e)e.focus(); },50); }
+async function savePw(){
+  const a=document.getElementById("npw1").value, b=document.getElementById("npw2").value, err=document.getElementById("npwErr"); err.textContent="";
+  if(a.length<6){ err.textContent="6자 이상 입력하세요"; return; }
+  if(a!==b){ err.textContent="두 비밀번호가 다릅니다"; return; }
+  const {error}=await sb.auth.updateUser({password:a});
+  if(error){ err.textContent="변경 실패: "+error.message; return; }
+  document.getElementById("pwReset").style.display="none";
+  try{ history.replaceState(null,"",location.pathname); }catch(e){}
+  toast("비밀번호가 변경되었습니다 — 새 비밀번호로 계속 이용하세요");
+}
+try{ sb.auth.onAuthStateChange(function(ev){ if(ev==="PASSWORD_RECOVERY") showPwReset(); }); }catch(e){}
+if(/type=recovery/.test(location.hash||"")) setTimeout(showPwReset,300);
+function renderWithdrawBtn(){
+  const b=document.getElementById("wdBtn"); if(!b) return;
+  if(!user||user.demo||user.admin){ b.style.display="none"; return; }
+  b.style.display="";
+  if(user.withdraw_requested_at){ b.textContent="탈퇴 요청 접수 "+user.withdraw_requested_at.slice(5,10)+" · 취소"; b.title="정산·환급 후 관리자가 처리합니다"; }
+  else { b.textContent="탈퇴 요청"; b.title=""; }
+}
+async function withdrawToggle(){
+  if(!user||user.demo||user.admin) return;
+  const au=await authUser(); if(!au){ toast("로그인 상태에서만 가능합니다"); return; }
+  const cancel=!!user.withdraw_requested_at;
+  if(!confirm(cancel?"탈퇴 요청을 취소할까요?":"탈퇴를 요청할까요?\n\n요청이 접수되면 관리자가 수강료 정산·환급(입금 계좌로)을 마친 뒤 계정과 학습 기록을 삭제합니다. 그 전까지는 계속 이용할 수 있습니다.")) return;
+  const val=cancel?null:new Date().toISOString();
+  const {error}=await sb.from('students').update({withdraw_requested_at:val}).eq('user_id',au.id);
+  if(error){ toast("처리 실패: "+error.message); return; }
+  user.withdraw_requested_at=val; renderWithdrawBtn();
+  toast(cancel?"탈퇴 요청을 취소했습니다":"탈퇴 요청이 접수되었습니다 — 정산 후 관리자가 처리합니다");
+}
 async function logout(){
   await clearUser();user=null;
   document.getElementById("userchip").style.display="none";
@@ -1560,12 +1605,20 @@ function renderApproveList(){
     const btns=(pending?'<button class="mini" style="background:var(--gold);color:#1a1f2e;font-weight:700" onclick="approve(\''+s.id+'\',\'applied\')">✔ 신청대로 승인</button> ':'')+
       '<button class="mini" onclick="approve(\''+s.id+'\',\'full\')">종합반</button> '+
       '<button class="mini" onclick="approveSingle(\''+s.id+'\')">단과반…</button> '+
-      (s.plan!=="none"?'<button class="mini" style="opacity:.6" onclick="approve(\''+s.id+'\',\'none\')">미결제로</button>':'');
+      (s.plan!=="none"?'<button class="mini" style="opacity:.6" onclick="approve(\''+s.id+'\',\'none\')">미결제로</button>':'')+
+      (s.withdraw_requested_at?'<br><small style="color:#ff8a80">정산·환급 후 Supabase → Authentication → Users에서 삭제</small> <button class="mini" style="opacity:.7" onclick="clearWithdraw(\''+s.id+'\')">요청 해제</button>':'');
     return '<div style="display:grid;grid-template-columns:1.3fr 1fr .7fr 1.6fr 1fr 1.4fr 2.2fr;gap:8px;padding:9px 4px;border-top:1px solid rgba(255,255,255,.06);align-items:center'+(pending?';background:rgba(201,162,39,.08)':'')+'">'+
-      '<span><b>'+s.name+'</b>'+(s.dup?' <span title="같은 로스쿨·학년·이름이 둘 이상">⚠</span>':'')+'</span><span>'+s.school+'</span><span>'+s.year+'</span>'+
+      '<span><b>'+s.name+'</b>'+(s.dup?' <span title="같은 로스쿨·학년·이름이 둘 이상">⚠</span>':'')+(s.withdraw_requested_at?'<br><span style="color:#ff8a80;font-size:.72rem;font-weight:700">탈퇴 요청 '+s.withdraw_requested_at.slice(5,10)+'</span>':'')+'</span><span>'+s.school+'</span><span>'+s.year+'</span>'+
       '<span style="font-size:.78rem;word-break:break-all">'+(s.email||"")+'<br>'+(s.phone||'<span style="color:var(--mute)">전화 미입력</span>')+'</span>'+
       '<span style="color:'+(s.plan==="none"?"var(--mute)":"var(--gold)")+'">'+cur+'</span><span>'+app+'</span><span>'+btns+'</span></div>';
   }).join("");
+}
+async function clearWithdraw(id){
+  const s=realRows.find(x=>x.id===id); if(!s)return;
+  if(!confirm(s.name+" 님의 탈퇴 요청 표시를 해제할까요? (계정은 그대로 유지됩니다)"))return;
+  const {error}=await sb.from('students').update({withdraw_requested_at:null}).eq('id',id);
+  if(error){toast("처리 실패: "+error.message);return;}
+  s.withdraw_requested_at=null; renderApproveList(); toast("탈퇴 요청 표시를 해제했습니다");
 }
 async function approve(id,mode){
   const s=realRows.find(x=>x.id===id); if(!s)return;
