@@ -2001,7 +2001,8 @@ const DATA_ENGINES={sel:'mcq', case:'case'};
 async function preloadEngineData(k){
   const kind=DATA_ENGINES[k]; if(!kind) return null;
   let uid=null; try{ const {data}=await sb.auth.getUser(); uid=data&&data.user?data.user.id:null; }catch(e){}
-  const out={engine:k, isAdmin:!!(user&&user.admin), userId:uid, subj:(window.matchSubject||window.userSubj||null),
+  let tok=null; try{ const {data}=await sb.auth.getSession(); tok=data&&data.session?data.session.access_token:null; }catch(e){}
+  const out={engine:k, isAdmin:!!(user&&user.admin), userId:uid, subj:(window.matchSubject||window.userSubj||null), sbUrl:SB_URL, sbKey:SB_KEY, token:tok,
              user:{name:(user&&user.name)||'', plan:(user&&user.plan)||'none'}, items:[], state:{}, config:{}};
   try{ const r=await sb.from('items').select('id,subj,kind,ord,content,free').eq('kind',kind).order('ord'); if(!r.error&&r.data) out.items=r.data; }catch(e){}
   if(uid){ try{ const r=await sb.from('engine_state').select('state').eq('engine',k).eq('user_id',uid).maybeSingle(); if(!r.error&&r.data&&r.data.state) out.state=r.data.state; }catch(e){} }
@@ -2026,7 +2027,9 @@ async function openEngine(k){
 }
 function closeEngine(){
   document.getElementById("engview").classList.remove("open");
-  document.getElementById("engframe").srcdoc="";
+  const fr=document.getElementById("engframe");
+  try{ if(fr.contentWindow&&typeof fr.contentWindow.__passonFlush==="function") fr.contentWindow.__passonFlush(); }catch(e){}
+  setTimeout(function(){ fr.srcdoc=""; }, 400);
 }
 </script>
 <script>window.openLecture=async function(name){ var e=ENGINE_META['lecture']; if(!e){return;} document.getElementById('engtitle').textContent='강의 학습 · '+(name||'')+' · 복습 → 선택형 → 사례형'; var fr=document.getElementById('engframe'); document.getElementById('engview').classList.add('open'); try{ fr.srcdoc=await loadEngineHtml('lecture'); }catch(err){ document.getElementById('engview').classList.remove('open'); if(typeof toast==='function') toast(engineErrorMsg('lecture',err)); } };</script>
