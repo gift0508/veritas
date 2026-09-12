@@ -521,6 +521,7 @@ border-radius:999px;padding:4px 12px;font-size:.7rem;cursor:pointer;font-family:
 .ecprice{font-size:11px;font-weight:800;padding:3px 8px;border-radius:20px;margin-top:6px;display:inline-block}
 .ecprice.pay{background:rgba(201,161,71,.18);color:#C9A227}
 .ecprice.free{background:rgba(94,201,143,.18);color:#5ec98f}
+  .bi{background:#0f1f45;border:1px solid #2c4278;color:#fff;border-radius:6px;padding:3px 6px;font-size:.78rem}
 </style>
 <style>.engmenu{align-items:center}.engmenu .fa{color:#c9a14a;font-weight:800;font-size:.85rem;align-self:center;margin:0 -1px}.engmenu .fa.div{color:#3a4a68;font-weight:400;margin:0 3px}  .secline{border:none;border-top:1px solid rgba(201,162,39,.45);margin:30px 0 22px}
   .hcell.hsnone{background:rgba(255,255,255,.05);color:rgba(255,255,255,.30)}
@@ -1619,13 +1620,79 @@ function renderApproveList(){
       '<button class="mini" onclick="approve(\''+s.id+'\',\'full\')">종합반</button> '+
       '<button class="mini" onclick="approveSingle(\''+s.id+'\')">단과반…</button> '+
       (s.plan!=="none"?'<button class="mini" style="opacity:.6" onclick="approve(\''+s.id+'\',\'none\')">미결제로</button>':'')+
-      (s.withdraw_requested_at?'<br><small style="color:#ff8a80">정산·환급 후 Supabase → Authentication → Users에서 삭제</small> <button class="mini" style="opacity:.7" onclick="clearWithdraw(\''+s.id+'\')">요청 해제</button>':'');
+      (s.withdraw_requested_at?'<br><small style="color:#ff8a80">정산·환급 후 Supabase → Authentication → Users에서 삭제</small> <button class="mini" style="opacity:.7" onclick="clearWithdraw(\''+s.id+'\')">요청 해제</button>':'')+
+      ' <button class="mini" onclick="toggleBilling(\''+s.id+'\')">등록·정산</button>';
     return '<div style="display:grid;grid-template-columns:1.3fr 1fr .7fr 1.6fr 1fr 1.4fr 2.2fr;gap:8px;padding:9px 4px;border-top:1px solid rgba(255,255,255,.06);align-items:center'+(pending?';background:rgba(201,162,39,.08)':'')+'">'+
       '<span><b>'+s.name+'</b>'+(s.dup?' <span title="같은 로스쿨·학년·이름이 둘 이상">⚠</span>':'')+(s.withdraw_requested_at?'<br><span style="color:#ff8a80;font-size:.72rem;font-weight:700">탈퇴 요청 '+s.withdraw_requested_at.slice(5,10)+'</span>':'')+'</span><span>'+s.school+'</span><span>'+s.year+'</span>'+
       '<span style="font-size:.78rem;word-break:break-all">'+(s.email||"")+'<br>'+(s.phone||'<span style="color:var(--mute)">전화 미입력</span>')+'</span>'+
-      '<span style="color:'+(s.plan==="none"?"var(--mute)":"var(--gold)")+'">'+cur+'</span><span>'+app+'</span><span>'+btns+'</span></div>';
+      '<span style="color:'+(s.plan==="none"?"var(--mute)":"var(--gold)")+'">'+cur+'</span><span>'+app+'</span><span>'+btns+'</span></div>'+
+      (s._billing?billingPanel(s):'');
   }).join("");
 }
+/* ---- 등록 정보 · 탈퇴 정산 ---- */
+function wonf(n){ return (Math.round(n)||0).toLocaleString("ko-KR")+"원"; }
+function calcSettle(s){
+  const lp=+s.list_price||0, paid=+s.paid_amount||0, term=+s.term_days||0;
+  const mats=(Array.isArray(s.materials)?s.materials:[]).filter(m=>m&&m.name);
+  const matSum=mats.reduce((a,m)=>a+(+m.amount||0),0);
+  const until=s.withdraw_requested_at?new Date(s.withdraw_requested_at):new Date();
+  let used=0; if(s.start_date){ used=Math.ceil((until-new Date(s.start_date+"T00:00:00"))/86400000); if(used<0)used=0; if(term&&used>term)used=term; }
+  const daily=term?lp/term:0, usedFee=Math.round(daily*used);
+  const refund=Math.max(0, paid-usedFee-matSum);
+  return {lp,paid,term,used,daily,usedFee,mats,matSum,refund,until};
+}
+function billingPanel(s){
+  const c=calcSettle(s);
+  const mats=(Array.isArray(s.materials)?s.materials:[]);
+  const matRows=mats.concat([{name:"",amount:""}]).map((m,i)=>'<span style="display:inline-flex;gap:4px;margin:2px 6px 2px 0"><input class="bi" data-k="mname" data-i="'+i+'" placeholder="자료명" value="'+(m.name||"")+'" style="width:130px"><input class="bi" data-k="mamt" data-i="'+i+'" placeholder="금액" value="'+(m.amount||"")+'" style="width:80px"></span>').join("");
+  let h='<div id="bill-'+s.id+'" style="grid-column:1/-1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 14px;margin:2px 0 8px;font-size:.8rem">';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px"><b style="color:var(--gold)">등록 정보</b>'+
+     '<label>정가 <input class="bi" data-k="list_price" value="'+(s.list_price||"")+'" style="width:100px"></label>'+
+     '<label>납부액 <input class="bi" data-k="paid_amount" value="'+(s.paid_amount||"")+'" style="width:100px"></label>'+
+     '<label>기간(일) <input class="bi" data-k="term_days" value="'+(s.term_days||"")+'" style="width:60px"></label>'+
+     '<label>시작일 <input class="bi" data-k="start_date" type="date" value="'+(s.start_date||"")+'"></label>'+
+     '<button class="mini" style="background:var(--gold);color:#1a1f2e;font-weight:700" onclick="saveBilling(\''+s.id+'\')">저장</button></div>';
+  h+='<div style="margin-bottom:8px"><b style="color:var(--gold)">배부자료 공제</b> '+matRows+'</div>';
+  if(s.withdraw_requested_at||s.settlement){
+    h+='<div style="border-top:1px solid rgba(255,255,255,.08);padding-top:8px"><b style="color:#ff8a80">탈퇴 정산</b> (요청 '+(s.withdraw_requested_at||"").slice(0,16).replace("T"," ")+')<br>'+
+       '정가 '+wonf(c.lp)+' ÷ '+c.term+'일 = 1일 '+wonf(c.daily)+' × 이용 '+c.used+'일(시작 '+(s.start_date||"미입력")+') = 공제 <b>'+wonf(c.usedFee)+'</b><br>'+
+       '납부 '+wonf(c.paid)+' − 이용분 '+wonf(c.usedFee)+' − 자료 '+wonf(c.matSum)+(c.mats.length?' ('+c.mats.map(m=>m.name+' '+wonf(+m.amount||0)).join(', ')+')':'')+' = <b style="color:var(--gold);font-size:1rem">환급 '+wonf(c.refund)+'</b> '+
+       '<button class="mini" onclick="printSettle(\''+s.id+'\')">정산서</button> '+
+       (s.settlement?'<span style="color:#5ec98f">✔ 정산 확정 '+(s.settlement.done_at||"").slice(0,10)+' · 환급 '+wonf(s.settlement.refund)+'</span>':'<button class="mini" onclick="confirmSettle(\''+s.id+'\')">정산 확정</button>')+'</div>';
+  }
+  return h+'</div>';
+}
+function toggleBilling(id){ const s=realRows.find(x=>x.id===id); if(!s)return; s._billing=!s._billing; renderApproveList(); }
+function readBilling(id){
+  const box=document.getElementById("bill-"+id); const g=k=>{const e=box.querySelector('.bi[data-k="'+k+'"]');return e?e.value.trim():"";};
+  const mats=[]; box.querySelectorAll('.bi[data-k="mname"]').forEach((e,i)=>{const n=e.value.trim(); const a=box.querySelector('.bi[data-k="mamt"][data-i="'+i+'"]').value.replace(/[^0-9]/g,""); if(n) mats.push({name:n, amount:+a||0});});
+  return {list_price:+g("list_price").replace(/[^0-9]/g,"")||null, paid_amount:+g("paid_amount").replace(/[^0-9]/g,"")||null, term_days:+g("term_days")||null, start_date:g("start_date")||null, materials:mats};
+}
+async function saveBilling(id){
+  const s=realRows.find(x=>x.id===id); if(!s)return; const patch=readBilling(id);
+  const {error}=await sb.from('students').update(patch).eq('id',id); if(error){toast("저장 실패: "+error.message);return;}
+  Object.assign(s,patch); renderApproveList(); toast(s.name+" 등록 정보 저장");
+}
+async function confirmSettle(id){
+  const s=realRows.find(x=>x.id===id); if(!s)return; const c=calcSettle(s);
+  if(!s.list_price||!s.term_days||!s.start_date){toast("정가·기간·시작일을 먼저 저장하세요");return;}
+  if(!confirm(s.name+" 님 정산을 확정할까요?\n환급액 "+wonf(c.refund)+"\n(확정 후 입금 계좌로 환급 → Authentication에서 계정 삭제)"))return;
+  const settlement={done_at:new Date().toISOString(), list_price:c.lp, paid:c.paid, term_days:c.term, used_days:c.used, used_fee:c.usedFee, materials:c.mats, material_sum:c.matSum, refund:c.refund, withdraw_at:s.withdraw_requested_at};
+  const {error}=await sb.from('students').update({settlement}).eq('id',id); if(error){toast("확정 실패: "+error.message);return;}
+  s.settlement=settlement; renderApproveList(); toast("정산 확정 — 환급 "+wonf(c.refund));
+}
+function printSettle(id){
+  const s=realRows.find(x=>x.id===id); if(!s)return; const c=calcSettle(s);
+  const rows=[["정가",wonf(c.lp)],["납부액",wonf(c.paid)],["수강기간",c.term+"일 (시작 "+(s.start_date||"")+")"],["탈퇴 요청 일시",(s.withdraw_requested_at||"").slice(0,16).replace("T"," ")],["이용 일수",c.used+"일"],["1일 이용료(정가 기준)",wonf(c.daily)],["이용분 공제",wonf(c.usedFee)]]
+    .concat(c.mats.map(m=>["배부자료 공제 · "+m.name,wonf(+m.amount||0)])).concat([["환급액",wonf(c.refund)]]);
+  const w=window.open("","_blank"); if(!w){toast("팝업이 차단되었습니다");return;}
+  w.document.write('<html><head><meta charset="utf-8"><title>수강료 정산서</title><style>body{font-family:"Malgun Gothic",sans-serif;padding:36px;color:#111}h1{font-size:20px;margin:0 0 4px}.s{color:#666;font-size:12px;margin-bottom:18px}table{border-collapse:collapse;width:100%;max-width:560px}td{border-bottom:1px solid #ddd;padding:8px 6px;font-size:14px}td:last-child{text-align:right}tr.t td{font-weight:700;font-size:16px;border-top:2px solid #111}.n{font-size:12px;color:#555;margin-top:16px;line-height:1.6}</style></head><body>'+
+    '<h1>수강료 정산서</h1><div class="s">베리타스 PASS:ON · '+s.name+' ('+s.school+' '+s.year+') · 발행 '+new Date().toISOString().slice(0,10)+'</div><table>'+
+    rows.map((r,i)=>'<tr'+(i===rows.length-1?' class="t"':'')+'><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join("")+'</table>'+
+    '<div class="n">· 탈퇴 요청 시 할인은 적용되지 않으며, 정가를 수강기간으로 나눈 1일 이용료에 이용 일수를 곱한 금액을 공제합니다.<br>· 배부자료는 회수하지 않고 자료비를 공제합니다.<br>· 환급은 등록 시 입금하신 계좌로 이루어집니다.</div>'+
+    '<script>window.print()<\/script></body></html>'); w.document.close();
+}
+
 async function clearWithdraw(id){
   const s=realRows.find(x=>x.id===id); if(!s)return;
   if(!confirm(s.name+" 님의 탈퇴 요청 표시를 해제할까요? (계정은 그대로 유지됩니다)"))return;
