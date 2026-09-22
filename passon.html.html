@@ -854,6 +854,15 @@ border-radius:999px;padding:4px 12px;font-size:.7rem;cursor:pointer;font-family:
 const SB_URL="https://swhkdtjishfigulgpbbj.supabase.co";
 const SB_KEY="sb_publishable_bL6M3894ms5qEdkrIx11EQ_1Fe7EkiU";
 const sb=window.supabase.createClient(SB_URL,SB_KEY); window.sb=sb;
+const SUB_PRICE=200000, SUB_DAYS=30, TRIAL_DAYS=7;
+function daysLeft(ts){ if(!ts) return 0; return Math.max(0, Math.ceil((new Date(ts)-new Date())/86400000)); }
+function subState(u){ if(!u) return {active:false,kind:"none",days:0,until:null};
+  if(u.admin) return {active:true,kind:"admin",days:0,until:null};
+  if(u.demo) return {active:u.plan==="full",kind:"demo",days:0,until:null};
+  const pd=daysLeft(u.paid_until), td=daysLeft(u.trial_until);
+  if(pd>0) return {active:true,kind:"paid",days:pd,until:u.paid_until};
+  if(td>0) return {active:true,kind:"trial",days:td,until:u.trial_until};
+  return {active:false,kind:(u.paid_until||u.trial_until)?"expired":"none",days:0,until:null}; }
 const ADMIN_EMAIL="gift0508@gmail.com"; // 관리자 계정 이메일 (RLS 정책과 동일해야 함)
 function adminProfile(email){ return {admin:1,name:"관리자",school:"베리타스",year:"운영팀",plan:"full",subj:null,subjs:null,email}; }
 </script>
@@ -927,10 +936,18 @@ function openCell(li,si){
 
 /* 선택형=3분류(공법/형사법/민사법) · 사례형=7법 · 데모 있는 것만 열림 */
 var SEL_CATS=[
-  {name:"공법", sub:"헌법 · 행정법", ready:true},
-  {name:"형사법", sub:"형법 · 형사소송법", ready:false},
-  {name:"민사법", sub:"민법 · 민사소송법 · 상법", ready:false},
+  {group:"과목별 엔진", name:"헌법", bank:"bar_const", laws:["헌법"], ready:true},
+  {group:"과목별 엔진", name:"행정법", bank:"bar_admin", laws:["행정법"], ready:true},
+  {group:"과목별 엔진", name:"민법", bank:"bar_civil", laws:["민법"], ready:true},
+  {group:"과목별 엔진", name:"상법", bank:"bar_comm", laws:["상법"], ready:true},
+  {group:"과목별 엔진", name:"민사소송법", bank:"bar_civpro", laws:["민사소송법"], ready:true},
+  {group:"과목별 엔진", name:"형법", bank:"bar_crim", laws:["형법"], ready:true},
+  {group:"과목별 엔진", name:"형사소송법", bank:"bar_crimpro", laws:["형사소송법"], ready:true},
+  {group:"통합 엔진", name:"공법", sub:"헌법 + 행정법", bank:"bar_public", laws:["헌법","행정법"], mode:"combined", ready:true},
+  {group:"통합 엔진", name:"민사법", sub:"민법 + 상법 + 민사소송법", bank:"bar_civillaw", laws:["민법","상법","민사소송법"], mode:"combined", ready:true},
+  {group:"통합 엔진", name:"형사법", sub:"형법 + 형사소송법", bank:"bar_criminal", laws:["형법","형사소송법"], mode:"combined", ready:true},
 ];
+var SUBJ2BANK={"헌법":"bar_const","행정법":"bar_admin","민법":"bar_civil","상법":"bar_comm","민사소송법":"bar_civpro","형법":"bar_crim","형사소송법":"bar_crimpro"};
 var CASE_CATS=[
   {name:"헌법",ready:false},{name:"행정법",ready:true},{name:"형법",ready:false},
   {name:"형사소송법",ready:false},{name:"민법",ready:false},{name:"민사소송법",ready:false},{name:"상법",ready:false},
@@ -947,7 +964,7 @@ function pickTeukgang(){
   document.getElementById("engChooser").classList.add("open");
 }
 function teukPick(nm){ if(window.toast)toast(nm+" 신청 화면으로 이동합니다."); else alert(nm+" 신청 화면으로 이동합니다."); }
-function pickSelType(){ openChooser("sel","선택형 학습엔진","학습엔진 10개 (공법 · 형사법 · 민사법)", SEL_CATS); }
+function pickSelType(){ openChooser("sel","선택형 학습엔진","과목별 엔진 7 · 통합 엔진 3", SEL_CATS); }
 function pickCaseType(){ openChooser("case","사례형 진도별 학습엔진","학습엔진 10개 (7법)", CASE_CATS); }
 function openChooser(k, kicker, title, cats){
   var single=isSingle();
@@ -959,17 +976,24 @@ function openChooser(k, kicker, title, cats){
     : (user&&user.plan==="full")
       ? '<b style="color:#5ec98f">종합반</b> — 모든 과목의 학습엔진을 이용합니다.'
       : '<b style="color:#9aa6bd">둘러보기</b> — 수강 신청·승인 후 학습엔진이 열립니다.';
+  var lastGroup=null;
   document.getElementById("ecGrid").innerHTML=cats.map(function(c){
+    var head=''; if(c.group&&c.group!==lastGroup){ lastGroup=c.group; head='<div style="grid-column:1/-1;font-size:12px;color:#9aa6bd;margin:6px 0 -2px;letter-spacing:.3px">'+c.group+(c.group==="통합 엔진"?' — 변시 출제 단위대로 여러 법을 섞어 풉니다':' — 주제·문항 수를 골라 오늘의 세트를 짤 수 있습니다')+'</div>'; }
+    return head+(function(){
     var sub=c.sub?('<span class="ecsub">'+c.sub+'</span>'):'';
     var price = (user&&user.plan==="full") ? '<span class="ecprice free">종합반</span>' : ((user&&user.plan==="single") ? '<span class="ecprice free">신청 과목</span>' : '');
     if(c.ready || (window.user&&window.user.admin) || (typeof user!=='undefined'&&user&&user.admin)) return '<button class="eccard ready" onclick="openEngWithCat(\''+k+'\',\''+c.name+'\')"><span class="ecnm">'+c.name+'</span>'+sub+price+'<span class="ecgo">열기 →</span></button>';
     return '<button class="eccard blank" onclick="ecBlank(\''+c.name+'\')"><span class="ecnm">'+c.name+'</span>'+sub+price+'<span class="ecwait">미선택</span></button>';
+    })();
   }).join("");
   document.getElementById("engChooser").classList.add("open");
 }
 function closeChooser(){ document.getElementById("engChooser").classList.remove("open"); }
 function openEngWithCat(k, cat){ doEngOpen(k, cat); }
 function doEngOpen(k, cat){
+  var cats=(k==="sel"?SEL_CATS:CASE_CATS); var c=cats.filter(function(x){ return x.name===cat; })[0]||null;
+  window.engCat=c?{bank:c.bank||null,laws:c.laws||[cat],mode:c.mode||"single",name:cat}:{bank:null,laws:[cat],mode:"single",name:cat};
+  if(k==="case") window.engCat.bank=window.engCat.bank||("case_"+cat);
   closeChooser(); openEngine(k);
   document.getElementById("engtitle").textContent=(k==="sel"?"선택형":"사례형 진도별")+" · "+cat;
 }
@@ -1047,6 +1071,15 @@ function lectures(){
     </div>`;
   }).join("");
 }
+const SUBJ2LAW={"헌법":"헌법","행정법":"행정법","민법":"민법","상법":"상법","민사소송법":"민소법","민소법":"민소법","형법":"형법","형사소송법":"형소법","형소법":"형소법"};
+window.addEventListener("message",function(ev){ const d=ev.data; if(!d||d.type!=="passon-solve") return; const l=SUBJ2LAW[d.subj]; if(!l||!accum[l]) return; const n=Math.max(1,+d.n||1);
+  const before=accum[l][0],beforeTotal=laws.reduce((a,k)=>a+accum[k][0],0); accum[l][0]+=n; today.sel+=n;
+  try{ const max=Math.max(...laws.map(k=>accum[k][0])); laws.forEach(k=>{document.getElementById("fill-"+k).style.width=(accum[k][0]/max*100).toFixed(1)+"%";});
+    countUp(document.getElementById("cnt-"+l),before,accum[l][0]); countUp(document.getElementById("accumTotal"),beforeTotal,laws.reduce((a,k)=>a+accum[k][0],0));
+    document.getElementById("todayDigest").textContent=today.sel+"문 · 답안 "+today.cas+(today.rec?(" · 기록 "+today.rec):"");
+    const parts=[]; if(today.sel)parts.push("+"+today.sel+"문");if(today.cas)parts.push("답안 +"+today.cas);if(today.rec)parts.push("기록 +"+today.rec);
+    document.getElementById("todayAdd").textContent=parts.length?("▲ 오늘 "+parts.join(" · ")+" 적립"):""; }catch(e){}
+});
 function consume(i,kind,n){
   const L=lec[i],l=L.subj;
   const slot=kind==="obj"?L.obj:(kind==="cas"?L.cas:L.rec);
@@ -1197,8 +1230,10 @@ async function fetchProfile(au){
   const {data,error}=await sb.from('students').select('*').eq('user_id',au.id).maybeSingle();
   if(error){ console.error("[supabase] fetchProfile",error); return null; }
   if(!data) return null;
-  return {id:data.id,school:data.school,year:data.year,name:data.name,plan:data.plan||"none",subj:data.subj,subjs:data.subjs,joined:data.joined,email:au.email,
-    phone:data.phone,applied_plan:data.applied_plan,applied_subjs:data.applied_subjs,applied_at:data.applied_at,approved_at:data.approved_at,withdraw_requested_at:data.withdraw_requested_at||null};
+  const st=subState({paid_until:data.paid_until,trial_until:data.trial_until});
+  return {id:data.id,school:data.school,year:data.year,name:data.name,plan:(st.active?"full":"none"),plan_db:data.plan||"none",subj:null,subjs:null,joined:data.joined,email:au.email,
+    phone:data.phone,applied_plan:data.applied_plan,applied_subjs:data.applied_subjs,applied_at:data.applied_at,approved_at:data.approved_at,withdraw_requested_at:data.withdraw_requested_at||null,
+    trial_until:data.trial_until||null,paid_until:data.paid_until||null};
 }
 async function loadUser(){
   const au=await authUser();
@@ -1220,10 +1255,12 @@ function applyUser(u){
   document.getElementById("uinfo").innerHTML=`<b>${u.name}</b> · ${u.school} ${u.year}`;
   document.querySelectorAll(".vseat").forEach(s=>{ if(s.textContent.indexOf("★")>=0) s.textContent="★ "+u.name; });
   const badge=chip.querySelector(".ubadge");
-  if(u.plan==="single"){badge.textContent="단과반 · "+(u.subjs&&u.subjs.length?u.subjs.join("·"):u.subj)+" 한정";badge.classList.add("single");}
-  else if(u.admin){badge.textContent="👑 관리자 · 모든 화면 열람";badge.classList.remove("single");}
-  else if(u.plan==="full"){badge.textContent="종합반 · 오프라인 연계 5% 할인 대상";badge.classList.remove("single");}
-  else{badge.textContent=u.applied_at?"신청 접수 · 입금 확인 후 승인 대기":"미결제 · 둘러보기 — 종합반/단과반 신청 후 이용";badge.classList.add("single");}
+  const ss=subState(u);
+  if(u.admin){badge.textContent="👑 관리자 · 모든 화면 열람";badge.classList.remove("single");}
+  else if(u.demo){badge.textContent="둘러보기 — 회원가입 시 7일 무료 체험";badge.classList.add("single");}
+  else if(ss.kind==="paid"){badge.textContent="이용 중 · "+ss.until.slice(0,10)+"까지 (D-"+ss.days+")";badge.classList.remove("single");}
+  else if(ss.kind==="trial"){badge.textContent="무료 체험 · "+ss.days+"일 남음 — 1개월 이용권 신청";badge.classList.remove("single");}
+  else{badge.textContent=(ss.kind==="expired"?"이용 기간 만료":"미결제")+(u.applied_at?" · 입금 확인 대기":" — 1개월 이용권 신청 후 이용");badge.classList.add("single");}
   let ab=document.getElementById("admTop");
   if(u.admin){
     if(!ab){ab=document.createElement("button");ab.id="admTop";ab.className="upgbtn";ab.textContent="👑 관리자 대시보드";
@@ -1231,7 +1268,7 @@ function applyUser(u){
   }else if(ab){ab.remove();}
   let ub=document.getElementById("upgTop");
   if(u.plan!=="full"){
-    if(!ub){ub=document.createElement("button");ub.id="upgTop";ub.className="upgbtn";ub.textContent=u.plan==="single"?"⭐ 종합반 신청":(u.applied_at?"⏳ 승인 상태 확인":"⭐ 종합반/단과반 신청");
+    if(!ub){ub=document.createElement("button");ub.id="upgTop";ub.className="upgbtn";ub.textContent=(u.applied_at&&subState(u).kind!=="paid")?"⏳ 입금 확인 상태":"⭐ 1개월 이용권 신청";
       ub.onclick=()=>openUpgrade();chip.insertBefore(ub,chip.querySelector(".mini"));}
   }else if(ub){ub.remove();}
   applyPlanLocks();
@@ -1375,21 +1412,17 @@ function realApplyView(fmsg){
   const u=user||{};
   const single=u.plan==="single";
   return `
-    <h3>${single?"종합반 전환 신청":"종합반 / 단과반 신청"}</h3>
-    <div class="upsub">${fmsg}신청서 제출 → 안내된 금액 입금 → 관리자가 입금을 확인하고 <b style="color:var(--gold)">승인</b>하면 즉시 전환됩니다.</div>
-    <label>신청 상품</label>
-    <div class="planrow">
-      <label class="planopt on" id="rpFull" onclick="rpPick('full')">종합반 <small>7법 전체</small></label>
-      ${single?"":'<label class="planopt" id="rpSingle" onclick="rpPick(\'single\')">단과반 <small>과목 선택</small></label>'}
-    </div>
-    <div id="rpSubjs" style="display:none;margin:8px 0 4px;flex-wrap:wrap;gap:6px 12px">
-      ${SUBJ7.map(s=>`<label style="font-size:12.5px;display:inline-flex;align-items:center;gap:4px;margin-right:10px"><input type="checkbox" class="rpsubj" value="${s}">${s}</label>`).join("")}
-    </div>
+    <h3>1개월 이용권 신청</h3>
+    <div class="upsub">${fmsg}강의 시청 + 학습엔진 전부(선택형·사례형·미션·모의고사·페이스메이커) · <b style="color:var(--gold)">30일 ${SUB_PRICE.toLocaleString("ko-KR")}원</b><br>신청 → 계좌이체 → 관리자가 입금을 확인하면 이용 기간이 ${SUB_DAYS}일 연장됩니다. 실전문제·답안피드백은 별도 응시권입니다.</div>
+    ${subState(u).active?`<div class="upsub" style="color:#5ec98f">현재 ${subState(u).kind==="trial"?"무료 체험":"이용"} 중 · ${subState(u).until.slice(0,10)}까지 — 지금 신청하면 그 뒤로 이어집니다</div>`:""}
+    <label>개월 수</label>
+    <select id="rpMonths" onchange="document.getElementById('rpAmt').textContent=(SUB_PRICE*this.value).toLocaleString('ko-KR')+'원'"><option value="1">1개월</option><option value="2">2개월</option><option value="3">3개월</option></select>
+    <div class="upsub">입금액 <b id="rpAmt" style="color:var(--gold)">${SUB_PRICE.toLocaleString("ko-KR")}원</b> · 입금 계좌는 신청 후 안내됩니다</div>
     <label>성명</label><input id="upName" type="text" maxlength="10" value="${u.name||""}" readonly style="opacity:.7">
-    <label>전화번호 <small style="color:#9aa6bd">(입금 안내·확인 연락용)</small></label><input id="upPhone" type="tel" placeholder="010-0000-0000" maxlength="13" value="${u.phone||""}">
+    <label>입금자명</label><input id="upDep" type="text" maxlength="20" placeholder="입금하실 때 쓰는 이름" value="${u.name||""}">
+    <label>전화번호 <small style="color:#9aa6bd">(입금 확인 연락용)</small></label><input id="upPhone" type="tel" placeholder="010-0000-0000" maxlength="13" value="${u.phone||""}">
     <div class="uperr" id="uperr"></div>
-    <button class="btn gbtn" onclick="submitRealApply()">신청하기 →</button>
-    <div class="upsub" style="margin:12px 0 0;text-align:center">종합반 비용은 <b class="upfeat">오프라인 종합반 대비 할인가</b>로 산정되며,<br>기수강 <b class="upfeat">단과 수강료 일부가 공제</b>됩니다</div>`;
+    <button class="btn gbtn" onclick="submitRealApply()">이용권 신청 →</button>`;
 }
 let rpPlan="full";
 function rpPick(p){ rpPlan=p; const a=document.getElementById("rpFull"),b=document.getElementById("rpSingle"),s=document.getElementById("rpSubjs");
@@ -1398,36 +1431,43 @@ async function submitRealApply(){
   const err=document.getElementById("uperr"); err.textContent="";
   const ph=document.getElementById("upPhone").value.trim();
   if(!ph){err.textContent="전화번호를 입력해 주세요";return;}
-  const subjs=rpPlan==="single"?[].slice.call(document.querySelectorAll(".rpsubj:checked")).map(c=>c.value):null;
-  if(rpPlan==="single"&&!subjs.length){err.textContent="단과반은 과목을 하나 이상 선택해 주세요";return;}
-  const u={...user,phone:ph,applied_plan:rpPlan,applied_subjs:subjs,applied_at:new Date().toISOString()};
-  await saveUser(u); applyUser(u);
-  document.getElementById("upBody").innerHTML=realWaitView();
-  toast("신청이 접수되었습니다 — 입금 확인 후 승인됩니다");
+  const months=+(document.getElementById("rpMonths").value||1), dep=(document.getElementById("upDep").value||"").trim();
+  if(!dep){err.textContent="입금자명을 입력해 주세요";return;}
+  const au=await authUser(); if(!au){err.textContent="로그인 상태에서만 신청할 수 있습니다";return;}
+  const {error}=await sb.from('subs').insert({user_id:au.id,months:months,amount:SUB_PRICE*months,depositor:dep,status:"requested"});
+  if(error){err.textContent="신청 실패: "+error.message;return;}
+  const u={...user,phone:ph,applied_plan:"full",applied_subjs:null,applied_at:new Date().toISOString()};
+  await saveUser(u); applyUser(u); user._lastSub={months,dep};
+  document.getElementById("upBody").innerHTML=realWaitView(); fillBankLine();
+  toast("신청이 접수되었습니다 — 입금 확인 후 이용 기간이 연장됩니다");
 }
 function realWaitView(){
   const u=user||{};
-  const what=u.applied_plan==="single"?"단과반 ("+(u.applied_subjs||[]).join("·")+")":"종합반";
+  const m=(u._lastSub&&u._lastSub.months)||1;
   return `
     <h3>신청이 접수되었습니다</h3>
-    <div class="upsub">신청 상품 <b style="color:var(--gold)">${what}</b> · 신청일 ${(u.applied_at||"").slice(0,10)}</div>
+    <div class="upsub">신청 상품 <b style="color:var(--gold)">${m}개월 이용권 · ${(SUB_PRICE*m).toLocaleString("ko-KR")}원</b> · 신청일 ${(u.applied_at||"").slice(0,10)}</div>
     <div class="updone">
       <b>다음 단계</b><br>
-      ① 관리자가 신청을 확인하고 <b>수강료를 산정</b>하여 ${u.phone||"등록된 번호"}로 안내합니다<br>
-      ② 안내된 금액을 입금하면, 관리자가 입금을 확인하고 <b>승인</b>합니다<br>
-      ③ 승인되면 아래 버튼을 누르거나 다시 로그인할 때 자동으로 전환됩니다
+      ① 아래 계좌로 <b>${(SUB_PRICE*m).toLocaleString("ko-KR")}원</b>을 입금해 주세요 (입금자명: ${(u._lastSub&&u._lastSub.dep)||u.name})<br>
+      <span id="bankLine" style="color:var(--gold)">입금 계좌 불러오는 중…</span><br>
+      ② 관리자가 입금을 확인하면 이용 기간이 ${SUB_DAYS*m}일 연장됩니다<br>
+      ③ 확인되면 아래 버튼을 누르거나 다시 로그인할 때 자동으로 반영됩니다
     </div>
     <div class="updiv"></div>
     <button class="btn gbtn" style="margin-top:6px" onclick="refreshStatus()">승인 상태 확인 →</button>
     <button class="quickbtn" onclick="cancelApply()">신청 내용 수정</button>`;
 }
+async function fillBankLine(){ const e=document.getElementById("bankLine"); if(!e)return;
+  try{ const r=await sb.from('engine_config').select('value').eq('engine','score').eq('key','bank').maybeSingle();
+    const v=r.data&&r.data.value; e.textContent=(v&&v.account)?(v.bank+" "+v.account+" (예금주 "+v.holder+")"):"입금 계좌는 관리자에게 문의해 주세요"; }
+  catch(err){ e.textContent="입금 계좌는 관리자에게 문의해 주세요"; } }
 async function refreshStatus(){
   const au=await authUser(); if(!au)return;
   const p=await fetchProfile(au); if(!p)return;
-  applyUser(p);
-  if(p.plan==="full"){closeUpgrade();toast("🎉 "+p.name+"님, 종합반으로 전환되었습니다 — 모든 기능이 열렸습니다");}
-  else if(p.plan==="single"){closeUpgrade();toast("✅ 단과반("+(p.subjs||[]).join("·")+")으로 승인되었습니다");}
-  else toast("아직 승인 전입니다 — 입금 확인 후 승인됩니다");
+  applyUser(p); const ss=subState(p);
+  if(ss.kind==="paid"){closeUpgrade();toast("🎉 "+p.name+"님, 이용 기간이 "+ss.until.slice(0,10)+"까지 연장되었습니다");}
+  else toast("아직 입금 확인 전입니다 — 확인되면 이용 기간이 연장됩니다");
 }
 async function cancelApply(){
   const u={...user,applied_plan:null,applied_subjs:null,applied_at:null};
@@ -1606,23 +1646,31 @@ function adminLogout(){
   if(!user){ var g2=document.querySelector(".gate"); if(g2)g2.classList.remove("hidden"); }
 }
 let realRows=[];
-function planLabel(s){ return s.plan==="full"?"종합반":(s.plan==="single"?"단과반("+(s.subjs||[s.subj]).filter(Boolean).join("·")+")":"미결제"); }
+function planLabel(s){ const ss=subState(s); if(ss.kind==="paid") return "이용 중 · ~"+ss.until.slice(0,10)+" (D-"+ss.days+")"; if(ss.kind==="trial") return "체험 · D-"+ss.days; return ss.kind==="expired"?"만료":"미결제"; }
+let SUBS=[];
+async function loadSubs(){ try{ const r=await sb.from('subs').select('id,user_id,months,amount,depositor,status,requested_at,confirmed_at').order('requested_at',{ascending:false}); SUBS=(!r.error&&r.data)?r.data:[]; }catch(e){ SUBS=[]; } }
+async function confirmSub(id,status){ const x=SUBS.find(s=>s.id===id); if(!x)return; const st=realRows.find(r=>r.user_id===x.user_id);
+  if(!confirm((status==="confirmed"?"입금을 확인하고 이용 기간을 "+(x.months*SUB_DAYS)+"일 연장할까요?":"이 신청을 거절할까요?")+"\n"+(st?st.name:"")+" · "+x.months+"개월 · "+x.amount.toLocaleString("ko-KR")+"원 · 입금자 "+(x.depositor||"")))return;
+  const {error}=await sb.from('subs').update({status}).eq('id',id); if(error){toast("처리 실패: "+error.message);return;}
+  toast(status==="confirmed"?"이용 기간 연장 완료":"거절 처리"); renderAdmin(); }
+async function extendDays(id,days){ const s=realRows.find(x=>x.id===id); if(!s)return;
+  if(!confirm(s.name+" 님 이용 기간을 "+days+"일 "+(days>0?"연장":"단축")+"할까요? (수동 조정)"))return;
+  const base=Math.max(new Date(s.paid_until||0).getTime(), Date.now()); const until=new Date(base+days*86400000).toISOString();
+  const {error}=await sb.from('students').update({paid_until:until,plan:"full",subj:null,subjs:null}).eq('id',id); if(error){toast("실패: "+error.message);return;}
+  toast(s.name+" · ~"+until.slice(0,10)); renderAdmin(); }
 function renderApproveList(){
   const el=document.getElementById("approveList"); if(!el)return;
   if(!realRows.length){el.innerHTML='<div class="empty-log">아직 가입한 학생이 없습니다.</div>';return;}
   const head='<div style="display:grid;grid-template-columns:1.3fr 1fr .7fr 1.6fr 1fr 1.4fr 2.2fr;gap:8px;padding:8px 4px;font-size:.68rem;color:var(--mute);letter-spacing:.08em">'+
     '<span>성명</span><span>로스쿨</span><span>학년</span><span>이메일 / 전화</span><span>현재</span><span>신청</span><span>처리</span></div>';
   el.innerHTML=head+realRows.map((s,i)=>{
-    const cur=planLabel(s);
-    const app=s.applied_at?(s.applied_plan==="single"?"단과반("+(s.applied_subjs||[]).join("·")+")":"종합반")+'<br><small style="color:var(--mute)">'+s.applied_at.slice(0,10)+'</small>':'<span style="color:var(--mute)">—</span>';
-    const pending=s.applied_at&&!(s.plan===s.applied_plan&&(s.plan!=="single"||JSON.stringify(s.subjs||[])===JSON.stringify(s.applied_subjs||[])));
-    const btns=(pending?'<button class="mini" style="background:var(--gold);color:#1a1f2e;font-weight:700" onclick="approve(\''+s.id+'\',\'applied\')">✔ 신청대로 승인</button> ':'')+
-      '<button class="mini" onclick="approve(\''+s.id+'\',\'full\')">종합반</button> '+
-      '<button class="mini" onclick="approveSingle(\''+s.id+'\')">단과반…</button> '+
-      (s.plan!=="none"?'<button class="mini" style="opacity:.6" onclick="approve(\''+s.id+'\',\'none\')">미결제로</button>':'')+
+    const cur=planLabel(s); const pend=SUBS.filter(x=>x.user_id===s.user_id&&x.status==="requested");
+    const app=pend.length?pend.map(x=>x.months+'개월 · '+x.amount.toLocaleString("ko-KR")+'원<br><small style="color:var(--mute)">입금자 '+(x.depositor||"")+' · '+x.requested_at.slice(0,10)+'</small>').join('<hr style="border:0;border-top:1px solid #23345f;margin:4px 0">'):'<span style="color:var(--mute)">—</span>';
+    let btns=pend.map(x=>'<button class="mini" style="background:var(--gold);color:#1a1f2e;font-weight:700" onclick="confirmSub(\''+x.id+'\',\'confirmed\')">입금 확인 · +'+(x.months*SUB_DAYS)+'일</button> <button class="mini" style="opacity:.7" onclick="confirmSub(\''+x.id+'\',\'rejected\')">거절</button>').join(" ")+
+      ' <button class="mini" onclick="extendDays(\''+s.id+'\',30)">+30일</button> <button class="mini" style="opacity:.6" onclick="extendDays(\''+s.id+'\',-30)">−30일</button>'+
       (s.withdraw_requested_at?'<br><small style="color:#ff8a80">정산·환급 후 Supabase → Authentication → Users에서 삭제</small> <button class="mini" style="opacity:.7" onclick="clearWithdraw(\''+s.id+'\')">요청 해제</button>':'')+
       ' <button class="mini" onclick="toggleBilling(\''+s.id+'\')">등록·정산</button>';
-    return '<div style="display:grid;grid-template-columns:1.3fr 1fr .7fr 1.6fr 1fr 1.4fr 2.2fr;gap:8px;padding:9px 4px;border-top:1px solid rgba(255,255,255,.06);align-items:center'+(pending?';background:rgba(201,162,39,.08)':'')+'">'+
+    return '<div style="display:grid;grid-template-columns:1.3fr 1fr .7fr 1.6fr 1fr 1.4fr 2.2fr;gap:8px;padding:9px 4px;border-top:1px solid rgba(255,255,255,.06);align-items:center'+(pend.length?';background:rgba(201,162,39,.08)':'')+'">'+
       '<span><b>'+s.name+'</b>'+(s.dup?' <span title="같은 로스쿨·학년·이름이 둘 이상">⚠</span>':'')+(s.withdraw_requested_at?'<br><span style="color:#ff8a80;font-size:.72rem;font-weight:700">탈퇴 요청 '+s.withdraw_requested_at.slice(5,10)+'</span>':'')+'</span><span>'+s.school+'</span><span>'+s.year+'</span>'+
       '<span style="font-size:.78rem;word-break:break-all">'+(s.email||"")+'<br>'+(s.phone||'<span style="color:var(--mute)">전화 미입력</span>')+'</span>'+
       '<span style="color:'+(s.plan==="none"?"var(--mute)":"var(--gold)")+'">'+cur+'</span><span>'+app+'</span><span>'+btns+'</span></div>'+
@@ -1632,7 +1680,7 @@ function renderApproveList(){
 /* ---- 등록 정보 · 탈퇴 정산 ---- */
 function wonf(n){ return (Math.round(n)||0).toLocaleString("ko-KR")+"원"; }
 function calcSettle(s){
-  const lp=+s.list_price||0, paid=+s.paid_amount||0, term=+s.term_days||0;
+  const lp=+s.list_price||SUB_PRICE, paid=+s.paid_amount||SUB_PRICE, term=+s.term_days||SUB_DAYS;
   const mats=(Array.isArray(s.materials)?s.materials:[]).filter(m=>m&&m.name);
   const matSum=mats.reduce((a,m)=>a+(+m.amount||0),0);
   const until=s.withdraw_requested_at?new Date(s.withdraw_requested_at):new Date();
@@ -1726,6 +1774,7 @@ async function approveSingle(id){
   renderAdmin();
 }
 async function renderAdmin(){
+  await loadSubs();
   // ---- Supabase students 테이블(실등록) + 시연용 rosterSeed ----
   let real=[];
   try{
@@ -2130,7 +2179,7 @@ async function loadEngineHtml(k){
 function engineErrorMsg(k,err){
   const tierOf=(ENGINE_META[k]||{}).p||'';
   if(tierOf.indexOf('engine/admin/')===0) return '관리자 계정으로만 열 수 있습니다';
-  if(tierOf.indexOf('engine/paid/')===0) return '수강 신청·승인 후 이용할 수 있습니다';
+  if(tierOf.indexOf('engine/paid/')===0) return (user&&subState(user).kind==="expired")?'이용 기간이 만료되었습니다 — 1개월 이용권을 신청해 주세요':'무료 체험 또는 이용권으로 열 수 있습니다 — 회원가입 후 7일 무료';
   return '로그인 후 이용할 수 있습니다';
 }
 /* ── 엔진 데이터 선적재: sel/case는 열기 전에 문항·학생상태·관리자설정을 받아 엔진 안에 넣어줌 ── */
@@ -2139,11 +2188,12 @@ async function preloadEngineData(k){
   const kind=DATA_ENGINES[k]; if(!kind) return null;
   let uid=null; try{ const {data}=await sb.auth.getUser(); uid=data&&data.user?data.user.id:null; }catch(e){}
   let tok=null; try{ const {data}=await sb.auth.getSession(); tok=data&&data.session?data.session.access_token:null; }catch(e){}
-  const out={engine:k, isAdmin:!!(user&&user.admin), userId:uid, subj:(window.matchSubject||window.userSubj||null), sbUrl:SB_URL, sbKey:SB_KEY, token:tok,
+  const ec=(k==="sel"||k==="case")?(window.engCat||{}):{}; const bank=ec.bank||null; const stateEngine=bank?(k+"__"+bank):k;
+  const out={engine:k, stateEngine:stateEngine, bank:bank, laws:ec.laws||null, mode:ec.mode||"single", isAdmin:!!(user&&user.admin), userId:uid, subj:(ec.laws&&ec.laws.length===1?ec.laws[0]:(window.matchSubject||window.userSubj||null)), sbUrl:SB_URL, sbKey:SB_KEY, token:tok,
              user:{name:(user&&user.name)||'', plan:(user&&user.plan)||'none'}, items:[], state:{}, config:{}};
-  try{ const r=await sb.from('items').select('id,subj,kind,ord,content,free').eq('kind',kind).order('ord'); if(!r.error&&r.data) out.items=r.data; }catch(e){}
-  if(uid){ try{ const r=await sb.from('engine_state').select('state').eq('engine',k).eq('user_id',uid).maybeSingle(); if(!r.error&&r.data&&r.data.state) out.state=r.data.state; }catch(e){} }
-  try{ const r=await sb.from('engine_config').select('key,value').eq('engine',k); if(!r.error&&r.data) r.data.forEach(row=>{ out.config[row.key]=row.value; }); }catch(e){}
+  try{ const r=await sb.from('items').select('id,subj,kind,ord,content,free,bank').eq('kind',kind).order('ord'); if(!r.error&&r.data){ out.items=bank?r.data.filter(it=>it.bank===bank||(it.bank==null&&SUBJ2BANK[it.subj]===bank)):r.data; } }catch(e){}
+  if(uid){ try{ const r=await sb.from('engine_state').select('state').eq('engine',stateEngine).eq('user_id',uid).maybeSingle(); if(!r.error&&r.data&&r.data.state) out.state=r.data.state; }catch(e){} }
+  try{ const r=await sb.from('engine_config').select('key,value').eq('engine',stateEngine); if(!r.error&&r.data) r.data.forEach(row=>{ out.config[row.key]=row.value; }); }catch(e){}
   if(k==='score'){
     out.feedback=[]; out.students=[];
     if(uid){ try{ const r=await sb.from('feedback').select('id,user_id,set_id,data,created_at').not('data','is',null); if(!r.error&&r.data) out.feedback=r.data; }catch(e){} }
@@ -2162,7 +2212,7 @@ async function prepareEngine(k){
 }
 async function openEngine(k){
   const e=ENGINE_META[k];if(!e)return;
-  if(user&&user.demo&&e.p.indexOf('engine/paid/')===0){ toast("둘러보기에서는 열리지 않습니다 — 회원가입 후 수강 신청·승인을 받으면 이용할 수 있습니다"); return; }
+  if(user&&user.demo&&e.p.indexOf('engine/paid/')===0){ toast("둘러보기에서는 열리지 않습니다 — 회원가입하면 7일 무료 체험이 시작됩니다"); return; }
   document.getElementById("engtitle").textContent=e.t;
   const fr=document.getElementById("engframe");
   fr.srcdoc='<div style="font-family:sans-serif;color:#9db0cf;padding:40px;text-align:center">학습엔진을 불러오는 중…</div>';
